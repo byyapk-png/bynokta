@@ -85,6 +85,31 @@
             margin: 10px 0;
         }
 
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .nav-tabs a {
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .nav-tabs a.tab-cark {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .nav-tabs a.tab-frekans {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+        }
+        .nav-tabs a.tab-frekans:hover {
+            background: rgba(102, 126, 234, 0.35);
+        }
+
         h1 {
             text-align: center;
             color: #667eea;
@@ -659,6 +684,10 @@
     <div class="gold-coin coin6">🪙</div>
     
     <div class="container">
+        <nav class="nav-tabs">
+            <a href="index.html" class="tab-cark">🎰 Çarkıfelek</a>
+            <a href="frekans.html" class="tab-frekans">📻 Frekans</a>
+        </nav>
         <h1>🎰 ByNoKTa Çarkıfelek 🎰</h1>
         <p class="subtitle">⭐ Altın Günü Özel ⭐</p>
 
@@ -705,6 +734,18 @@
         let winners = [];
         const canvas = document.getElementById('wheelCanvas');
         const ctx = canvas.getContext('2d');
+
+        // Gizli sekme / mobil: ses ancak kullanıcı tıkladıktan sonra çalışır
+        let audioContext = null;
+        function getAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            return audioContext;
+        }
         
         const colors = [
             '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', 
@@ -914,20 +955,20 @@
 
         function playAddSound() {
             try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
+                const ctx = getAudioContext();
+                const oscillator = ctx.createOscillator();
+                const gainNode = ctx.createGain();
                 
                 oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
+                gainNode.connect(ctx.destination);
                 
                 oscillator.frequency.value = 800;
                 oscillator.type = 'sine';
-                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
                 
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.1);
+                oscillator.start(ctx.currentTime);
+                oscillator.stop(ctx.currentTime + 0.1);
             } catch (e) {
                 console.log('Ses çalınamadı:', e);
             }
@@ -1011,27 +1052,23 @@
         }
 
         let tickInterval;
-        let audioContext;
 
         function playTickSound() {
             try {
-                if (!audioContext) {
-                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
+                const ctx = getAudioContext();
+                const oscillator = ctx.createOscillator();
+                const gainNode = ctx.createGain();
                 
                 oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
+                gainNode.connect(ctx.destination);
                 
                 oscillator.frequency.value = 800;
                 oscillator.type = 'square';
-                gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
+                gainNode.gain.setValueAtTime(0.15, ctx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
                 
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.05);
+                oscillator.start(ctx.currentTime);
+                oscillator.stop(ctx.currentTime + 0.05);
             } catch (e) {
                 console.log('Ses çalınamadı:', e);
             }
@@ -1098,23 +1135,22 @@
 
         function playCelebrationSound() {
             try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                
+                const ctx = getAudioContext();
                 for (let i = 0; i < 3; i++) {
                     setTimeout(() => {
-                        const oscillator = audioContext.createOscillator();
-                        const gainNode = audioContext.createGain();
+                        const oscillator = ctx.createOscillator();
+                        const gainNode = ctx.createGain();
                         
                         oscillator.connect(gainNode);
-                        gainNode.connect(audioContext.destination);
+                        gainNode.connect(ctx.destination);
                         
                         oscillator.frequency.value = 800 + i * 200;
                         oscillator.type = 'sine';
-                        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                        gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
                         
-                        oscillator.start(audioContext.currentTime);
-                        oscillator.stop(audioContext.currentTime + 0.3);
+                        oscillator.start(ctx.currentTime);
+                        oscillator.stop(ctx.currentTime + 0.3);
                     }, i * 100);
                 }
             } catch (e) {

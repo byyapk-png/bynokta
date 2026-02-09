@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frekans - ByNoKTa</title>
+    <base href="./">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { min-height: 100%; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 10px;
+            position: relative;
+            color: #333;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+            margin: 10px 0;
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .nav-tabs a {
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .nav-tabs a.tab-cark {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+        }
+        .nav-tabs a.tab-cark:hover {
+            background: rgba(102, 126, 234, 0.35);
+        }
+        .nav-tabs a.tab-frekans {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 2em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #764ba2;
+            margin-bottom: 24px;
+            font-size: 1.1em;
+        }
+        .frekans-block {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border-left: 4px solid #667eea;
+        }
+        .frekans-block h3 {
+            color: #764ba2;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        .frekans-block p {
+            color: #333;
+            line-height: 1.6;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 16px; }
+            h1 { font-size: 1.5em; }
+            .nav-tabs a { padding: 8px 14px; font-size: 0.95em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="nav-tabs">
+            <a href="index.html" class="tab-cark">&#127918; Çarkıfelek</a>
+            <a href="frekans.html" class="tab-frekans">&#128251; Frekans</a>
+        </nav>
+        <h1>&#128251; Frekans</h1>
+        <p class="subtitle">ByNoKTa – Aynı adres, bu sekme</p>
+
+        <div class="frekans-block">
+            <h3>Ne zaman, hangi gün?</h3>
+            <p>Buraya toplantı frekansınızı veya tarih bilgisini yazabilirsiniz. (Örn: Her ayın ilk pazarı, ayda bir, vb.)</p>
+        </div>
+        <div class="frekans-block">
+            <h3>İletişim / Adres</h3>
+            <p>Buraya iletişim veya adres bilgisi ekleyebilirsiniz.</p>
+        </div>
+    </div>
+</body>
+</html>
