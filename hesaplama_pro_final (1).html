@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ByNoKTa Pro - Finansal Kontrol</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0a0e27;
+            --card: #151932;
+            --accent: #6366f1;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text: #f1f5f9;
+            --text-dim: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        [data-theme="light"] {
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --text: #0f172a;
+            --text-dim: #64748b;
+            --border: rgba(15, 23, 42, 0.08);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .theme-btn {
+            padding: 8px 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .theme-btn:hover {
+            border-color: var(--accent);
+        }
+
+        /* Main Container */
+        .main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 12px;
+            padding: 12px;
+        }
+
+        /* Left Panel */
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Income Bar */
+        .income-bar {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 10px;
+        }
+
+        .income-card, .month-card {
+            background: var(--card);
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .income-card {
+            border-left: 3px solid var(--success);
+        }
+
+        .month-card {
+            border-left: 3px solid var(--accent);
+        }
+
+        .card-label {
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text);
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+        }
+
+        .income-input, .month-select {
+            flex: 1;
+            padding: 8px;
+            font-size: 20px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            text-align: center;
+        }
+
+        .income-input:focus, .month-select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* Categories */
+        .categories {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .category-title {
+            font-size: 15px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 12px 16px;
+            background: var(--card);
+            border-radius: 10px;
+            border-left: 4px solid var(--accent);
+            margin-bottom: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .expense-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .expense-card {
+            background: var(--card);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .expense-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--card-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .expense-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--card-color);
+            border-radius: 8px 8px 0 0;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .expense-card:hover::before {
+            opacity: 1;
+        }
+
+        .expense-percent {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            font-size: 9px;
+            font-weight: 900;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 2px 5px;
+            background: var(--bg);
+            border-radius: 4px;
+            color: var(--card-color);
+            border: 1px solid var(--card-color);
+        }
+
+        .expense-label {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            color: var(--text);
+            padding-right: 35px;
+            letter-spacing: 0.3px;
+            line-height: 1.3;
+        }
+
+        .expense-input {
+            width: 100%;
+            padding: 6px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            color: var(--text);
+            text-align: center;
+        }
+
+        .expense-input:focus {
+            outline: none;
+            border-color: var(--card-color);
+        }
+
+        /* Right Panel */
+        .right-panel {
+            background: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 73px;
+            height: fit-content;
+            max-height: calc(100vh - 85px);
+        }
+
+        .panel-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding: 8px 0;
+        }
+
+        /* Chart */
+        .chart-container {
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 12px;
+        }
+
+        .chart {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(var(--border) 0% 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+
+        .chart-inner {
+            width: 120px;
+            height: 120px;
+            background: var(--card);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chart-percentage {
+            font-size: 32px;
+            font-weight: 900;
+            font-family: 'JetBrains Mono', monospace;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+
+        .chart-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        /* Summary */
+        .summary {
+            background: var(--bg);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .summary-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .summary-label {
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text);
+            letter-spacing: 0.5px;
+        }
+
+        .summary-value {
+            font-size: 18px;
+            font-weight: 900;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .stat {
+            background: var(--bg);
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 900;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 2px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text);
+            letter-spacing: 0.5px;
+        }
+
+        /* Legend */
+        .legend {
+            flex: 1;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            padding-right: 4px;
+            margin-bottom: 12px;
+            max-height: 250px;
+        }
+
+        .legend::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .legend::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .legend::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 9px;
+            font-weight: 600;
+            padding: 6px;
+            background: var(--bg);
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .legend-item:hover {
+            transform: translateX(2px);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        /* Export Button */
+        .export-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Responsive - Tablet */
+        @media (max-width: 1024px) {
+            .main {
+                grid-template-columns: 1fr;
+            }
+
+            .right-panel {
+                position: relative;
+                top: 0;
+                max-height: none;
+            }
+
+            .expense-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Responsive - Mobile */
+        @media (max-width: 768px) {
+            .header {
+                padding: 10px 15px;
+            }
+
+            .logo {
+                font-size: 16px;
+            }
+
+            .theme-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .main {
+                padding: 10px;
+                gap: 10px;
+            }
+
+            .income-bar {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .income-input, .month-select {
+                font-size: 18px;
+            }
+
+            .expense-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .category-title {
+                font-size: 13px;
+                padding: 10px 12px;
+            }
+
+            .expense-card {
+                padding: 8px;
+            }
+
+            .expense-label {
+                font-size: 10px;
+                padding-right: 28px;
+            }
+
+            .expense-input {
+                font-size: 14px;
+                padding: 5px;
+            }
+
+            .expense-percent {
+                font-size: 8px;
+                padding: 2px 4px;
+                top: 4px;
+                right: 4px;
+            }
+
+            .chart-container {
+                width: 140px;
+                height: 140px;
+            }
+
+            .chart-inner {
+                width: 105px;
+                height: 105px;
+            }
+
+            .chart-percentage {
+                font-size: 28px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .stat-value {
+                font-size: 14px;
+            }
+
+            .stat-label {
+                font-size: 8px;
+            }
+
+            .summary-value {
+                font-size: 16px;
+            }
+
+            .legend {
+                grid-template-columns: 1fr;
+                max-height: 180px;
+            }
+
+            .export-btn {
+                padding: 12px;
+                font-size: 12px;
+            }
+        }
+
+        /* Responsive - Small Mobile */
+        @media (max-width: 480px) {
+            .expense-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .income-card, .month-card {
+                padding: 10px 12px;
+            }
+
+            .card-label {
+                font-size: 10px;
+            }
+
+            .income-input, .month-select {
+                font-size: 16px;
+            }
+        }
+
+        @media print {
+            .theme-btn, .export-btn { display: none; }
+            body { background: white; color: black; }
+            .right-panel { position: relative; top: 0; }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <span>💰</span>
+            <span>ByNoKTa Pro</span>
+        </div>
+        <button class="theme-btn" onclick="toggleTheme()">
+            <span id="theme-icon">☀️</span>
+            <span id="theme-text">Aydınlık</span>
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+        <!-- Left Panel -->
+        <div class="left-panel">
+            <!-- Income Bar -->
+            <div class="income-bar">
+                <div class="income-card">
+                    <span class="card-label">💵 Gelir</span>
+                    <input type="number" id="ana-gelir" class="income-input" placeholder="0" oninput="hesapla()">
+                </div>
+                <div class="month-card">
+                    <span class="card-label">📅 Dönem</span>
+                    <select id="secili-ay" class="month-select" onchange="hesapla()">
+                        <option>Ocak</option>
+                        <option>Şubat</option>
+                        <option>Mart</option>
+                        <option>Nisan</option>
+                        <option>Mayıs</option>
+                        <option>Haziran</option>
+                        <option>Temmuz</option>
+                        <option>Ağustos</option>
+                        <option>Eylül</option>
+                        <option>Ekim</option>
+                        <option>Kasım</option>
+                        <option>Aralık</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="categories">
+                <!-- Category 1 -->
+                <div>
+                    <div class="category-title">💳 Kartlar & Ticari</div>
+                    <div class="expense-grid">
+                        <div class="expense-card" data-color="#9b59b6">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Halkbank Kart</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#8e44ad">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Yapı Kredi</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#2c3e50">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Finans Ticari</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#34495e">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Finans Bireysel</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#2980b9">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Denizbank</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#16a085">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Vakıfbank</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#27ae60">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Garanti</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#fdcb6e">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Faiz</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category 2 -->
+                <div>
+                    <div class="category-title">🏦 Krediler & Özel</div>
+                    <div class="expense-grid">
+                        <div class="expense-card" data-color="#e67e22">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Halkbank Bir.</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#d35400">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Halkbank Tic.</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#f39c12">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">YKB Kredi</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#f1c40f">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Finans Kredi</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#e74c3c">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Deniz Kredi</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#c0392b">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Vakıf Kredi</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#e84393">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Garanti Kredi</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#6c5ce7">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Altın Günü</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category 3 -->
+                <div>
+                    <div class="category-title">🏠 İşletme & Yaşam</div>
+                    <div class="expense-grid">
+                        <div class="expense-card" data-color="#1abc9c">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Dükkan/Kira</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#00cec9">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Araba/Yakıt</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#fab1a0">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Mutfak/Gıda</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#ffeaa7">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Elektrik</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#74b9ff">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Su</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#a29bfe">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Doğalgaz</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#95a5a6">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">İnternet/Tel</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                        <div class="expense-card" data-color="#e17055">
+                            <span class="expense-percent">%0</span>
+                            <div class="expense-label">Eğitim/Diğer</div>
+                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="right-panel">
+            <div class="panel-title">📊 Analiz</div>
+
+            <!-- Stats -->
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="stat-items">0</div>
+                    <div class="stat-label">Aktif</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="stat-avg">0₺</div>
+                    <div class="stat-label">Ortalama</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="stat-highest">0₺</div>
+                    <div class="stat-label">En Yüksek</div>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="chart-container">
+                <div class="chart" id="chart">
+                    <div class="chart-inner">
+                        <div class="chart-percentage" id="chart-percentage">%100</div>
+                        <div class="chart-label" id="chart-label">KALAN</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="summary">
+                <div class="summary-row">
+                    <span class="summary-label">Gelir</span>
+                    <span class="summary-value" id="summary-income" style="color: var(--success)">0₺</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Gider</span>
+                    <span class="summary-value" id="summary-expense" style="color: var(--danger)">0₺</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Bakiye</span>
+                    <span class="summary-value" id="summary-balance">0₺</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend" id="legend"></div>
+
+            <!-- Export -->
+            <button class="export-btn" onclick="window.print()">
+                <span>📄</span>
+                <span>PDF Kaydet</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const current = body.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', next);
+            document.getElementById('theme-icon').textContent = next === 'light' ? '🌙' : '☀️';
+            document.getElementById('theme-text').textContent = next === 'light' ? 'Koyu' : 'Aydınlık';
+            localStorage.setItem('bynokta_theme', next);
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('tr-TR', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value) + '₺';
+        }
+
+        function hesapla() {
+            const gelir = parseFloat(document.getElementById('ana-gelir').value) || 0;
+            const inputs = document.querySelectorAll('.gider-input');
+            
+            let totalExpense = 0;
+            let gradientParts = [];
+            let currentPos = 0;
+            let legendHtml = "";
+            const savedData = [];
+            const expenseItems = [];
+
+            inputs.forEach(input => {
+                const val = parseFloat(input.value) || 0;
+                const card = input.closest('.expense-card');
+                const label = card.querySelector('.expense-label').textContent;
+                const color = card.getAttribute('data-color');
+                const percentSpan = card.querySelector('.expense-percent');
+                
+                totalExpense += val;
+                savedData.push(input.value);
+
+                if (val > 0) {
+                    expenseItems.push({ label, value: val, color });
+                }
+
+                if (gelir > 0 && val > 0) {
+                    const itemPercent = (val / gelir) * 100;
+                    percentSpan.textContent = `%${itemPercent.toFixed(1)}`;
+                    percentSpan.style.color = color;
+                    percentSpan.style.borderColor = color;
+                    
+                    gradientParts.push(`${color} ${currentPos}% ${currentPos + itemPercent}%`);
+                    currentPos += itemPercent;
+                    
+                    legendHtml += `
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: ${color}"></div>
+                            <span>${label}: %${itemPercent.toFixed(1)}</span>
+                        </div>
+                    `;
+                } else {
+                    percentSpan.textContent = '%0';
+                    percentSpan.style.color = 'var(--text-dim)';
+                    percentSpan.style.borderColor = 'var(--border)';
+                }
+
+                card.style.setProperty('--card-color', color);
+            });
+
+            // Stats
+            const activeItems = expenseItems.length;
+            const avgExpense = activeItems > 0 ? totalExpense / activeItems : 0;
+            const highestExpense = activeItems > 0 ? Math.max(...expenseItems.map(item => item.value)) : 0;
+
+            document.getElementById('stat-items').textContent = activeItems;
+            document.getElementById('stat-avg').textContent = formatCurrency(avgExpense);
+            document.getElementById('stat-highest').textContent = formatCurrency(highestExpense);
+
+            // Balance
+            const balance = gelir - totalExpense;
+            const remainingPercent = gelir > 0 ? Math.max(0, (balance / gelir) * 100) : 100;
+
+            // Summary
+            document.getElementById('summary-income').textContent = formatCurrency(gelir);
+            document.getElementById('summary-expense').textContent = formatCurrency(totalExpense);
+            
+            const balanceEl = document.getElementById('summary-balance');
+            balanceEl.textContent = formatCurrency(balance);
+            balanceEl.style.color = balance >= 0 ? 'var(--success)' : 'var(--danger)';
+
+            // Chart
+            const chartPercentage = document.getElementById('chart-percentage');
+            const chartLabel = document.getElementById('chart-label');
+            const chart = document.getElementById('chart');
+
+            chartPercentage.textContent = `%${remainingPercent.toFixed(1)}`;
+
+            if (balance < 0) {
+                chart.style.background = `conic-gradient(var(--danger) 0% 100%)`;
+                chartLabel.textContent = 'AŞILDI';
+                chartLabel.style.color = 'var(--danger)';
+                chartPercentage.style.background = 'linear-gradient(135deg, var(--danger), #c0392b)';
+                chartPercentage.style.webkitBackgroundClip = 'text';
+                chartPercentage.style.webkitTextFillColor = 'transparent';
+            } else {
+                if (remainingPercent < 100) {
+                    gradientParts.push(`var(--border) ${currentPos}% 100%`);
+                }
+                chart.style.background = `conic-gradient(${gradientParts.join(', ')})`;
+                chartLabel.textContent = 'KALAN';
+                chartLabel.style.color = 'var(--text-dim)';
+                chartPercentage.style.background = 'linear-gradient(135deg, var(--accent), #8b5cf6)';
+                chartPercentage.style.webkitBackgroundClip = 'text';
+                chartPercentage.style.webkitTextFillColor = 'transparent';
+            }
+
+            // Legend
+            document.getElementById('legend').innerHTML = legendHtml;
+
+            // Save
+            localStorage.setItem('bynokta_gelir', gelir);
+            localStorage.setItem('bynokta_ay', document.getElementById('secili-ay').value);
+            localStorage.setItem('bynokta_giderler', JSON.stringify(savedData));
+        }
+
+        window.onload = function() {
+            const theme = localStorage.getItem('bynokta_theme') || 'dark';
+            if (theme === 'light') {
+                document.body.setAttribute('data-theme', 'light');
+                document.getElementById('theme-icon').textContent = '🌙';
+                document.getElementById('theme-text').textContent = 'Koyu';
+            }
+
+            const savedIncome = localStorage.getItem('bynokta_gelir');
+            const savedMonth = localStorage.getItem('bynokta_ay');
+            const savedExpenses = JSON.parse(localStorage.getItem('bynokta_giderler'));
+
+            if (savedIncome) document.getElementById('ana-gelir').value = savedIncome;
+            if (savedMonth) document.getElementById('secili-ay').value = savedMonth;
+            if (savedExpenses) {
+                const inputs = document.querySelectorAll('.gider-input');
+                savedExpenses.forEach((value, index) => {
+                    if (inputs[index]) inputs[index].value = value;
+                });
+            }
+
+            hesapla();
+        };
+    </script>
+</body>
+</html>
