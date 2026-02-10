@@ -53,6 +53,39 @@
             z-index: 100;
         }
 
+        /* Site sekmeleri (Çarkıfelek / Frekans / Hesaplama) */
+        .top-nav {
+            display: flex;
+            gap: 8px;
+            padding: 8px 20px;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .top-nav a {
+            padding: 6px 14px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-dim);
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .top-nav a:hover {
+            color: var(--text);
+            border-color: var(--accent);
+        }
+
+        .top-nav a.active {
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            color: #0f172a;
+            border-color: transparent;
+        }
+
         .logo {
             display: flex;
             align-items: center;
@@ -628,6 +661,12 @@
         </button>
     </div>
 
+    <nav class="top-nav">
+        <a href="index.html">🎰 Çarkıfelek</a>
+        <a href="frekans.html">📻 Frekans</a>
+        <a href="hesaplama.html" class="active">📊 Hesaplama Pro</a>
+    </nav>
+
     <!-- Main Content -->
     <div class="main">
         <!-- Left Panel -->
@@ -659,95 +698,75 @@
 
             <!-- Categories -->
             <div class="categories">
-                <!-- Category 1 -->
+                <!-- Category 1: Kredi Kartları - 6 büyük banka -->
                 <div>
-                    <div class="category-title">💳 Kartlar & Ticari</div>
+                    <div class="category-title">💳 Kredi Kartları - 6 Büyük Banka</div>
                     <div class="expense-grid">
                         <div class="expense-card" data-color="#9b59b6">
                             <span class="expense-percent">%0</span>
-                            <div class="expense-label">Halkbank Kart</div>
+                            <div class="expense-label">Ziraat Kart</div>
                             <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
                         </div>
                         <div class="expense-card" data-color="#8e44ad">
                             <span class="expense-percent">%0</span>
-                            <div class="expense-label">Yapı Kredi</div>
+                            <div class="expense-label">Halkbank Kart</div>
                             <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
                         </div>
                         <div class="expense-card" data-color="#2c3e50">
                             <span class="expense-percent">%0</span>
-                            <div class="expense-label">Finans Ticari</div>
-                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
-                        </div>
-                        <div class="expense-card" data-color="#34495e">
-                            <span class="expense-percent">%0</span>
-                            <div class="expense-label">Finans Bireysel</div>
+                            <div class="expense-label">Vakıfbank Kart</div>
                             <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
                         </div>
                         <div class="expense-card" data-color="#2980b9">
                             <span class="expense-percent">%0</span>
-                            <div class="expense-label">Denizbank</div>
-                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
-                        </div>
-                        <div class="expense-card" data-color="#16a085">
-                            <span class="expense-percent">%0</span>
-                            <div class="expense-label">Vakıfbank</div>
+                            <div class="expense-label">İş Bankası Kart</div>
                             <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
                         </div>
                         <div class="expense-card" data-color="#27ae60">
                             <span class="expense-percent">%0</span>
-                            <div class="expense-label">Garanti</div>
+                            <div class="expense-label">Garanti Kart</div>
                             <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
                         </div>
-                        <div class="expense-card" data-color="#fdcb6e">
+                        <div class="expense-card" data-color="#16a085">
                             <span class="expense-percent">%0</span>
-                            <div class="expense-label">Faiz</div>
+                            <div class="expense-label">Yapı Kredi Kart</div>
                             <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
                         </div>
                     </div>
                 </div>
 
-                <!-- Category 2 -->
+                <!-- Category 2: Krediler - 6 büyük banka -->
                 <div>
-                    <div class="category-title">🏦 Krediler & Özel</div>
+                    <div class="category-title">🏦 Krediler - 6 Büyük Banka</div>
                     <div class="expense-grid">
                         <div class="expense-card" data-color="#e67e22">
                             <span class="expense-percent">%0</span>
-                            <div class="expense-label">Halkbank Bir.</div>
+                            <div class="expense-label">Ziraat Kredi</div>
                             <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
                         </div>
                         <div class="expense-card" data-color="#d35400">
                             <span class="expense-percent">%0</span>
-                            <div class="expense-label">Halkbank Tic.</div>
+                            <div class="expense-label">Halkbank Kredi</div>
                             <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
                         </div>
                         <div class="expense-card" data-color="#f39c12">
                             <span class="expense-percent">%0</span>
-                            <div class="expense-label">YKB Kredi</div>
+                            <div class="expense-label">Vakıfbank Kredi</div>
                             <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
                         </div>
                         <div class="expense-card" data-color="#f1c40f">
                             <span class="expense-percent">%0</span>
-                            <div class="expense-label">Finans Kredi</div>
+                            <div class="expense-label">İş Bankası Kredi</div>
                             <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
                         </div>
                         <div class="expense-card" data-color="#e74c3c">
                             <span class="expense-percent">%0</span>
-                            <div class="expense-label">Deniz Kredi</div>
+                            <div class="expense-label">Garanti Kredi</div>
                             <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
                         </div>
                         <div class="expense-card" data-color="#c0392b">
                             <span class="expense-percent">%0</span>
-                            <div class="expense-label">Vakıf Kredi</div>
-                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
-                        </div>
-                        <div class="expense-card" data-color="#e84393">
-                            <span class="expense-percent">%0</span>
-                            <div class="expense-label">Garanti Kredi</div>
-                            <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
-                        </div>
-                        <div class="expense-card" data-color="#6c5ce7">
-                            <span class="expense-percent">%0</span>
-                            <div class="expense-label">Altın Günü</div>
+                            <div class="expense-label">Yapı Kredi Kredisi</div>
                             <input type="number" class="expense-input gider-input" placeholder="0" oninput="hesapla()">
                         </div>
                     </div>
