@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ByNoKTa Çarkıfelek</title>
+    <title>Altın Günü Çekiliş</title>
     <style>
         * {
             margin: 0;
@@ -85,31 +85,18 @@
             margin: 10px 0;
         }
 
-        .nav-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-        .nav-tabs a {
-            padding: 10px 20px;
-            border-radius: 10px;
+        /* Geri Dön Butonu */
+        .back-link {
+            display: inline-block;
             text-decoration: none;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-        .nav-tabs a.tab-cark {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        .nav-tabs a.tab-frekans,
-        .nav-tabs a.tab-hesaplama {
-            background: rgba(102, 126, 234, 0.2);
             color: #667eea;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            transition: color 0.2s;
         }
-        .nav-tabs a.tab-frekans:hover,
-        .nav-tabs a.tab-hesaplama:hover {
-            background: rgba(102, 126, 234, 0.35);
+        .back-link:hover {
+            color: #764ba2;
         }
 
         h1 {
@@ -686,13 +673,10 @@
     <div class="gold-coin coin6">🪙</div>
     
     <div class="container">
-        <nav class="nav-tabs">
-            <a href="index.html" class="tab-cark">🎰 Çarkıfelek</a>
-            <a href="frekans.html" class="tab-frekans">📻 Frekans</a>
-            <a href="hesaplama.html" class="tab-hesaplama">📊 Hesaplama Pro</a>
-        </nav>
-        <h1>🎰 ByNoKTa Çarkıfelek 🎰</h1>
-        <p class="subtitle">⭐ Altın Günü Özel ⭐</p>
+        <a href="index.html" class="back-link">← Ana Sayfaya Dön</a>
+
+        <h1>🎰 Altın Günü Çekiliş 🎰</h1>
+        <p class="subtitle">⭐ ByNoKTa Özel ⭐</p>
 
         <div class="input-section">
             <input type="text" id="nameInput" placeholder="İsim girin ve Ekle'ye basın...">
