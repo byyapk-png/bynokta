@@ -3,1293 +3,253 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ByNoKTa Çarkıfelek</title>
+    <title>ByNoKTa Portal - Ana Sayfa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;900&family=JetBrains+Mono:wght@500;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg: #06080f;
+            --card: #111627;
+            --card-hover: #1a2138;
+            --text: #f0f0f8;
+            --text-dim: #8892b0;
+            --accent-cark: #e056fd; /* Çarkıfelek Rengi */
+            --accent-freq: #00f0ff; /* Frekans Rengi */
+            --accent-calc: #00b894; /* Hesaplama Rengi */
+            --border: rgba(255, 255, 255, 0.08);
+            --glow: rgba(108, 92, 231, 0.2);
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            padding: 10px;
-            position: relative;
+            justify-content: center;
             overflow-x: hidden;
+            position: relative;
         }
 
+        /* Arkaplan Animasyonu (Hesaplama Pro'dan alındı) */
         body::before {
             content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 90% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(224, 86, 253, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(0, 240, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 60% 80%, rgba(0, 184, 148, 0.05) 0%, transparent 50%);
+            animation: drift 20s ease-in-out infinite;
             pointer-events: none;
             z-index: 0;
         }
 
-        .gold-coin {
-            position: fixed;
-            font-size: 60px;
-            opacity: 0.15;
-            pointer-events: none;
-            z-index: 0;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(10deg); }
-        }
-
-        .coin1 { top: 10%; left: 5%; animation-delay: 0s; }
-        .coin2 { top: 15%; right: 8%; animation-delay: 1s; font-size: 45px; }
-        .coin3 { top: 60%; left: 3%; animation-delay: 2s; font-size: 50px; }
-        .coin4 { top: 70%; right: 5%; animation-delay: 3s; }
-        .coin5 { top: 35%; left: 8%; animation-delay: 1.5s; font-size: 40px; }
-        .coin6 { top: 45%; right: 10%; animation-delay: 2.5s; font-size: 55px; }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 5px;
-            }
-            
-            .gold-coin {
-                font-size: 30px;
-            }
-            
-            .coin2, .coin5 { font-size: 25px; }
-            .coin3, .coin6 { font-size: 28px; }
+        @keyframes drift {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(2%, -1%); }
         }
 
         .container {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 800px;
-            width: 100%;
             position: relative;
             z-index: 1;
-            margin: 10px 0;
-        }
-
-        .nav-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-        .nav-tabs a {
-            padding: 10px 20px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-        .nav-tabs a.tab-cark {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        .nav-tabs a.tab-frekans,
-        .nav-tabs a.tab-hesaplama {
-            background: rgba(102, 126, 234, 0.2);
-            color: #667eea;
-        }
-        .nav-tabs a.tab-frekans:hover,
-        .nav-tabs a.tab-hesaplama:hover {
-            background: rgba(102, 126, 234, 0.35);
-        }
-
-        h1 {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
             text-align: center;
-            color: #667eea;
-            margin-bottom: 5px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .logo-area {
+            margin-bottom: 50px;
+            animation: fadeDown 0.8s ease-out;
+        }
+
+        .main-logo {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
         }
 
         .subtitle {
-            text-align: center;
-            color: #764ba2;
-            margin-bottom: 20px;
-            font-size: 1.2em;
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: 1px;
         }
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-                border-radius: 15px;
-            }
-            
-            h1 {
-                font-size: 1.8em;
-                margin-bottom: 3px;
-            }
-            
-            .subtitle {
-                font-size: 1em;
-                margin-bottom: 15px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 1.5em;
-            }
-            
-            .subtitle {
-                font-size: 0.9em;
-            }
-        }
-
-        .wheel-container {
-            position: relative;
-            margin: 30px auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        @media (max-width: 768px) {
-            .wheel-container {
-                position: sticky;
-                top: 10px;
-                z-index: 100;
-                background: white;
-                border-radius: 50%;
-                padding: 10px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                margin: 20px auto;
-            }
-        }
-
-        #wheelCanvas {
-            border-radius: 50%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-        }
-
-        .arrow {
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 25px solid #2c3e50;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-            z-index: 10;
-        }
-        
-        .arrow::before {
-            content: '';
-            position: absolute;
-            top: -28px;
-            left: -6px;
-            width: 12px;
-            height: 12px;
-            background: #2c3e50;
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .center-button {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(145deg, #ffd700, #ffed4e);
-            border: 4px solid #fff;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #764ba2;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-            transition: all 0.2s ease;
-            z-index: 10;
-        }
-
-        .center-button:hover:not(:disabled) {
-            transform: translate(-50%, -50%) scale(1.1);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-        }
-
-        .center-button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        .input-section {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        input[type="text"] {
-            flex: 1;
-            min-width: 200px;
-            padding: 12px 20px;
-            border: 2px solid #667eea;
-            border-radius: 10px;
-            font-size: 1em;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        input[type="text"]:focus {
-            border-color: #764ba2;
-            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
-        }
-
-        button {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            white-space: nowrap;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        @media (max-width: 768px) {
-            .input-section {
-                gap: 8px;
-                margin-bottom: 12px;
-            }
-            
-            input[type="text"] {
-                width: 100%;
-                min-width: 100%;
-                padding: 10px 15px;
-                font-size: 0.95em;
-            }
-            
-            button {
-                padding: 10px 18px;
-                font-size: 0.95em;
-            }
-        }
-
-        @media (max-width: 480px) {
-            input[type="text"] {
-                padding: 8px 12px;
-                font-size: 0.9em;
-            }
-            
-            button {
-                padding: 8px 15px;
-                font-size: 0.9em;
-            }
-        }
-
-        .btn-clear {
-            background: linear-gradient(135deg, #ff4757 0%, #e84118 100%) !important;
-        }
-
-        .names-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
             margin-top: 20px;
-            min-height: 50px;
         }
 
-        .name-tag {
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            padding: 8px 16px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.8);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .name-tag span {
-            font-weight: bold;
-            color: #764ba2;
-        }
-
-        .remove-btn {
-            background: #ff4757;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            font-size: 0.8em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-        }
-
-        .winner-announcement {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            text-align: center;
-            display: none;
-            z-index: 1000;
-            animation: popIn 0.5s ease;
-        }
-
-        @keyframes popIn {
-            0% {
-                transform: translate(-50%, -50%) scale(0);
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.1);
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-            }
-        }
-
-        .winner-announcement h2 {
-            color: #667eea;
-            font-size: 2em;
-            margin-bottom: 20px;
-        }
-
-        .winner-announcement .winner-name {
-            color: #ffd700;
-            font-size: 3em;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-            margin-bottom: 20px;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            display: none;
-            z-index: 999;
-        }
-
-        .info-text {
-            text-align: center;
-            color: #666;
-            margin-top: 10px;
-            font-size: 0.9em;
-        }
-
-        .winners-section {
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 3px solid #667eea;
-            display: block !important;
-        }
-
-        .winners-title {
-            text-align: center;
-            color: #667eea;
-            font-size: 1.5em;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-
-        .winners-list {
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .winner-item {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 15px 20px;
-            border-radius: 10px;
-            display: flex;
             align-items: center;
-            gap: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            animation: slideIn 0.3s ease;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
         }
 
-        @media (max-width: 768px) {
-            .winners-section {
-                margin-top: 20px;
-                padding-top: 20px;
-            }
-            
-            .winners-title {
-                font-size: 1.2em;
-                margin-bottom: 15px;
-            }
-            
-            .winners-list {
-                max-height: 250px;
-                gap: 8px;
-            }
-            
-            .winner-item {
-                padding: 10px 12px;
-                gap: 10px;
-                font-size: 0.9em;
-            }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at top right, var(--glow-color), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.4s;
         }
 
-        @media (max-width: 480px) {
-            .winner-item {
-                padding: 8px 10px;
-                gap: 8px;
-                font-size: 0.85em;
-            }
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-color);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+            background: var(--card-hover);
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
+        .card:hover::before { opacity: 0.1; }
 
-        .winner-number {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: 1.1em;
-            flex-shrink: 0;
+            font-size: 36px;
+            border: 1px solid var(--border);
+            transition: transform 0.4s;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }
 
-        .winner-month {
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            color: #764ba2;
-            padding: 5px 15px;
-            border-radius: 15px;
-            font-weight: bold;
-            font-size: 0.9em;
-            flex-shrink: 0;
+        .card:hover .icon-box {
+            transform: scale(1.1) rotate(5deg);
+            background: var(--accent-color);
+            border-color: transparent;
+            color: #000;
+            box-shadow: 0 0 30px var(--glow-color);
         }
 
-        .winner-name-display {
-            flex: 1;
-            color: #333;
-            font-size: 1.1em;
-            font-weight: 600;
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
         }
 
-        @media (max-width: 768px) {
-            .winner-number {
-                width: 32px;
-                height: 32px;
-                font-size: 0.95em;
-            }
-            
-            .winner-month {
-                padding: 4px 10px;
-                font-size: 0.8em;
-            }
-            
-            .winner-name-display {
-                font-size: 0.95em;
-            }
+        .card-desc {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            line-height: 1.6;
         }
 
-        @media (max-width: 480px) {
-            .winner-number {
-                width: 28px;
-                height: 28px;
-                font-size: 0.85em;
-            }
-            
-            .winner-month {
-                padding: 3px 8px;
-                font-size: 0.75em;
-            }
-            
-            .winner-name-display {
-                font-size: 0.9em;
-            }
+        .badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border-radius: 99px;
+            background: rgba(255,255,255,0.05);
+            color: var(--accent-color);
+            border: 1px solid var(--border);
+            font-weight: 700;
         }
 
-        .clear-history-btn {
-            margin-top: 15px;
-            width: 100%;
-            background: #ff4757;
+        /* Kartlara Özel Renkler */
+        .cark { --accent-color: var(--accent-cark); --glow-color: rgba(224, 86, 253, 0.4); }
+        .freq { --accent-color: var(--accent-freq); --glow-color: rgba(0, 240, 255, 0.4); }
+        .calc { --accent-color: var(--accent-calc); --glow-color: rgba(0, 184, 148, 0.4); }
+
+        .footer {
+            margin-top: 60px;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            opacity: 0.6;
         }
 
-        .print-btn {
-            margin-top: 15px;
-            width: 100%;
-            background: linear-gradient(135deg, #27ae60 0%, #219653 100%);
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .print-btn:hover {
-            background: linear-gradient(135deg, #219653 0%, #27ae60 100%);
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .share-btn {
-            margin-top: 15px;
-            width: 100%;
-            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-            display: none;
-        }
-
-        .share-btn:hover {
-            background: linear-gradient(135deg, #128C7E 0%, #25D366 100%);
-        }
+        .grid > *:nth-child(1) { animation: fadeUp 0.6s ease-out 0.1s both; }
+        .grid > *:nth-child(2) { animation: fadeUp 0.6s ease-out 0.2s both; }
+        .grid > *:nth-child(3) { animation: fadeUp 0.6s ease-out 0.3s both; }
 
         @media (max-width: 768px) {
-            .print-btn {
-                display: none !important;
-            }
-            
-            .share-btn {
-                display: block !important;
-            }
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .action-buttons button {
-            flex: 1;
-        }
-
-        @media (max-width: 768px) {
-            .action-buttons {
-                gap: 8px;
-                margin-top: 12px;
-                flex-direction: column;
-            }
-            
-            .action-buttons button {
-                width: 100%;
-            }
-        }
-
-        .empty-winners {
-            text-align: center;
-            color: #999;
-            padding: 40px;
-            font-style: italic;
-        }
-
-        @media print {
-            body {
-                background: white;
-            }
-            
-            .gold-coin {
-                display: none;
-            }
-            
-            .input-section, 
-            .names-list, 
-            .wheel-container, 
-            .action-buttons,
-            .info-text {
-                display: none !important;
-            }
-            
-            .container {
-                box-shadow: none;
-                max-width: 100%;
-            }
-            
-            h1 {
-                color: #667eea !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-            
-            .subtitle {
-                color: #764ba2 !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-            
-            .winners-section {
-                page-break-inside: avoid;
-            }
-            
-            .winner-item {
-                page-break-inside: avoid;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
+            .main-logo { font-size: 2.5rem; }
+            .grid { grid-template-columns: 1fr; max-width: 400px; margin: 20px auto; }
         }
     </style>
 </head>
 <body>
-    <div class="gold-coin coin1">🪙</div>
-    <div class="gold-coin coin2">🥇</div>
-    <div class="gold-coin coin3">🪙</div>
-    <div class="gold-coin coin4">💰</div>
-    <div class="gold-coin coin5">🥇</div>
-    <div class="gold-coin coin6">🪙</div>
-    
+
     <div class="container">
-        <nav class="nav-tabs">
-            <a href="index.html" class="tab-cark">🎰 Çarkıfelek</a>
-            <a href="frekans.html" class="tab-frekans">📻 Frekans</a>
-            <a href="hesaplama.html" class="tab-hesaplama">📊 Hesaplama Pro</a>
-        </nav>
-        <h1>🎰 ByNoKTa Çarkıfelek 🎰</h1>
-        <p class="subtitle">⭐ Altın Günü Özel ⭐</p>
-
-        <div class="input-section">
-            <input type="text" id="nameInput" placeholder="İsim girin ve Ekle'ye basın...">
-            <button id="addBtn" onclick="handleAdd()">➕ Ekle</button>
-            <button id="clearBtn" class="btn-clear" onclick="handleClear()">🗑️ Temizle</button>
+        <div class="logo-area">
+            <h1 class="main-logo">ByNoKTa Portal</h1>
+            <p class="subtitle">Dijital Araçlar & Finansal Çözümler</p>
         </div>
 
-        <p class="info-text">Eklenecek isim sayısı: <strong id="count">0</strong> / 25</p>
+        <div class="grid">
+            <a href="carkifelek.html" class="card cark">
+                <div class="icon-box">🎰</div>
+                <div>
+                    <h2 class="card-title">Çarkıfelek</h2>
+                    <span class="badge">v2.0</span>
+                </div>
+                <p class="card-desc">
+                    Altın günü çekilişleri, şans oyunları ve rastgele seçimler için eğlenceli çark sistemi.
+                </p>
+            </a>
 
-        <div class="names-list" id="namesList"></div>
+            <a href="frekans.html" class="card freq">
+                <div class="icon-box">📻</div>
+                <div>
+                    <h2 class="card-title">Frekans Pro</h2>
+                    <span class="badge">v3.0</span>
+                </div>
+                <p class="card-desc">
+                    Binaural beatler, solfeggio frekansları ve ses terapisi için gelişmiş sinyal üretici.
+                </p>
+            </a>
 
-        <div class="wheel-container">
-            <div class="arrow"></div>
-            <canvas id="wheelCanvas"></canvas>
-            <button class="center-button" id="spinBtn" onclick="spin()" disabled>ÇEVİR!</button>
+            <a href="hesaplama.html" class="card calc">
+                <div class="icon-box">📊</div>
+                <div>
+                    <h2 class="card-title">Hesaplama Pro</h2>
+                    <span class="badge">v3.0 Fix</span>
+                </div>
+                <p class="card-desc">
+                    Gelir-gider takibi, kredi hesaplamaları ve taksit yönetimi için finansal kontrol merkezi.
+                </p>
+            </a>
         </div>
 
-        <div class="winners-section" id="winnersSection">
-            <h3 class="winners-title">🏆 Kazananlar Listesi 🏆</h3>
-            <div class="winners-list" id="winnersList"></div>
-            <div class="action-buttons">
-                <button class="print-btn" onclick="printWinners()">🖨️ Yazdır</button>
-                <button class="share-btn" onclick="shareWinners()">📤 Paylaş</button>
-                <button class="print-btn" onclick="downloadPDF()">📄 PDF İndir</button>
-                <button class="clear-history-btn" onclick="clearHistory()">🗑️ Temizle</button>
-            </div>
+        <div class="footer">
+            &copy; 2026 ByNoKTa Software. Tüm hakları saklıdır.
         </div>
     </div>
 
-    <div class="overlay" id="overlay"></div>
-    <div class="winner-announcement" id="winnerBox">
-        <h2>🎉 Tebrikler! 🎉</h2>
-        <div class="winner-name" id="winnerName"></div>
-        <div style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #764ba2; padding: 10px 25px; border-radius: 20px; font-weight: bold; font-size: 1.3em; margin: 15px auto; display: inline-block;" id="winnerMonth"></div>
-        <p style="color: #999; font-size: 0.9em; margin-top: 10px;">Otomatik devam ediliyor...</p>
-        <button onclick="closeWinner()">Hemen Devam Et</button>
-    </div>
-
-    <script>
-        let names = [];
-        let isSpinning = false;
-        let winners = [];
-        const canvas = document.getElementById('wheelCanvas');
-        const ctx = canvas.getContext('2d');
-
-        // Gizli sekme / mobil: ses ancak kullanıcı tıkladıktan sonra çalışır
-        let audioContext = null;
-        function getAudioContext() {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
-            return audioContext;
-        }
-        
-        const colors = [
-            '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', 
-            '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2',
-            '#F8B88B', '#A9DFBF', '#FAD7A0', '#D7BDE2'
-        ];
-
-        const monthNames = [
-            'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-            'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
-        ];
-
-        function getCurrentMonthIndex() {
-            const now = new Date();
-            const currentMonth = now.getMonth();
-            return (currentMonth + 1) % 12;
-        }
-
-        function getCurrentYear() {
-            return new Date().getFullYear();
-        }
-
-        function getMonthForWinner(winnerIndex) {
-            const startMonth = getCurrentMonthIndex();
-            const startYear = getCurrentYear();
-            
-            const totalMonthsFromStart = winnerIndex;
-            const monthIndex = (startMonth + totalMonthsFromStart) % 12;
-            const yearOffset = Math.floor((startMonth + totalMonthsFromStart) / 12);
-            const year = startYear + yearOffset;
-            
-            return monthNames[monthIndex] + ' ' + year;
-        }
-
-        function updateCanvasSize() {
-            const size = Math.min(500, Math.max(250, 200 + names.length * 10));
-            canvas.width = size;
-            canvas.height = size;
-            drawWheel();
-        }
-
-        function drawWheel() {
-            if (names.length === 0) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#f0f0f0';
-                ctx.beginPath();
-                ctx.arc(canvas.width/2, canvas.height/2, canvas.width/2, 0, 2 * Math.PI);
-                ctx.fill();
-                ctx.fillStyle = '#999';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.font = '16px Arial';
-                ctx.fillText('İsim ekleyin', canvas.width/2, canvas.height/2);
-                return;
-            }
-
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const radius = canvas.width / 2;
-            const sliceAngle = (2 * Math.PI) / names.length;
-
-            // Ana çarkı çiz
-            for (let i = 0; i < names.length; i++) {
-                const startAngle = i * sliceAngle;
-                const endAngle = startAngle + sliceAngle;
-
-                ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-                ctx.closePath();
-                ctx.fillStyle = colors[i % colors.length];
-                ctx.fill();
-                ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 3;
-                ctx.stroke();
-
-                ctx.save();
-                ctx.translate(centerX, centerY);
-                ctx.rotate(startAngle + sliceAngle / 2);
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillStyle = '#fff';
-                
-                let fontSize;
-                if (names.length <= 8) {
-                    fontSize = 18;
-                } else if (names.length <= 12) {
-                    fontSize = 16;
-                } else if (names.length <= 18) {
-                    fontSize = 14;
-                } else {
-                    fontSize = 12;
-                }
-                
-                ctx.font = 'bold ' + fontSize + 'px Arial';
-                ctx.shadowColor = 'rgba(0,0,0,0.5)';
-                ctx.shadowBlur = 4;
-                ctx.fillText(names[i], radius * 0.6, 0);
-                ctx.restore();
-            }
-
-            // Dişleri çiz (çarkın kenarına)
-            const pegCount = names.length;
-            const pegRadius = 8;
-            const pegDistance = radius - 5;
-            
-            for (let i = 0; i < pegCount; i++) {
-                const angle = (i * sliceAngle) + (sliceAngle / 2);
-                const pegX = centerX + Math.cos(angle) * pegDistance;
-                const pegY = centerY + Math.sin(angle) * pegDistance;
-                
-                // Dış daire (altın rengi)
-                ctx.beginPath();
-                ctx.arc(pegX, pegY, pegRadius, 0, 2 * Math.PI);
-                ctx.fillStyle = '#FFD700';
-                ctx.fill();
-                ctx.strokeStyle = '#FFA500';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-                
-                // İç daire (3D efekti için)
-                ctx.beginPath();
-                ctx.arc(pegX, pegY, pegRadius * 0.6, 0, 2 * Math.PI);
-                ctx.fillStyle = '#FFED4E';
-                ctx.fill();
-            }
-        }
-
-        function handleAdd() {
-            const input = document.getElementById('nameInput');
-            const name = input.value.trim();
-            
-            console.log('Ekle tuşuna basıldı, isim:', name);
-            
-            if (names.length >= 25) {
-                alert('Maksimum 25 isim ekleyebilirsiniz!');
-                return;
-            }
-            
-            if (!name) {
-                alert('Lütfen bir isim girin!');
-                return;
-            }
-            
-            if (names.includes(name)) {
-                alert('Bu isim zaten ekli!');
-                return;
-            }
-            
-            names.push(name);
-            input.value = '';
-            updateUI();
-            playAddSound();
-            console.log('İsim eklendi. Toplam:', names.length);
-        }
-
-        function handleClear() {
-            console.log('Temizle tuşuna basıldı. Mevcut isim sayısı:', names.length);
-            
-            if (names.length === 0) {
-                alert('Temizlenecek isim yok!');
-                return;
-            }
-            
-            if (confirm('Tüm isimleri silmek istediğinize emin misiniz?')) {
-                names = [];
-                updateUI();
-                alert('İsimler temizlendi!');
-                console.log('İsimler temizlendi');
-            } else {
-                console.log('Temizleme iptal edildi');
-            }
-        }
-
-        function removeName(index) {
-            console.log('İsim siliniyor, index:', index);
-            const removedName = names[index];
-            names.splice(index, 1);
-            
-            const winnerIndex = winners.findIndex(w => w.name === removedName);
-            if (winnerIndex !== -1) {
-                winners.splice(winnerIndex, 1);
-                updateWinnersList();
-            }
-            
-            updateUI();
-        }
-
-        function updateUI() {
-            updateCanvasSize();
-            
-            const namesList = document.getElementById('namesList');
-            namesList.innerHTML = '';
-            names.forEach((name, index) => {
-                const tag = document.createElement('div');
-                tag.className = 'name-tag';
-                tag.innerHTML = `
-                    <span>${name}</span>
-                    <button class="remove-btn" onclick="removeName(${index})">×</button>
-                `;
-                namesList.appendChild(tag);
-            });
-
-            document.getElementById('count').textContent = names.length;
-            document.getElementById('spinBtn').disabled = names.length === 0;
-        }
-
-        function playAddSound() {
-            try {
-                const ctx = getAudioContext();
-                const oscillator = ctx.createOscillator();
-                const gainNode = ctx.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(ctx.destination);
-                
-                oscillator.frequency.value = 800;
-                oscillator.type = 'sine';
-                gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
-                
-                oscillator.start(ctx.currentTime);
-                oscillator.stop(ctx.currentTime + 0.1);
-            } catch (e) {
-                console.log('Ses çalınamadı:', e);
-            }
-        }
-
-        async function spin() {
-            if (isSpinning || names.length === 0) return;
-            
-            // Eğer sadece 1 kişi kaldıysa, direkt kazanan yap
-            if (names.length === 1) {
-                isSpinning = true;
-                playCelebrationSound();
-                const lastPerson = names[0];
-                const month = getMonthForWinner(winners.length);
-                winners.push({
-                    name: lastPerson,
-                    month: month,
-                    order: winners.length + 1
-                });
-                names = [];
-                updateWinnersList();
-                updateUI();
-                
-                document.getElementById('winnerName').textContent = lastPerson;
-                document.getElementById('winnerMonth').textContent = month;
-                document.getElementById('overlay').style.display = 'block';
-                document.getElementById('winnerBox').style.display = 'block';
-                
-                setTimeout(() => {
-                    document.getElementById('overlay').style.display = 'none';
-                    document.getElementById('winnerBox').style.display = 'none';
-                    isSpinning = false;
-                    
-                    // Kazananlar listesine kaydır
-                    document.getElementById('winnersSection').scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'start' 
-                    });
-                    
-                    setTimeout(() => {
-                        alert('🎉 Tüm kazananlar belirlendi! 🎉');
-                    }, 500);
-                }, 4000);
-                return;
-            }
-            
-            isSpinning = true;
-            document.getElementById('spinBtn').disabled = true;
-
-            playSpinSound();
-
-            // Çok heyecanlı: 15-20 tur arası (daha fazla tur)
-            const spins = 15 + Math.random() * 5;
-            const totalRotation = spins * 360;
-            const randomDegree = Math.random() * 360;
-            const finalRotation = totalRotation + randomDegree;
-            
-            // Çok yavaş ve gerilim dolu: 12 saniye (daha uzun)
-            // Yavaş başla, hızlan, sonra çok yavaş dur
-            canvas.style.transition = 'transform 12s cubic-bezier(0.22, 0.61, 0.26, 0.99)';
-            canvas.style.transform = `rotate(${finalRotation}deg)`;
-
-            await new Promise(resolve => setTimeout(resolve, 12000));
-
-            const sliceAngle = 360 / names.length;
-            const normalizedRotation = finalRotation % 360;
-            // İbre üstte (270 derece pozisyonunda) sabit duruyor
-            // Çark saat yönünde dönerken, ibrenin gösterdiği dilimi bul
-            // Çark döndüğünde dilimler de dönüyor, ibreden çıkarıyoruz
-            const adjustedRotation = (270 - normalizedRotation + 360) % 360;
-            const winnerIndex = Math.floor(adjustedRotation / sliceAngle) % names.length;
-
-            showWinner(names[winnerIndex]);
-
-            setTimeout(() => {
-                canvas.style.transition = 'none';
-                canvas.style.transform = 'rotate(0deg)';
-                isSpinning = false;
-                document.getElementById('spinBtn').disabled = names.length === 0;
-            }, 1500);
-        }
-
-        let tickInterval;
-
-        function playTickSound() {
-            try {
-                const ctx = getAudioContext();
-                const oscillator = ctx.createOscillator();
-                const gainNode = ctx.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(ctx.destination);
-                
-                oscillator.frequency.value = 800;
-                oscillator.type = 'square';
-                gainNode.gain.setValueAtTime(0.15, ctx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
-                
-                oscillator.start(ctx.currentTime);
-                oscillator.stop(ctx.currentTime + 0.05);
-            } catch (e) {
-                console.log('Ses çalınamadı:', e);
-            }
-        }
-
-        function startTickingSounds(duration) {
-            let elapsed = 0;
-            const startInterval = 40; // Başlangıç: 40ms (çok hızlı)
-            const endInterval = 500;  // Bitiş: 500ms (çok yavaş - daha dramatik)
-            
-            function scheduleTick() {
-                if (elapsed >= duration) {
-                    return;
-                }
-                
-                // Zamanla giderek yavaşlayan tık süresi hesapla (daha dramatik)
-                const progress = elapsed / duration;
-                // Kübik eğri ile daha dramatik yavaşlama
-                const currentInterval = startInterval + (endInterval - startInterval) * Math.pow(progress, 3);
-                
-                playTickSound();
-                elapsed += currentInterval;
-                
-                setTimeout(scheduleTick, currentInterval);
-            }
-            
-            scheduleTick();
-        }
-
-        function playSpinSound() {
-            // 12 saniye boyunca giderek yavaşlayan tık sesleri
-            startTickingSounds(12000);
-        }
-
-        function showWinner(name) {
-            playCelebrationSound();
-            
-            const month = getMonthForWinner(winners.length);
-            winners.push({
-                name: name,
-                month: month,
-                order: winners.length + 1
-            });
-            
-            const nameIndex = names.indexOf(name);
-            if (nameIndex !== -1) {
-                names.splice(nameIndex, 1);
-            }
-            
-            updateWinnersList();
-            updateUI();
-            
-            // İsim ve ay bilgisini göster
-            document.getElementById('winnerName').textContent = name;
-            document.getElementById('winnerMonth').textContent = month;
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('winnerBox').style.display = 'block';
-            
-            // 4 saniye sonra otomatik kapat ve devam et (daha uzun kutlama)
-            setTimeout(() => {
-                closeWinner();
-            }, 4000);
-        }
-
-        function playCelebrationSound() {
-            try {
-                const ctx = getAudioContext();
-                for (let i = 0; i < 3; i++) {
-                    setTimeout(() => {
-                        const oscillator = ctx.createOscillator();
-                        const gainNode = ctx.createGain();
-                        
-                        oscillator.connect(gainNode);
-                        gainNode.connect(ctx.destination);
-                        
-                        oscillator.frequency.value = 800 + i * 200;
-                        oscillator.type = 'sine';
-                        gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
-                        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-                        
-                        oscillator.start(ctx.currentTime);
-                        oscillator.stop(ctx.currentTime + 0.3);
-                    }, i * 100);
-                }
-            } catch (e) {
-                console.log('Ses çalınamadı:', e);
-            }
-        }
-
-        function closeWinner() {
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('winnerBox').style.display = 'none';
-            
-            // Kazananlar listesine kaydır
-            setTimeout(() => {
-                document.getElementById('winnersSection').scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'nearest' 
-                });
-            }, 300);
-            
-            // Eğer hala isim varsa, 3 saniye sonra otomatik çevir (daha uzun bekleme)
-            if (names.length > 0) {
-                setTimeout(() => {
-                    spin();
-                }, 3000);
-            }
-        }
-
-        function updateWinnersList() {
-            const winnersList = document.getElementById('winnersList');
-            const winnersSection = document.getElementById('winnersSection');
-            
-            winnersSection.style.display = 'block';
-            
-            if (winners.length === 0) {
-                winnersList.innerHTML = '<div class="empty-winners">Henüz kazanan yok</div>';
-                return;
-            }
-            
-            winnersList.innerHTML = '';
-            
-            winners.forEach((winner, index) => {
-                const item = document.createElement('div');
-                item.className = 'winner-item';
-                item.innerHTML = `
-                    <div class="winner-number">${winner.order}</div>
-                    <div class="winner-month">${winner.month}</div>
-                    <div class="winner-name-display">${winner.name}</div>
-                `;
-                winnersList.appendChild(item);
-            });
-        }
-
-        function clearHistory() {
-            if (winners.length > 0 && confirm('Kazananlar geçmişini silmek istediğinize emin misiniz?')) {
-                winners = [];
-                updateWinnersList();
-            }
-        }
-
-        function printWinners() {
-            if (winners.length === 0) {
-                alert('Yazdırılacak kazanan yok!');
-                return;
-            }
-            
-            window.print();
-        }
-
-        function downloadPDF() {
-            if (winners.length === 0) {
-                alert('PDF oluşturulacak kazanan yok!');
-                return;
-            }
-            
-            // Tarayıcının "Yazdır" penceresini PDF olarak kaydet seçeneği ile aç
-            alert('Açılacak pencereden "Hedef" veya "Printer" kısmından "PDF olarak kaydet" seçeneğini seçin.');
-            setTimeout(() => {
-                window.print();
-            }, 500);
-        }
-
-        async function shareWinners() {
-            if (winners.length === 0) {
-                alert('Paylaşılacak kazanan yok!');
-                return;
-            }
-            
-            // Kazananlar listesini metin olarak oluştur
-            let text = '🎰 ByNoKTa Çarkıfelek - Altın Günü 🎰\n';
-            text += '━━━━━━━━━━━━━━━━━━━━━\n';
-            text += '🏆 Kazananlar Listesi 🏆\n\n';
-            
-            winners.forEach((winner) => {
-                text += `${winner.order}. ${winner.month} - ${winner.name}\n`;
-            });
-            
-            text += '\n━━━━━━━━━━━━━━━━━━━━━\n';
-            text += `Toplam ${winners.length} kazanan`;
-            
-            // Modern paylaşım API'si varsa kullan
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        title: 'ByNoKTa Çarkıfelek - Kazananlar',
-                        text: text
-                    });
-                    console.log('Paylaşım başarılı!');
-                } catch (err) {
-                    console.log('Paylaşım iptal edildi veya hata:', err);
-                    // Paylaşım iptal edildiyse WhatsApp'a yönlendir
-                    shareToWhatsApp(text);
-                }
-            } else {
-                // Eski tarayıcılar için direkt WhatsApp
-                shareToWhatsApp(text);
-            }
-        }
-
-        function shareToWhatsApp(text) {
-            const encodedText = encodeURIComponent(text);
-            const whatsappUrl = `https://wa.me/?text=${encodedText}`;
-            window.open(whatsappUrl, '_blank');
-        }
-
-        document.getElementById('nameInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                handleAdd();
-            }
-        });
-
-        // Test fonksiyonu - konsola yaz
-        console.log('ByNoKTa Çarkıfelek yüklendi!');
-        console.log('Temizle butonu ID:', document.getElementById('clearBtn'));
-        
-        updateCanvasSize();
-        updateWinnersList(); // Kazananlar listesini başlat
-    </script>
 </body>
 </html>
