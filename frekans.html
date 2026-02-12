@@ -12,6 +12,7 @@
             --accent-cyan: #00f0ff;
             --accent-magenta: #ff00aa;
             --accent-yellow: #ffea00;
+            --accent-red: #ff4444; /* Kayıt butonu için */
             --text-primary: #e8f4f8;
             --text-secondary: #8b9dc3;
             --glow-cyan: 0 0 15px rgba(0, 240, 255, 0.4);
@@ -63,7 +64,7 @@
 
         .container {
             width: 100%;
-            max-width: 1200px; /* Geniş ekran desteği */
+            max-width: 1200px;
             background: rgba(17, 22, 39, 0.8);
             backdrop-filter: blur(20px);
             border-radius: 24px;
@@ -73,7 +74,6 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
         }
 
-        /* Başlık Alanı */
         .header-area {
             text-align: center;
             margin-bottom: 30px;
@@ -98,21 +98,17 @@
             letter-spacing: 1px;
         }
 
-        /* GRID YAPISI (PC için yan yana, Mobil için alt alta) */
         .main-grid {
             display: grid;
-            grid-template-columns: 1fr 1.2fr; /* Sol panel daha dar, sağ daha geniş */
+            grid-template-columns: 1fr 1.2fr;
             gap: 30px;
             align-items: start;
         }
 
         @media (max-width: 900px) {
-            .main-grid {
-                grid-template-columns: 1fr; /* Mobilde tek sütun */
-            }
+            .main-grid { grid-template-columns: 1fr; }
         }
 
-        /* Sol Panel: Kontroller */
         .controls-panel {
             background: rgba(255, 255, 255, 0.03);
             border-radius: 16px;
@@ -120,7 +116,6 @@
             border: 1px solid var(--border);
         }
 
-        /* Sağ Panel: Menüler */
         .presets-panel {
             display: flex;
             flex-direction: column;
@@ -145,7 +140,6 @@
             font-family: 'Orbitron', sans-serif;
         }
 
-        /* Sliderlar */
         input[type="range"] {
             width: 100%;
             height: 6px;
@@ -168,7 +162,6 @@
             border-radius: 10px;
         }
 
-        /* Input ve Select */
         select, input[type="number"] {
             width: 100%;
             padding: 12px;
@@ -180,15 +173,13 @@
             outline: none;
             transition: border-color 0.3s;
         }
-        select:focus, input[type="number"]:focus {
-            border-color: var(--accent-cyan);
-        }
+        select:focus, input[type="number"]:focus { border-color: var(--accent-cyan); }
         
         /* Ana Butonlar */
         .main-buttons {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            grid-template-columns: 1fr 1fr 1fr; /* 3 Buton için ayarlandı */
+            gap: 10px;
             margin-top: 30px;
         }
 
@@ -201,7 +192,7 @@
             text-transform: uppercase;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: 1rem;
+            font-size: 0.9rem; /* Butonlar sığsın diye biraz küçülttüm */
         }
 
         .btn-play {
@@ -219,7 +210,21 @@
         }
         .btn-stop:hover { background: rgba(255, 255, 255, 0.2); }
 
-        /* Kategori Menüleri (Yatay) */
+        /* Kayıt Butonu Stili */
+        .btn-rec {
+            background: linear-gradient(135deg, var(--accent-red), #cc0000);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(255, 68, 68, 0.4);
+        }
+        .btn-rec:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--accent-red); }
+        .btn-rec.recording { animation: pulseRed 1.5s infinite; background: #cc0000; }
+
+        @keyframes pulseRed {
+            0% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); }
+        }
+
         .category-scroll {
             display: flex;
             gap: 8px;
@@ -250,9 +255,8 @@
             font-weight: bold;
         }
 
-        /* Alt Menü Butonları (Grid) */
         .preset-grid {
-            display: none; /* Varsayılan gizli */
+            display: none;
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
             gap: 10px;
             animation: fadeIn 0.3s ease;
@@ -280,7 +284,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Bilgi Paneli */
         .info-box {
             background: rgba(0, 240, 255, 0.05);
             border-left: 3px solid var(--accent-cyan);
@@ -293,7 +296,6 @@
             display: none;
         }
 
-        /* Visualizer */
         .visualizer {
             width: 100%;
             height: 100px;
@@ -316,7 +318,6 @@
             transition: height 0.05s ease;
         }
 
-        /* Manuel Giriş Alanı */
         .manual-input-row {
             display: flex;
             gap: 10px;
@@ -333,7 +334,6 @@
         }
         .btn-small:hover { background: var(--accent-cyan); color: #000; }
 
-        /* Yasal Uyarı Modalı */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -437,6 +437,7 @@
                 <div class="main-buttons">
                     <button class="btn-big btn-play" id="playBtn">BAŞLAT</button>
                     <button class="btn-big btn-stop" id="stopBtn">DURDUR</button>
+                    <button class="btn-big btn-rec" id="recBtn">KAYIT</button>
                 </div>
             </div>
 
@@ -506,10 +507,13 @@
         let analyser = null;
         let isPlaying = false;
         let bars = [];
+        let mediaRecorder = null;
+        let recordedChunks = [];
 
         // DOM Elemanları
         const playBtn = document.getElementById('playBtn');
         const stopBtn = document.getElementById('stopBtn');
+        const recBtn = document.getElementById('recBtn');
         const freqSlider = document.getElementById('frequency');
         const freqInput = document.getElementById('freqInput');
         const freqDisplay = document.getElementById('freqValue');
@@ -567,18 +571,17 @@
             document.getElementById('binauralControl').style.display = 'block';
             document.getElementById('binauralDiff').value = diff;
             document.getElementById('binauralDiffValue').textContent = diff;
-            freqSlider.value = 200; // Taşıyıcı frekans
+            freqSlider.value = 200;
             freqInput.value = 200;
             freqDisplay.textContent = 200;
             
             showInfo(info);
-            if(isPlaying) stopSound(); // Binaural mod değişince yeniden başlatmak daha sağlıklıdır
+            if(isPlaying) stopSound();
         };
 
         function showInfo(text) {
             infoText.textContent = text;
             infoPanel.style.display = 'block';
-            // Scroll kilitleme kodlarını kaldırdım, artık zıplama yapmaz.
         }
 
         // Manuel Giriş
@@ -643,7 +646,6 @@
             const wave = waveSelect.value;
 
             if(modeSelect.value === 'binaural') {
-                // Binaural Mod
                 const diff = parseFloat(document.getElementById('binauralDiff').value);
                 const merger = audioCtx.createChannelMerger(2);
                 
@@ -661,7 +663,6 @@
                 oscL.start();
                 oscR.start();
             } else {
-                // Normal Mod
                 osc = audioCtx.createOscillator();
                 osc.type = wave;
                 osc.frequency.value = freq;
@@ -702,10 +703,66 @@
             }
         }
 
+        // --- SES KAYIT ÖZELLİĞİ ---
+        recBtn.addEventListener('click', async () => {
+            if (!isPlaying) {
+                alert('Kayıt almak için önce sesi başlatın!');
+                return;
+            }
+
+            const durationStr = prompt("Kaç saniye kayıt edilsin? (Örn: 60)", "60");
+            if (!durationStr) return;
+            
+            const seconds = parseInt(durationStr);
+            if (isNaN(seconds) || seconds <= 0) {
+                alert("Geçersiz süre!");
+                return;
+            }
+
+            // Kayıt Başlat
+            const dest = audioCtx.createMediaStreamDestination();
+            gainNode.connect(dest);
+            mediaRecorder = new MediaRecorder(dest.stream);
+            recordedChunks = [];
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) recordedChunks.push(e.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `Frekans_${freqSlider.value}Hz_${new Date().getTime()}.webm`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                alert("✅ Kayıt tamamlandı ve indirildi!");
+                recBtn.classList.remove('recording');
+                recBtn.textContent = "KAYIT";
+            };
+
+            mediaRecorder.start();
+            recBtn.classList.add('recording');
+            recBtn.textContent = `KAYIT (${seconds}s)`;
+
+            // Süre bitince durdur
+            let timeLeft = seconds;
+            const countdown = setInterval(() => {
+                timeLeft--;
+                recBtn.textContent = `KAYIT (${timeLeft}s)`;
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    mediaRecorder.stop();
+                }
+            }, 1000);
+        });
+
         playBtn.addEventListener('click', startSound);
         stopBtn.addEventListener('click', stopSound);
 
-        // Görselleştirici Döngüsü
         function drawVisualizer() {
             if(!isPlaying) return;
             requestAnimationFrame(drawVisualizer);
