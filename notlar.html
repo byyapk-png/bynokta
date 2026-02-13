@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notlar & Ajanda - ByNoKTa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;900&family=JetBrains+Mono:wght@500;800&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #06080f;
+            --card: #111627;
+            --text: #f0f0f8;
+            --text-dim: #8892b0;
+            --accent: #ff9f43; /* Turuncu Tema */
+            --border: rgba(255, 255, 255, 0.08);
+            --note-yellow: #feca57;
+            --note-blue: #48dbfb;
+            --note-red: #ff6b6b;
+            --note-green: #1dd1a1;
+            --note-purple: #a29bfe;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Geri Dön Linki */
+        .back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+            z-index: 100;
+        }
+        .back-link:hover { color: var(--accent); }
+
+        .container {
+            max-width: 1200px;
+            margin: 50px auto 0;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; }
+        }
+
+        /* Sol Panel: Yapılacaklar (Todo) */
+        .todo-panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 25px;
+            height: fit-content;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 20px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            outline: none;
+        }
+        input[type="text"]:focus { border-color: var(--accent); }
+
+        button {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            padding: 0 20px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover { transform: translateY(-2px); }
+
+        .todo-list { list-style: none; }
+        
+        .todo-item {
+            background: rgba(255,255,255,0.03);
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+            border-left: 3px solid var(--accent);
+        }
+        .todo-item:hover { background: rgba(255,255,255,0.05); }
+        
+        .todo-item.completed {
+            opacity: 0.5;
+            text-decoration: line-through;
+            border-color: #555;
+        }
+
+        .todo-text { flex: 1; cursor: pointer; }
+
+        .btn-del {
+            background: transparent;
+            color: var(--text-dim);
+            padding: 5px;
+            font-size: 1.1rem;
+        }
+        .btn-del:hover { color: #ff6b6b; transform: none; }
+
+        /* Sağ Panel: Notlar (Grid) */
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            align-content: start;
+        }
+
+        .new-note-card {
+            background: rgba(255,255,255,0.05);
+            border: 2px dashed var(--border);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-dim);
+        }
+        .new-note-card:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(255, 159, 67, 0.05);
+        }
+
+        .note-card {
+            background: var(--note-yellow);
+            color: #2d3436;
+            padding: 20px;
+            border-radius: 2px 2px 15px 2px; /* Post-it şekli */
+            min-height: 200px;
+            position: relative;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+            font-family: 'Kalam', cursive; /* El yazısı fontu */
+            font-size: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            animation: popIn 0.3s ease;
+        }
+        .note-card::before {
+            content: '';
+            position: absolute;
+            bottom: 0; right: 0;
+            border-width: 0 0 20px 20px;
+            border-style: solid;
+            border-color: rgba(0,0,0,0.1) #fff; /* Kıvrık köşe efekti */
+            display: block;
+            width: 0;
+        }
+
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .note-card:hover { transform: translateY(-5px) rotate(1deg); z-index: 10; }
+
+        .note-date { font-size: 0.7rem; opacity: 0.6; margin-bottom: 10px; font-family: sans-serif; text-align: right; }
+        .note-content { flex: 1; outline: none; white-space: pre-wrap; }
+        
+        .note-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .note-card:hover .note-actions { opacity: 1; }
+
+        .color-dots { display: flex; gap: 5px; }
+        .dot { width: 15px; height: 15px; border-radius: 50%; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid var(--border);
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 15px;
+            color: var(--text);
+            margin: 15px 0;
+            resize: none;
+            outline: none;
+            font-family: 'Kalam', cursive;
+            font-size: 1.2rem;
+        }
+        .color-picker { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
+        .pick-dot { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; transition: transform 0.2s; }
+        .pick-dot:hover, .pick-dot.active { transform: scale(1.2); border: 2px solid #fff; }
+
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="back-link">← Portal'a Dön</a>
+
+    <div class="container">
+        
+        <div class="todo-panel">
+            <div class="section-title">✅ Yapılacaklar</div>
+            
+            <div class="input-group">
+                <input type="text" id="todoInput" placeholder="Yeni görev ekle...">
+                <button onclick="addTodo()">Ekle</button>
+            </div>
+
+            <ul class="todo-list" id="todoList">
+                </ul>
+        </div>
+
+        <div class="notes-grid" id="notesGrid">
+            <div class="new-note-card" onclick="openModal()">
+                <div style="font-size: 3rem;">+</div>
+                <div>Yeni Not Al</div>
+            </div>
+            </div>
+
+    </div>
+
+    <div class="modal-overlay" id="noteModal">
+        <div class="modal">
+            <h3 style="color: var(--text); margin-bottom: 10px;">📝 Yeni Not Oluştur</h3>
+            
+            <div class="color-picker">
+                <div class="pick-dot active" style="background: var(--note-yellow);" onclick="selectColor(this, 'var(--note-yellow)')"></div>
+                <div class="pick-dot" style="background: var(--note-blue);" onclick="selectColor(this, 'var(--note-blue)')"></div>
+                <div class="pick-dot" style="background: var(--note-red);" onclick="selectColor(this, 'var(--note-red)')"></div>
+                <div class="pick-dot" style="background: var(--note-green);" onclick="selectColor(this, 'var(--note-green)')"></div>
+                <div class="pick-dot" style="background: var(--note-purple);" onclick="selectColor(this, 'var(--note-purple)')"></div>
+            </div>
+
+            <textarea id="noteText" placeholder="Buraya yaz..."></textarea>
+            
+            <div style="display: flex; gap: 10px;">
+                <button onclick="saveNote()" style="flex: 1;">Kaydet</button>
+                <button onclick="closeModal()" style="flex: 1; background: #555; color: #fff;">İptal</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Veri Yönetimi
+        let todos = JSON.parse(localStorage.getItem('byn_todos')) || [];
+        let notes = JSON.parse(localStorage.getItem('byn_notes')) || [];
+        let selectedColor = 'var(--note-yellow)';
+
+        // Başlangıç
+        renderTodos();
+        renderNotes();
+
+        // --- TODO FONKSİYONLARI ---
+        function addTodo() {
+            const input = document.getElementById('todoInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            todos.push({ id: Date.now(), text: text, done: false });
+            input.value = '';
+            saveTodos();
+            renderTodos();
+        }
+
+        function toggleTodo(id) {
+            todos = todos.map(t => t.id === id ? { ...t, done: !t.done } : t);
+            saveTodos();
+            renderTodos();
+        }
+
+        function deleteTodo(id) {
+            if(confirm('Görevi silmek istiyor musun?')) {
+                todos = todos.filter(t => t.id !== id);
+                saveTodos();
+                renderTodos();
+            }
+        }
+
+        function saveTodos() { localStorage.setItem('byn_todos', JSON.stringify(todos)); }
+
+        function renderTodos() {
+            const list = document.getElementById('todoList');
+            list.innerHTML = '';
+            
+            // Tamamlanmayanlar üstte görünsün
+            todos.sort((a,b) => a.done - b.done);
+
+            todos.forEach(t => {
+                const li = document.createElement('li');
+                li.className = `todo-item ${t.done ? 'completed' : ''}`;
+                li.innerHTML = `
+                    <div class="todo-text" onclick="toggleTodo(${t.id})">${t.text}</div>
+                    <button class="btn-del" onclick="deleteTodo(${t.id})">🗑️</button>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        // --- NOT FONKSİYONLARI ---
+        function openModal() {
+            document.getElementById('noteModal').style.display = 'flex';
+            document.getElementById('noteText').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('noteModal').style.display = 'none';
+            document.getElementById('noteText').value = '';
+        }
+
+        function selectColor(el, color) {
+            document.querySelectorAll('.pick-dot').forEach(d => d.classList.remove('active'));
+            el.classList.add('active');
+            selectedColor = color;
+        }
+
+        function saveNote() {
+            const text = document.getElementById('noteText').value.trim();
+            if (!text) return;
+
+            notes.push({
+                id: Date.now(),
+                text: text,
+                color: selectedColor,
+                date: new Date().toLocaleDateString('tr-TR')
+            });
+
+            closeModal();
+            saveNotes();
+            renderNotes();
+        }
+
+        function deleteNote(id) {
+            if(confirm('Bu notu silmek istiyor musun?')) {
+                notes = notes.filter(n => n.id !== id);
+                saveNotes();
+                renderNotes();
+            }
+        }
+
+        function saveNotes() { localStorage.setItem('byn_notes', JSON.stringify(notes)); }
+
+        function renderNotes() {
+            const grid = document.getElementById('notesGrid');
+            // Yeni not kartını koru, diğerlerini temizle
+            const addCard = grid.firstElementChild;
+            grid.innerHTML = '';
+            grid.appendChild(addCard);
+
+            // Yeni notlar en başta
+            [...notes].reverse().forEach(n => {
+                const div = document.createElement('div');
+                div.className = 'note-card';
+                div.style.background = n.color;
+                div.innerHTML = `
+                    <div class="note-date">${n.date}</div>
+                    <div class="note-content">${n.text}</div>
+                    <div class="note-actions">
+                        <div class="color-dots">
+                            </div>
+                        <button class="btn-del" style="color:#000; opacity:0.6" onclick="deleteNote(${n.id})">🗑️</button>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        // Enter ile todo ekleme
+        document.getElementById('todoInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') addTodo();
+        });
+
+        // Modal dışına tıklayınca kapatma
+        document.getElementById('noteModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+    </script>
+</body>
+</html>
