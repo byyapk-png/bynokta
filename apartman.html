@@ -3,150 +3,191 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Apartman ve Site Yönetim Sistemi</title>
+<title>Apartman ve Site Yönetim Sistemi - ByNoKTa</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+/* --- BYNOKTA DARK THEME OVERRIDES --- */
 :root {
-  --primary: #1a3a5c;
-  --primary-light: #2a5a8c;
-  --accent: #e8913a;
-  --accent-hover: #d47e2a;
-  --bg: #f0f2f5;
-  --card: #ffffff;
-  --text: #1a1a2e;
-  --text-muted: #6b7280;
-  --border: #e2e5ea;
-  --success: #0d9f6e;
-  --danger: #e02d3c;
-  --warning: #f59e0b;
+  --primary: #6c5ce7;
+  --primary-light: #a29bfe;
+  --accent: #f59e0b; /* Amber for Apartman */
+  --accent-hover: #d97706;
+  --bg: #06080f;
+  --bg-input: #0c1020;
+  --card: #111627;
+  --text: #f0f0f8;
+  --text-muted: #8892b0;
+  --border: rgba(255, 255, 255, 0.08);
+  --success: #00b894;
+  --danger: #ff6b6b;
+  --warning: #fdcb6e;
   --sidebar-w: 260px;
+  --glow: rgba(245, 158, 11, 0.15);
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+body { 
+  font-family: 'Outfit', sans-serif; 
+  background: var(--bg); 
+  color: var(--text); 
+  min-height: 100vh; 
+  overflow-x: hidden;
+}
+
+/* Arkaplan Animasyonu (Diğer sayfalarla uyum) */
+body::before {
+    content: '';
+    position: fixed;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background: 
+        radial-gradient(ellipse at 20% 50%, rgba(108, 92, 231, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(245, 158, 11, 0.05) 0%, transparent 50%);
+    animation: drift 20s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+@keyframes drift {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(2%, -1%); }
+}
 
 /* SIDEBAR */
 .sidebar {
   position:fixed; left:0; top:0; bottom:0; width:var(--sidebar-w);
-  background:linear-gradient(180deg, var(--primary) 0%, #0f2540 100%);
-  color:#fff; z-index:1040; transition:transform .3s ease;
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  color: var(--text); z-index:1040; transition:transform .3s ease;
   display:flex; flex-direction:column;
-  box-shadow: 4px 0 24px rgba(0,0,0,.15);
+  box-shadow: 4px 0 24px rgba(0,0,0,.3);
 }
 .sidebar-brand {
-  padding:24px 20px; border-bottom:1px solid rgba(255,255,255,.1);
+  padding:24px 20px; border-bottom:1px solid var(--border);
   display:flex; align-items:center; gap:12px;
 }
 .sidebar-brand .brand-icon {
-  width:44px; height:44px; background:var(--accent); border-radius:12px;
-  display:flex; align-items:center; justify-content:center; font-size:20px;
-  box-shadow: 0 4px 12px rgba(232,145,58,.4);
+  width:44px; height:44px; background: linear-gradient(135deg, var(--accent), #fbbf24);
+  border-radius:12px;
+  display:flex; align-items:center; justify-content:center; font-size:20px; color: #000;
+  box-shadow: 0 4px 12px var(--glow);
 }
-.sidebar-brand h5 { font-weight:800; font-size:15px; margin:0; line-height:1.3; }
-.sidebar-brand small { font-size:11px; opacity:.6; }
+.sidebar-brand h5 { font-weight:800; font-size:15px; margin:0; line-height:1.3; color: var(--text); }
+.sidebar-brand small { font-size:11px; color: var(--text-muted); }
+
 .sidebar-nav { flex:1; padding:16px 12px; overflow-y:auto; }
 .sidebar-nav .nav-item {
-  display:flex; align-items:center; gap:12px; padding:11px 14px;
+  display:flex; align-items:center; gap:12px; padding:12px 14px;
   border-radius:10px; cursor:pointer; transition:all .2s;
-  color:rgba(255,255,255,.65); font-size:14px; font-weight:500; margin-bottom:2px;
-  text-decoration:none;
+  color: var(--text-muted); font-size:14px; font-weight:600; margin-bottom:4px;
+  text-decoration:none; border: 1px solid transparent;
 }
-.sidebar-nav .nav-item:hover { background:rgba(255,255,255,.08); color:#fff; }
-.sidebar-nav .nav-item.active { background:rgba(232,145,58,.18); color:var(--accent); }
+.sidebar-nav .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); border-color: var(--border); }
+.sidebar-nav .nav-item.active { 
+  background: rgba(245, 158, 11, 0.1); 
+  color: var(--accent); 
+  border-color: rgba(245, 158, 11, 0.3);
+}
 .sidebar-nav .nav-item i { width:20px; text-align:center; font-size:16px; }
-.sidebar-footer { padding:16px; border-top:1px solid rgba(255,255,255,.1); }
-.sidebar-footer .btn { width:100%; font-size:13px; }
 
-/* MAIN */
-.main-content { margin-left:var(--sidebar-w); min-height:100vh; }
+/* Back to Portal Button */
+.nav-item.back-btn {
+    margin-bottom: 20px;
+    background: linear-gradient(90deg, rgba(108, 92, 231, 0.2), transparent);
+    border: 1px solid rgba(108, 92, 231, 0.3);
+    color: #a29bfe;
+}
+.nav-item.back-btn:hover {
+    background: linear-gradient(90deg, rgba(108, 92, 231, 0.4), transparent);
+    color: #fff;
+}
+
+.sidebar-footer { padding:16px; border-top:1px solid var(--border); }
+
+/* MAIN CONTENT */
+.main-content { margin-left:var(--sidebar-w); min-height:100vh; position: relative; z-index: 1; }
 .top-bar {
-  background:var(--card); padding:14px 28px; border-bottom:1px solid var(--border);
+  background: rgba(17, 22, 39, 0.8); backdrop-filter: blur(10px);
+  padding:14px 28px; border-bottom:1px solid var(--border);
   display:flex; align-items:center; justify-content:space-between;
   position:sticky; top:0; z-index:1020;
 }
-.top-bar .page-title { font-weight:700; font-size:20px; }
+.top-bar .page-title { font-weight:800; font-size:20px; letter-spacing: 0.5px; }
 .hamburger { display:none; background:none; border:none; font-size:22px; color:var(--text); cursor:pointer; }
 .content-area { padding:24px 28px; }
 
 /* CARDS */
 .stat-card {
-  background:var(--card); border-radius:14px; padding:22px;
+  background: var(--card); border-radius:16px; padding:22px;
   border:1px solid var(--border); transition:all .25s;
-  box-shadow: 0 1px 3px rgba(0,0,0,.04);
 }
-.stat-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.08); }
+.stat-card:hover { transform:translateY(-3px); box-shadow:0 10px 30px rgba(0,0,0,0.3); border-color: var(--accent); }
 .stat-card .stat-icon {
   width:48px; height:48px; border-radius:12px;
   display:flex; align-items:center; justify-content:center; font-size:20px;
 }
-.stat-card .stat-value { font-size:26px; font-weight:800; font-family:'JetBrains Mono',monospace; }
-.stat-card .stat-label { font-size:13px; color:var(--text-muted); font-weight:500; }
+.stat-card .stat-value { font-size:26px; font-weight:800; font-family:'JetBrains Mono',monospace; margin-top: 5px;}
+.stat-card .stat-label { font-size:12px; color:var(--text-muted); font-weight:700; text-transform: uppercase; letter-spacing: 1px; }
 
 .card-custom {
-  background:var(--card); border-radius:14px; border:1px solid var(--border);
-  box-shadow:0 1px 3px rgba(0,0,0,.04); overflow:hidden;
+  background:var(--card); border-radius:16px; border:1px solid var(--border);
+  box-shadow:0 4px 20px rgba(0,0,0,0.2); overflow:hidden; margin-bottom: 20px;
 }
 .card-custom .card-header-custom {
   padding:18px 22px; border-bottom:1px solid var(--border);
   display:flex; align-items:center; justify-content:space-between;
-  font-weight:700; font-size:16px;
+  font-weight:700; font-size:16px; background: rgba(255,255,255,0.02);
 }
 
-/* TABLE */
-.table-custom { margin:0; font-size:14px; }
+/* TABLE OVERRIDES FOR DARK MODE */
+.table { --bs-table-bg: transparent; --bs-table-color: var(--text); --bs-table-border-color: var(--border); }
 .table-custom thead th {
-  background:#f8f9fb; border-bottom:2px solid var(--border);
-  font-weight:600; font-size:13px; text-transform:uppercase;
-  letter-spacing:.5px; color:var(--text-muted); padding:12px 16px;
+  background: rgba(255,255,255,0.05); border-bottom:2px solid var(--border);
+  font-weight:700; font-size:12px; text-transform:uppercase;
+  letter-spacing:1px; color:var(--text-muted); padding:12px 16px;
   white-space:nowrap;
 }
-.table-custom tbody td { padding:12px 16px; vertical-align:middle; border-bottom:1px solid #f0f1f3; }
-.table-custom tbody tr:hover { background:#f8f9fb; }
+.table-custom tbody td { padding:12px 16px; vertical-align:middle; border-bottom:1px solid var(--border); color: var(--text); }
+.table-custom tbody tr:hover { background: rgba(255,255,255,0.03); }
 
-/* BADGES */
-.badge-paid { background:#d1fae5; color:#065f46; font-weight:600; }
-.badge-unpaid { background:#fee2e2; color:#991b1b; font-weight:600; }
-.badge-partial { background:#fef3c7; color:#92400e; font-weight:600; }
-.badge-type { background:#dbeafe; color:#1e40af; font-weight:600; }
+/* FORMS & MODALS DARK MODE */
+.modal-content { background: var(--card); border: 1px solid var(--border); color: var(--text); }
+.modal-header { border-bottom: 1px solid var(--border); }
+.modal-footer { border-top: 1px solid var(--border); }
+.btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+.form-control, .form-select {
+    background-color: var(--bg-input); border-color: var(--border); color: var(--text);
+}
+.form-control:focus, .form-select:focus {
+    background-color: var(--bg-input); border-color: var(--accent); color: var(--text); box-shadow: 0 0 0 0.25rem rgba(245, 158, 11, 0.15);
+}
+.form-control::placeholder { color: var(--text-muted); opacity: 0.5; }
 
 /* BUTTONS */
-.btn-accent { background:var(--accent); color:#fff; border:none; font-weight:600; }
-.btn-accent:hover { background:var(--accent-hover); color:#fff; }
-.btn-outline-accent { border:1.5px solid var(--accent); color:var(--accent); font-weight:600; }
-.btn-outline-accent:hover { background:var(--accent); color:#fff; }
+.btn-accent { background: linear-gradient(135deg, var(--accent), #fbbf24); color:#000; border:none; font-weight:700; }
+.btn-accent:hover { transform: translateY(-1px); box-shadow: 0 4px 15px var(--glow); color: #000; }
+.btn-outline-accent { border:1px solid var(--accent); color:var(--accent); font-weight:600; background: transparent; }
+.btn-outline-accent:hover { background:var(--accent); color:#000; }
 
-/* MODAL */
-.modal-content { border-radius:16px; border:none; box-shadow:0 20px 60px rgba(0,0,0,.15); }
-.modal-header { border-bottom:1px solid var(--border); padding:20px 24px; }
-.modal-header .modal-title { font-weight:700; }
-.modal-body { padding:24px; }
-.modal-footer { border-top:1px solid var(--border); padding:16px 24px; }
-.form-label { font-weight:600; font-size:13px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.3px; margin-bottom:6px; }
-.form-control, .form-select {
-  border-radius:10px; border:1.5px solid var(--border); padding:10px 14px;
-  font-size:14px; transition:border-color .2s;
-}
-.form-control:focus, .form-select:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(232,145,58,.15); }
-
-/* PAGES */
-.page { display:none; }
-.page.active { display:block; animation: fadeIn .3s ease; }
-@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-
-/* WHATSAPP */
-.btn-whatsapp { background:#25d366; color:#fff; border:none; }
-.btn-whatsapp:hover { background:#1da851; color:#fff; }
+/* BADGES */
+.badge-paid { background:rgba(0, 184, 148, 0.15); color:var(--success); font-weight:700; border: 1px solid rgba(0, 184, 148, 0.3); }
+.badge-unpaid { background:rgba(255, 107, 107, 0.15); color:var(--danger); font-weight:700; border: 1px solid rgba(255, 107, 107, 0.3); }
+.badge-partial { background:rgba(253, 203, 110, 0.15); color:var(--warning); font-weight:700; border: 1px solid rgba(253, 203, 110, 0.3); }
+.badge-type { background:rgba(108, 92, 231, 0.15); color:#a29bfe; font-weight:700; border: 1px solid rgba(108, 92, 231, 0.3); }
 
 /* SUMMARY BAR */
 .summary-bar {
-  background:linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-  color:#fff; border-radius:12px; padding:16px 22px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text); border-radius:12px; padding:16px 22px;
   display:flex; flex-wrap:wrap; gap:24px; align-items:center;
   font-size:14px; margin-top:16px;
 }
-.summary-bar .summary-item { display:flex; align-items:center; gap:8px; }
-.summary-bar .summary-value { font-family:'JetBrains Mono',monospace; font-weight:700; font-size:18px; }
+.summary-bar .summary-value { font-family:'JetBrains Mono',monospace; font-weight:700; font-size:18px; color: var(--accent); }
+
+/* PAGES ANIMATION */
+.page { display:none; }
+.page.active { display:block; animation: fadeIn .4s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
 /* RESPONSIVE */
 @media(max-width:991px) {
@@ -155,60 +196,37 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
   .main-content { margin-left:0; }
   .hamburger { display:block; }
   .content-area { padding:16px; }
-  .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:1035; }
+  .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:1035; backdrop-filter: blur(3px); }
   .sidebar-overlay.show { display:block; }
 }
-@media(max-width:576px) {
-  .stat-card .stat-value { font-size:20px; }
-  .top-bar .page-title { font-size:16px; }
-}
 
-/* PRINT */
 @media print {
-  body { background:#fff !important; font-size:11pt; color:#000 !important; }
-  .sidebar, .top-bar, .hamburger, .sidebar-overlay,
-  .no-print, .btn, button, .nav-item, .sidebar-footer,
-  .toast-container { display:none !important; }
+  body { background:#fff !important; color:#000 !important; }
+  .sidebar, .top-bar, .hamburger, .sidebar-overlay, .no-print { display:none !important; }
   .main-content { margin-left:0 !important; }
-  .content-area { padding:0 !important; }
-  .page { display:none !important; }
-  #page-rapor { display:block !important; }
   .card-custom { border:none !important; box-shadow:none !important; }
-  .card-header-custom { padding:0 0 8px 0 !important; border-bottom:2px solid #000 !important; }
-  .print-area { display:block !important; }
-  .print-header {
-    text-align:center; border-bottom:3px double #000; padding-bottom:12px; margin-bottom:16px;
-  }
-  .print-header h2 { font-size:18pt; font-weight:bold; margin:0; }
-  .print-header p { font-size:10pt; margin:4px 0 0; }
-  table { border-collapse:collapse; width:100%; page-break-inside:auto; }
-  table th, table td { border:1px solid #000 !important; padding:6px 8px !important; font-size:10pt; color:#000 !important; background:#fff !important; }
-  table th { background:#eee !important; font-weight:bold; }
-  .print-signature {
-    margin-top:40px; display:flex; justify-content:space-between;
-    page-break-inside:avoid;
-  }
-  .print-signature div { text-align:center; min-width:180px; }
-  .print-signature .sig-line { border-top:1px solid #000; margin-top:50px; padding-top:6px; }
-  .stat-card, .summary-bar { display:none !important; }
+  table th, table td { color: #000 !important; border: 1px solid #000 !important; }
 }
 </style>
 </head>
 <body>
 
-<!-- SIDEBAR OVERLAY (mobile) -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-<!-- SIDEBAR -->
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-brand">
     <div class="brand-icon"><i class="fas fa-building"></i></div>
     <div>
       <h5>Apartman Yönetim</h5>
-      <small>Profesyonel Sistem v2.0</small>
+      <small>ByNoKTa Pro v2.0</small>
     </div>
   </div>
+  
   <div class="sidebar-nav">
+    <a href="index.html" class="nav-item back-btn">
+        <i class="fas fa-arrow-left"></i> Portal'a Dön
+    </a>
+
     <a class="nav-item active" data-page="panel" onclick="goPage('panel',this)">
       <i class="fas fa-th-large"></i> Kontrol Paneli
     </a>
@@ -229,13 +247,11 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
     </a>
   </div>
   <div class="sidebar-footer">
-    <button class="btn btn-sm btn-outline-light" onclick="loadDemo()"><i class="fas fa-database me-1"></i> Demo Verileri Yükle</button>
+    <button class="btn btn-sm btn-outline-secondary w-100" onclick="loadDemo()"><i class="fas fa-database me-1"></i> Demo Veri</button>
   </div>
 </nav>
 
-<!-- MAIN CONTENT -->
 <div class="main-content">
-  <!-- TOP BAR -->
   <div class="top-bar">
     <div class="d-flex align-items-center gap-3">
       <button class="hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
@@ -248,7 +264,6 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 
   <div class="content-area">
 
-    <!-- ===== PANEL ===== -->
     <div class="page active" id="page-panel">
       <div class="row g-3 mb-4">
         <div class="col-6 col-lg-3">
@@ -258,7 +273,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
                 <div class="stat-label">Toplam Daire</div>
                 <div class="stat-value" id="sDaire">0</div>
               </div>
-              <div class="stat-icon" style="background:#dbeafe;color:#2563eb"><i class="fas fa-door-open"></i></div>
+              <div class="stat-icon" style="background:rgba(108, 92, 231, 0.15);color:#a29bfe"><i class="fas fa-door-open"></i></div>
             </div>
           </div>
         </div>
@@ -269,7 +284,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
                 <div class="stat-label">Toplam Gider</div>
                 <div class="stat-value" id="sGider">₺0</div>
               </div>
-              <div class="stat-icon" style="background:#fee2e2;color:#dc2626"><i class="fas fa-arrow-trend-down"></i></div>
+              <div class="stat-icon" style="background:rgba(255, 107, 107, 0.15);color:#ff6b6b"><i class="fas fa-arrow-trend-down"></i></div>
             </div>
           </div>
         </div>
@@ -280,7 +295,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
                 <div class="stat-label">Toplam Tahsilat</div>
                 <div class="stat-value" id="sTahsilat">₺0</div>
               </div>
-              <div class="stat-icon" style="background:#d1fae5;color:#059669"><i class="fas fa-arrow-trend-up"></i></div>
+              <div class="stat-icon" style="background:rgba(0, 184, 148, 0.15);color:#00b894"><i class="fas fa-arrow-trend-up"></i></div>
             </div>
           </div>
         </div>
@@ -291,12 +306,11 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
                 <div class="stat-label">Bakiye (Kasa)</div>
                 <div class="stat-value" id="sKasa">₺0</div>
               </div>
-              <div class="stat-icon" style="background:#fef3c7;color:#d97706"><i class="fas fa-wallet"></i></div>
+              <div class="stat-icon" style="background:rgba(245, 158, 11, 0.15);color:#f59e0b"><i class="fas fa-wallet"></i></div>
             </div>
           </div>
         </div>
       </div>
-      <!-- Son İşlemler -->
       <div class="card-custom">
         <div class="card-header-custom">
           <span><i class="fas fa-clock-rotate-left me-2"></i>Son İşlemler</span>
@@ -308,12 +322,11 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
           </table>
         </div>
         <div class="p-3 text-center text-muted" id="emptyDashMsg" style="font-size:14px">
-          <i class="fas fa-info-circle me-1"></i> Henüz işlem yok. Sol menüden "Demo Verileri Yükle" butonuyla başlayabilirsiniz.
+          <i class="fas fa-info-circle me-1"></i> Henüz işlem yok. Sol menüden "Demo Veri" butonuyla başlayabilirsiniz.
         </div>
       </div>
     </div>
 
-    <!-- ===== DAİRELER ===== -->
     <div class="page" id="page-daireler">
       <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <span class="fw-bold"><i class="fas fa-door-open me-2"></i>Daire Listesi</span>
@@ -333,7 +346,6 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
       </div>
     </div>
 
-    <!-- ===== GİDERLER ===== -->
     <div class="page" id="page-giderler">
       <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <span class="fw-bold"><i class="fas fa-file-invoice-dollar me-2"></i>Gider Kayıtları</span>
@@ -347,11 +359,10 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
           </table>
         </div>
       </div>
-      <!-- Borç Dağıtım Tablosu -->
       <div class="card-custom mt-4">
         <div class="card-header-custom">
           <span><i class="fas fa-calculator me-2"></i>Daire Borç Dağılımı (Aylık Filtresiz - Tümü)</span>
-          <button class="btn btn-sm btn-whatsapp no-print" onclick="sendWpGroup()"><i class="fab fa-whatsapp me-1"></i> Gruba Gönder</button>
+          <button class="btn btn-sm btn-outline-success no-print" onclick="sendWpGroup()"><i class="fab fa-whatsapp me-1"></i> Gruba Gönder</button>
         </div>
         <div class="table-responsive">
           <table class="table table-custom" id="tblBorc">
@@ -362,7 +373,6 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
       </div>
     </div>
 
-    <!-- ===== TAHSİLAT ===== -->
     <div class="page" id="page-tahsilat">
       <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <span class="fw-bold"><i class="fas fa-cash-register me-2"></i>Tahsilat Girişi</span>
@@ -395,7 +405,6 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
       </div>
     </div>
 
-    <!-- ===== RAPOR ===== -->
     <div class="page" id="page-rapor">
       <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2 no-print">
         <span class="fw-bold"><i class="fas fa-chart-bar me-2"></i>Aylık Resmi Rapor</span>
@@ -403,11 +412,10 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
           <select class="form-select form-select-sm" id="selRaporAy" style="width:130px"></select>
           <select class="form-select form-select-sm" id="selRaporYil" style="width:100px"></select>
           <button class="btn btn-accent btn-sm" onclick="generateReport()"><i class="fas fa-search me-1"></i> Raporu Getir</button>
-          <button class="btn btn-outline-dark btn-sm" onclick="window.print()"><i class="fas fa-print me-1"></i> Yazdır / PDF</button>
+          <button class="btn btn-outline-light btn-sm" onclick="window.print()"><i class="fas fa-print me-1"></i> Yazdır / PDF</button>
         </div>
       </div>
 
-      <!-- Print Header (hidden on screen) -->
       <div class="print-header" style="display:none">
         <h2>APARTMAN YÖNETİMİ AYLIK GİDER RAPORU</h2>
         <p id="printPeriod"></p>
@@ -418,14 +426,12 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
         <div class="text-center text-muted py-5"><i class="fas fa-info-circle me-2"></i>Lütfen ay ve yıl seçip "Raporu Getir" butonuna basın.</div>
       </div>
 
-      <!-- Print Signature (hidden on screen) -->
       <div class="print-signature" style="display:none">
         <div><div class="sig-line">Yönetici</div></div>
         <div><div class="sig-line">Denetçi</div></div>
       </div>
     </div>
 
-    <!-- ===== AYARLAR ===== -->
     <div class="page" id="page-ayarlar">
       <div class="row g-4">
         <div class="col-md-6">
@@ -460,7 +466,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
                 <input type="url" class="form-control" id="inpWpGrup" placeholder="https://chat.whatsapp.com/XXXXX...">
               </div>
               <div class="col-md-2">
-                <button class="btn btn-whatsapp w-100" onclick="saveWpSettings()"><i class="fas fa-save me-1"></i> Kaydet</button>
+                <button class="btn btn-success w-100" onclick="saveWpSettings()"><i class="fas fa-save me-1"></i> Kaydet</button>
               </div>
             </div>
             <div id="wpGrupStatus" class="mt-2" style="font-size:13px"></div>
@@ -470,11 +476,11 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
           <div class="card-custom p-4">
             <h6 class="fw-bold mb-3"><i class="fas fa-database me-2"></i>Demo Verileri</h6>
             <p class="text-muted" style="font-size:14px">Sistemi test etmek için örnek veriler yükleyin.</p>
-            <button class="btn btn-outline-accent" onclick="loadDemo()"><i class="fas fa-play me-1"></i> Demo Yükle</button>
+            <button class="btn btn-outline-light" onclick="loadDemo()"><i class="fas fa-play me-1"></i> Demo Yükle</button>
           </div>
         </div>
         <div class="col-md-6">
-          <div class="card-custom p-4">
+          <div class="card-custom p-4" style="border-color: var(--danger);">
             <h6 class="fw-bold mb-3 text-danger"><i class="fas fa-trash me-2"></i>Verileri Sıfırla</h6>
             <p class="text-muted" style="font-size:14px">Tüm verileri kalıcı olarak silin. Bu işlem geri alınamaz!</p>
             <button class="btn btn-danger" onclick="resetAll()"><i class="fas fa-eraser me-1"></i> Her Şeyi Sil</button>
@@ -486,7 +492,6 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
   </div>
 </div>
 
-<!-- DAIRE MODAL -->
 <div class="modal fade" id="modalDaire" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -521,7 +526,6 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
   </div>
 </div>
 
-<!-- GIDER MODAL -->
 <div class="modal fade" id="modalGider" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -554,7 +558,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
             <option value="diger">Diğer</option>
           </select>
         </div>
-        <div class="alert alert-info" style="font-size:13px">
+        <div class="alert alert-info" style="font-size:13px; background: rgba(0, 240, 255, 0.1); border-color: rgba(0, 240, 255, 0.2); color: var(--text);">
           <i class="fas fa-info-circle me-1"></i>
           <strong>Isınma (Doğalgaz)</strong> seçilirse tutar petek boyuna göre, diğer türler eşit olarak dağıtılır.
         </div>
@@ -567,7 +571,6 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:1080">
   <div class="toast align-items-center text-bg-success border-0" id="toastOk" role="alert">
     <div class="d-flex">
@@ -692,7 +695,7 @@ function renderDaireler() {
       <td>${esc(d.telefon)}</td>
       <td><span class="badge badge-type">${fmt(d.petek)} mt</span></td>
       <td>
-        <button class="btn btn-sm btn-outline-secondary me-1" onclick="openDaireModal('${d.id}')" title="Düzenle"><i class="fas fa-pen"></i></button>
+        <button class="btn btn-sm btn-outline-accent me-1" onclick="openDaireModal('${d.id}')" title="Düzenle"><i class="fas fa-pen"></i></button>
         <button class="btn btn-sm btn-outline-danger" onclick="deleteDaire('${d.id}')" title="Sil"><i class="fas fa-trash"></i></button>
       </td>
     </tr>`;
@@ -760,7 +763,7 @@ function renderGiderler() {
       <td>${formatDate(g.tarih)}</td>
       <td>${esc(g.ad)}</td>
       <td><span class="badge badge-type">${turLabels[g.tur]||g.tur}</span></td>
-      <td class="fw-bold">${fmtCur(g.tutar)}</td>
+      <td class="fw-bold text-danger">${fmtCur(g.tutar)}</td>
       <td><small class="text-muted">${dagStr}</small></td>
       <td><button class="btn btn-sm btn-outline-danger" onclick="deleteGider('${g.id}')"><i class="fas fa-trash"></i></button></td>
     </tr>`;
@@ -824,7 +827,7 @@ function renderBorc() {
       <td>${fmtCur(b.odenen)}</td>
       <td class="fw-bold" style="color:${b.bakiye>0?'var(--danger)':'var(--success)'}">${fmtCur(b.bakiye)}</td>
       <td>${badge}</td>
-      <td class="no-print"><a href="${wpUrl}" target="_blank" class="btn btn-sm btn-whatsapp" title="WhatsApp"><i class="fab fa-whatsapp"></i></a></td>
+      <td class="no-print"><a href="${wpUrl}" target="_blank" class="btn btn-sm btn-success" title="WhatsApp"><i class="fab fa-whatsapp"></i></a></td>
     </tr>`;
   });
 }
@@ -899,18 +902,6 @@ function shareViaWhatsApp(text) {
   const wpUrl = `https://api.whatsapp.com/send?text=${encoded}`;
   window.open(wpUrl, '_blank');
   toast('WhatsApp açılıyor...');
-}
-function fallbackCopy(text) {
-  const ta = document.createElement('textarea');
-  ta.value = text;
-  ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px';
-  document.body.appendChild(ta);
-  ta.focus(); ta.select();
-  try {
-    document.execCommand('copy');
-    toast('Metin panoya kopyalandı! WhatsApp grubunuza yapıştırabilirsiniz.');
-  } catch { toast('Kopyalama başarısız. Lütfen manuel kopyalayın.','danger'); }
-  document.body.removeChild(ta);
 }
 function sendWpGroup() {
   const daireler = getDaireler();
@@ -1048,7 +1039,7 @@ function generateReport() {
   // Daire borç dağılımı
   html += `<div class="card-custom mb-4"><div class="card-header-custom">
     <span>Daire Borç Dağılımı - ${period}</span>
-    <button class="btn btn-sm btn-whatsapp no-print" onclick="sendWpGroupMonthly(${ay},${yil})"><i class="fab fa-whatsapp me-1"></i> Gruba Gönder</button>
+    <button class="btn btn-sm btn-outline-success no-print" onclick="sendWpGroupMonthly(${ay},${yil})"><i class="fab fa-whatsapp me-1"></i> Gruba Gönder</button>
   </div>
   <div class="table-responsive"><table class="table table-custom"><thead><tr><th>Kapı No</th><th>Ad Soyad</th><th>Isınma</th><th>Ortak</th><th>Toplam</th><th>Ödenen</th><th>Bakiye</th><th>Durum</th><th class="no-print">WA</th></tr></thead><tbody>`;
 
@@ -1070,7 +1061,7 @@ function generateReport() {
       <td class="fw-bold">${fmtCur(b.toplam)}</td><td>${fmtCur(b.odenen)}</td>
       <td class="fw-bold" style="color:${b.bakiye>0?'var(--danger)':'var(--success)'}">${fmtCur(b.bakiye)}</td>
       <td>${badge}</td>
-      <td class="no-print"><a href="${wpUrl}" target="_blank" class="btn btn-sm btn-whatsapp"><i class="fab fa-whatsapp"></i></a></td>
+      <td class="no-print"><a href="${wpUrl}" target="_blank" class="btn btn-sm btn-success"><i class="fab fa-whatsapp"></i></a></td>
     </tr>`;
     printRows += `<tr><td>${esc(d.kapiNo)}</td><td>${esc(d.adSoyad)}</td><td style="text-align:right">${fmtCur(b.isinma)}</td><td style="text-align:right">${fmtCur(b.ortak)}</td><td style="text-align:right;font-weight:bold">${fmtCur(b.toplam)}</td><td style="text-align:right">${fmtCur(b.odenen)}</td><td style="text-align:right;font-weight:bold">${fmtCur(b.bakiye)}</td><td>${status}</td></tr>`;
   });
