@@ -12,10 +12,11 @@
             --card-hover: #1a2138;
             --text: #f0f0f8;
             --text-dim: #8892b0;
-            --accent-cark: #e056fd;
-            --accent-freq: #00f0ff;
-            --accent-calc: #00b894;
+            --accent-cark: #e056fd; /* Çarkıfelek Rengi */
+            --accent-freq: #00f0ff; /* Frekans Rengi */
+            --accent-calc: #00b894; /* Hesaplama Rengi */
             --accent-apt: #f59e0b; /* Apartman Rengi */
+            --accent-note: #ff9f43; /* Notlar Rengi */
             --border: rgba(255, 255, 255, 0.08);
             --glow: rgba(108, 92, 231, 0.2);
         }
@@ -35,6 +36,7 @@
             position: relative;
         }
 
+        /* Arkaplan Animasyonu */
         body::before {
             content: '';
             position: fixed;
@@ -42,7 +44,7 @@
             background: 
                 radial-gradient(ellipse at 20% 50%, rgba(224, 86, 253, 0.05) 0%, transparent 50%),
                 radial-gradient(ellipse at 80% 20%, rgba(0, 240, 255, 0.05) 0%, transparent 50%),
-                radial-gradient(ellipse at 60% 80%, rgba(245, 158, 11, 0.05) 0%, transparent 50%);
+                radial-gradient(ellipse at 60% 80%, rgba(255, 159, 67, 0.05) 0%, transparent 50%);
             animation: drift 20s ease-in-out infinite;
             pointer-events: none;
             z-index: 0;
@@ -176,6 +178,7 @@
         .freq { --accent-color: var(--accent-freq); --glow-color: rgba(0, 240, 255, 0.4); }
         .calc { --accent-color: var(--accent-calc); --glow-color: rgba(0, 184, 148, 0.4); }
         .apt  { --accent-color: var(--accent-apt); --glow-color: rgba(245, 158, 11, 0.4); }
+        .note { --accent-color: var(--accent-note); --glow-color: rgba(255, 159, 67, 0.4); }
 
         .footer {
             margin-top: 60px;
@@ -198,6 +201,7 @@
         .grid > *:nth-child(2) { animation: fadeUp 0.6s ease-out 0.2s both; }
         .grid > *:nth-child(3) { animation: fadeUp 0.6s ease-out 0.3s both; }
         .grid > *:nth-child(4) { animation: fadeUp 0.6s ease-out 0.4s both; }
+        .grid > *:nth-child(5) { animation: fadeUp 0.6s ease-out 0.5s both; }
 
         @media (max-width: 768px) {
             .main-logo { font-size: 2.5rem; }
@@ -250,11 +254,22 @@
             <a href="apartman.html" class="card apt">
                 <div class="icon-box">🏢</div>
                 <div>
-                    <h2 class="card-title">Apt. Yönetim</h2>
+                    <h2 class="card-title">Apartman Yönetim</h2>
+                    <span class="badge">v2.0</span>
+                </div>
+                <p class="card-desc">
+                    Daire aidat takibi, apartman giderleri ve kasa durumu yönetimi için profesyonel araç.
+                </p>
+            </a>
+
+            <a href="notlar.html" class="card note">
+                <div class="icon-box">📝</div>
+                <div>
+                    <h2 class="card-title">Notlar & Ajanda</h2>
                     <span class="badge">v1.0</span>
                 </div>
                 <p class="card-desc">
-                    Daire aidat takibi, apartman giderleri ve kasa durumu yönetimi için pratik araç.
+                    Hızlı notlar almak, yapılacaklar listesi oluşturmak ve planlama yapmak için dijital asistan.
                 </p>
             </a>
         </div>
