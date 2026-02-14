@@ -12,201 +12,55 @@
             --card-hover: #1a2138;
             --text: #f0f0f8;
             --text-dim: #8892b0;
-            --accent-cark: #e056fd; /* Çarkıfelek Rengi */
-            --accent-freq: #00f0ff; /* Frekans Rengi */
-            --accent-calc: #00b894; /* Hesaplama Rengi */
-            --accent-apt: #f59e0b; /* Apartman Rengi */
-            --accent-note: #ff9f43; /* Notlar Rengi */
+            --accent-cark: #e056fd;
+            --accent-freq: #00f0ff;
+            --accent-calc: #00b894;
+            --accent-apt: #f59e0b;
+            --accent-note: #ff9f43;
+            --accent-panel: #48dbfb; /* Yeni Kolay Panel Rengi */
             --border: rgba(255, 255, 255, 0.08);
             --glow: rgba(108, 92, 231, 0.2);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow-x: hidden; position: relative; }
 
-        body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        /* Arkaplan Animasyonu */
         body::before {
-            content: '';
-            position: fixed;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background: 
-                radial-gradient(ellipse at 20% 50%, rgba(224, 86, 253, 0.05) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 20%, rgba(0, 240, 255, 0.05) 0%, transparent 50%),
-                radial-gradient(ellipse at 60% 80%, rgba(255, 159, 67, 0.05) 0%, transparent 50%);
-            animation: drift 20s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 0;
+            content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(ellipse at 20% 50%, rgba(224, 86, 253, 0.05) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 20%, rgba(0, 240, 255, 0.05) 0%, transparent 50%),
+                        radial-gradient(ellipse at 60% 80%, rgba(255, 159, 67, 0.05) 0%, transparent 50%);
+            animation: drift 20s ease-in-out infinite; pointer-events: none; z-index: 0;
         }
+        @keyframes drift { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(2%, -1%); } }
 
-        @keyframes drift {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(2%, -1%); }
-        }
+        .container { position: relative; z-index: 1; width: 100%; max-width: 1200px; padding: 20px; text-align: center; }
+        .logo-area { margin-bottom: 50px; }
+        .main-logo { font-size: 3rem; font-weight: 900; background: linear-gradient(135deg, #6c5ce7, #a29bfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+        .subtitle { color: var(--text-dim); font-size: 1.1rem; letter-spacing: 1px; }
 
-        .container {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 1200px;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .logo-area {
-            margin-bottom: 50px;
-            animation: fadeDown 0.8s ease-out;
-        }
-
-        .main-logo {
-            font-size: 3rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-            letter-spacing: -1px;
-        }
-
-        .subtitle {
-            color: var(--text-dim);
-            font-size: 1.1rem;
-            font-weight: 500;
-            letter-spacing: 1px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-top: 20px;
-        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-top: 20px; }
 
         .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 40px 30px;
-            text-decoration: none;
-            color: var(--text);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
+            background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 40px 30px; text-decoration: none; color: var(--text); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; gap: 20px; position: relative; overflow: hidden; backdrop-filter: blur(10px);
         }
+        .card:hover { transform: translateY(-10px); border-color: var(--accent-color); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5); background: var(--card-hover); }
+        
+        .icon-box { width: 80px; height: 80px; border-radius: 20px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 36px; border: 1px solid var(--border); transition: transform 0.4s; }
+        .card:hover .icon-box { transform: scale(1.1) rotate(5deg); background: var(--accent-color); border-color: transparent; color: #000; }
 
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at top right, var(--glow-color), transparent 60%);
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
+        .card-title { font-size: 1.5rem; font-weight: 800; }
+        .card-desc { color: var(--text-dim); font-size: 0.95rem; line-height: 1.6; }
+        .badge { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 6px 12px; border-radius: 99px; background: rgba(255,255,255,0.05); color: var(--accent-color); border: 1px solid var(--border); font-weight: 700; }
 
-        .card:hover {
-            transform: translateY(-10px);
-            border-color: var(--accent-color);
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
-            background: var(--card-hover);
-        }
+        .cark { --accent-color: var(--accent-cark); }
+        .freq { --accent-color: var(--accent-freq); }
+        .calc { --accent-color: var(--accent-calc); }
+        .apt  { --accent-color: var(--accent-apt); }
+        .note { --accent-color: var(--accent-note); }
+        .panel { --accent-color: var(--accent-panel); }
 
-        .card:hover::before { opacity: 0.1; }
-
-        .icon-box {
-            width: 80px;
-            height: 80px;
-            border-radius: 20px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
-            border: 1px solid var(--border);
-            transition: transform 0.4s;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-        }
-
-        .card:hover .icon-box {
-            transform: scale(1.1) rotate(5deg);
-            background: var(--accent-color);
-            border-color: transparent;
-            color: #000;
-            box-shadow: 0 0 30px var(--glow-color);
-        }
-
-        .card-title {
-            font-size: 1.5rem;
-            font-weight: 800;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .card-desc {
-            color: var(--text-dim);
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-
-        .badge {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            padding: 6px 12px;
-            border-radius: 99px;
-            background: rgba(255,255,255,0.05);
-            color: var(--accent-color);
-            border: 1px solid var(--border);
-            font-weight: 700;
-        }
-
-        /* Kartlara Özel Renkler */
-        .cark { --accent-color: var(--accent-cark); --glow-color: rgba(224, 86, 253, 0.4); }
-        .freq { --accent-color: var(--accent-freq); --glow-color: rgba(0, 240, 255, 0.4); }
-        .calc { --accent-color: var(--accent-calc); --glow-color: rgba(0, 184, 148, 0.4); }
-        .apt  { --accent-color: var(--accent-apt); --glow-color: rgba(245, 158, 11, 0.4); }
-        .note { --accent-color: var(--accent-note); --glow-color: rgba(255, 159, 67, 0.4); }
-
-        .footer {
-            margin-top: 60px;
-            color: var(--text-dim);
-            font-size: 0.8rem;
-            opacity: 0.6;
-        }
-
-        @keyframes fadeDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .grid > *:nth-child(1) { animation: fadeUp 0.6s ease-out 0.1s both; }
-        .grid > *:nth-child(2) { animation: fadeUp 0.6s ease-out 0.2s both; }
-        .grid > *:nth-child(3) { animation: fadeUp 0.6s ease-out 0.3s both; }
-        .grid > *:nth-child(4) { animation: fadeUp 0.6s ease-out 0.4s both; }
-        .grid > *:nth-child(5) { animation: fadeUp 0.6s ease-out 0.5s both; }
-
-        @media (max-width: 768px) {
-            .main-logo { font-size: 2.5rem; }
-            .grid { grid-template-columns: 1fr; max-width: 400px; margin: 20px auto; }
-        }
+        .footer { margin-top: 60px; color: var(--text-dim); font-size: 0.8rem; opacity: 0.6; }
     </style>
 </head>
 <body>
@@ -220,57 +74,38 @@
         <div class="grid">
             <a href="carkifelek.html" class="card cark">
                 <div class="icon-box">🎰</div>
-                <div>
-                    <h2 class="card-title">Altın Günü Çekiliş</h2>
-                    <span class="badge">v2.0</span>
-                </div>
-                <p class="card-desc">
-                    Altın günü çekilişleri, şans oyunları ve rastgele seçimler için eğlenceli çark sistemi.
-                </p>
+                <div><h2 class="card-title">Altın Günü Çekiliş</h2><span class="badge">v2.0</span></div>
+                <p class="card-desc">Altın günü çekilişleri ve rastgele seçimler için eğlenceli çark sistemi.</p>
             </a>
 
             <a href="frekans.html" class="card freq">
                 <div class="icon-box">📻</div>
-                <div>
-                    <h2 class="card-title">Frekans Pro</h2>
-                    <span class="badge">v3.0</span>
-                </div>
-                <p class="card-desc">
-                    Binaural beatler, solfeggio frekansları ve ses terapisi için gelişmiş sinyal üretici.
-                </p>
+                <div><h2 class="card-title">Frekans Pro</h2><span class="badge">v3.0</span></div>
+                <p class="card-desc">Binaural beatler ve ses terapisi için gelişmiş sinyal üretici.</p>
             </a>
 
             <a href="hesaplama.html" class="card calc">
                 <div class="icon-box">📊</div>
-                <div>
-                    <h2 class="card-title">Hesaplama Pro</h2>
-                    <span class="badge">v3.0 Fix</span>
-                </div>
-                <p class="card-desc">
-                    Gelir-gider takibi, kredi hesaplamaları ve taksit yönetimi için finansal kontrol merkezi.
-                </p>
+                <div><h2 class="card-title">Hesaplama Pro</h2><span class="badge">v3.0 Fix</span></div>
+                <p class="card-desc">Gelir-gider takibi ve kredi hesaplamaları için finans merkezi.</p>
             </a>
 
             <a href="apartman.html" class="card apt">
                 <div class="icon-box">🏢</div>
-                <div>
-                    <h2 class="card-title">Apartman Yönetim</h2>
-                    <span class="badge">v2.0</span>
-                </div>
-                <p class="card-desc">
-                    Daire aidat takibi, apartman giderleri ve kasa durumu yönetimi için profesyonel araç.
-                </p>
+                <div><h2 class="card-title">Apartman Yönetim</h2><span class="badge">v2.0</span></div>
+                <p class="card-desc">Daire aidat takibi ve kasa durumu yönetimi için profesyonel araç.</p>
             </a>
 
             <a href="notlar.html" class="card note">
                 <div class="icon-box">📝</div>
-                <div>
-                    <h2 class="card-title">Notlar & Ajanda</h2>
-                    <span class="badge">v1.0</span>
-                </div>
-                <p class="card-desc">
-                    Hızlı notlar almak, yapılacaklar listesi oluşturmak ve planlama yapmak için dijital asistan.
-                </p>
+                <div><h2 class="card-title">Notlar & Ajanda</h2><span class="badge">v1.0</span></div>
+                <p class="card-desc">Yapılacaklar listesi ve planlama yapmak için dijital asistan.</p>
+            </a>
+
+            <a href="panel.html" class="card panel">
+                <div class="icon-box">🚀</div>
+                <div><h2 class="card-title">Kolay Panel</h2><span class="badge">v1.0</span></div>
+                <p class="card-desc">Kişisel link deposu, döviz kurları ve hızlı başlatıcı (Şifreli).</p>
             </a>
         </div>
 
