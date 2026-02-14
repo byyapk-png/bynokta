@@ -7,15 +7,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;900&family=JetBrains+Mono:wght@500;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #06080f; --card: #111627; --card-hover: #1a2138; --text: #f0f0f8; --text-dim: #8892b0;
-            --accent-cark: #e056fd; --accent-freq: #00f0ff; --accent-calc: #00b894;
-            --accent-apt: #f59e0b; --accent-note: #ff9f43; --accent-panel: #48dbfb;
-            --border: rgba(255, 255, 255, 0.08); --glow: rgba(108, 92, 231, 0.2);
+            --bg: #06080f; 
+            --card: #111627; 
+            --card-hover: #1a2138; 
+            --text: #f0f0f8; 
+            --text-dim: #8892b0;
+            --accent-cark: #e056fd; 
+            --accent-freq: #00f0ff; 
+            --accent-calc: #00b894;
+            --accent-apt: #f59e0b; 
+            --accent-note: #ff9f43; 
+            --accent-panel: #00ff00; /* Matrix Yeşili */
+            --border: rgba(255, 255, 255, 0.08); 
+            --glow: rgba(108, 92, 231, 0.2);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow-x: hidden; position: relative; }
+        
+        body { 
+            font-family: 'Outfit', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            overflow-x: hidden; 
+            position: relative; 
+        }
 
+        /* Arkaplan Animasyonu */
         body::before {
             content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
             background: radial-gradient(ellipse at 20% 50%, rgba(224, 86, 253, 0.05) 0%, transparent 50%),
@@ -53,13 +75,15 @@
 
         /* Şifre Modalı */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); z-index: 9999;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); z-index: 9999;
             display: none; align-items: center; justify-content: center;
         }
-        .modal { background: var(--card); padding: 40px; border-radius: 24px; border: 1px solid var(--border); text-align: center; width: 90%; max-width: 400px; }
-        .modal input { width: 100%; padding: 15px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: #fff; text-align: center; font-size: 1.2rem; margin: 20px 0; outline: none; }
-        .modal button { width: 100%; padding: 15px; background: var(--accent-panel); color: #000; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; }
-        .modal .close-btn { margin-top: 15px; background: transparent; color: var(--text-dim); font-weight: 500; }
+        .modal { background: var(--card); padding: 40px; border-radius: 32px; border: 1px solid var(--accent-panel); text-align: center; width: 90%; max-width: 400px; box-shadow: 0 0 30px rgba(0, 255, 0, 0.1); }
+        .modal input { width: 100%; padding: 15px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: var(--accent-panel); text-align: center; font-size: 1.5rem; margin: 20px 0; outline: none; font-family: 'JetBrains Mono'; letter-spacing: 4px; }
+        .modal input:focus { border-color: var(--accent-panel); box-shadow: 0 0 15px rgba(0, 255, 0, 0.2); }
+        .modal button { width: 100%; padding: 15px; background: var(--accent-panel); color: #000; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; transition: all 0.2s; }
+        .modal button:hover { transform: scale(1.02); filter: brightness(1.1); }
+        .modal .close-btn { margin-top: 15px; background: transparent; color: var(--text-dim); font-weight: 500; font-size: 0.9rem; border: none; cursor: pointer; }
 
         .footer { margin-top: 60px; color: var(--text-dim); font-size: 0.8rem; opacity: 0.6; }
     </style>
@@ -105,8 +129,8 @@
 
             <div class="card panel" onclick="openPassModal()">
                 <div class="icon-box">🚀</div>
-                <div><h2 class="card-title">Kolay Panel</h2><span class="badge">v1.0</span></div>
-                <p class="card-desc">Kişisel link deposu, döviz kurları ve hızlı başlatıcı (Şifreli).</p>
+                <div><h2 class="card-title">Kolay Panel</h2><span class="badge">v5.4</span></div>
+                <p class="card-desc">Kişisel link deposu, döviz kurları ve Matrix paneli (Şifreli).</p>
             </div>
         </div>
 
@@ -118,18 +142,19 @@
     <div class="modal-overlay" id="passModal">
         <div class="modal">
             <div style="font-size: 3rem; margin-bottom: 10px;">🔐</div>
-            <h2 style="font-weight: 900;">Kolay Panel</h2>
-            <p style="color: var(--text-dim); font-size: 0.8rem;">Giriş için şifrenizi girin.</p>
-            <input type="password" id="panelPass" placeholder="••••••••" onkeypress="if(event.key==='Enter') verifyPass()">
-            <button onclick="verifyPass()">GİRİŞ YAP</button>
-            <button class="close-btn" onclick="closePassModal()">İptal Et</button>
-            <p id="errorMsg" style="color: #ff6b6b; font-size: 0.8rem; margin-top: 15px; display: none;">Hatalı şifre denemesi!</p>
+            <h2 style="font-weight: 900; color: var(--accent-panel);">SİSTEM KİLİTLİ</h2>
+            <p style="color: var(--text-dim); font-size: 0.8rem;">Kolay Panel'e erişim için şifre girin.</p>
+            <input type="password" id="panelPass" placeholder="••••" onkeypress="if(event.key==='Enter') verifyPass()">
+            <button onclick="verifyPass()">ERİŞİM İZNİ VER</button>
+            <button class="close-btn" onclick="closePassModal()">Vazgeç</button>
+            <p id="errorMsg" style="color: #ff6b6b; font-size: 0.8rem; margin-top: 15px; display: none;">❌ Hatalı Şifre!</p>
         </div>
     </div>
 
     <script>
-        const PASS = "bynokta2026";
+        const PASS = "bynokta2026"; // Buradan şifreni değiştirebilirsin
 
+        // Şifre Fonksiyonları
         function openPassModal() {
             document.getElementById('passModal').style.display = 'flex';
             document.getElementById('panelPass').focus();
@@ -148,8 +173,27 @@
             } else {
                 document.getElementById('errorMsg').style.display = 'block';
                 document.getElementById('panelPass').value = '';
+                document.querySelector('.modal').animate([
+                    { transform: 'translateX(-5px)' },
+                    { transform: 'translateX(5px)' },
+                    { transform: 'translateX(-5px)' },
+                    { transform: 'translateX(0)' }
+                ], { duration: 200 });
             }
         }
+
+        // SAĞ TIK VE F12 ENGELLEME (GÜVENLİK)
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        }, false);
+
+        document.onkeydown = function(e) {
+            if(e.keyCode == 123) return false;
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
+            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+            if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false;
+        };
     </script>
 </body>
 </html>
