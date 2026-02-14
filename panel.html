@@ -2,205 +2,443 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kolay Panel - ByNoKTa</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ByNoKTa - Geniş Panel v5.4</title>
     <style>
-        :root {
-            --bg: #06080f;
-            --card: #111627;
-            --accent: #48dbfb; /* Cyan/Blue accent */
-            --text: #f0f0f8;
-            --text-dim: #8892b0;
-            --border: rgba(255, 255, 255, 0.08);
-            --success: #00b894;
-            --danger: #ff6b6b;
-        }
-
+        /* --- TEMEL AYARLAR --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
-
-        /* Şifre Ekranı */
-        #lockScreen {
-            position: fixed; inset: 0; background: var(--bg); z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        
+        body {
+            font-family: 'Segoe UI', 'Consolas', monospace;
+            background-color: #000;
+            color: #00ff00;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
         }
-        .lock-box { background: var(--card); padding: 40px; border-radius: 24px; border: 1px solid var(--border); text-align: center; width: 90%; max-width: 400px; }
-        .lock-box input { width: 100%; padding: 15px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; color: #fff; text-align: center; font-size: 1.2rem; margin: 20px 0; outline: none; }
-        .lock-box button { width: 100%; padding: 15px; background: var(--accent); color: #000; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; }
 
-        /* Ana İçerik */
-        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; display: none; }
-        .back-link { display: inline-block; color: var(--text-dim); text-decoration: none; font-weight: bold; margin-bottom: 20px; }
-        .back-link:hover { color: var(--accent); }
+        /* MATRIX CANVAS */
+        #matrixCanvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; opacity: 0.35;
+        }
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
-        .header h1 { font-weight: 900; background: linear-gradient(135deg, var(--accent), #54a0ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        /* 16:9 GENİŞ PANEL (PC İÇİN) */
+        .container {
+            background: rgba(0, 10, 0, 0.92);
+            border: 2px solid #00ff00;
+            border-radius: 12px;
+            width: 90vw;
+            max-width: 1400px;
+            height: 85vh;
+            max-height: 850px;
+            box-shadow: 0 0 50px rgba(0, 255, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+        }
 
-        .panel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        @media (max-width: 768px) { .panel-grid { grid-template-columns: 1fr; } }
+        /* Başlık */
+        .header {
+            padding: 15px;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 50, 0, 0.3);
+            border-radius: 10px 10px 0 0;
+            flex-shrink: 0;
+        }
+        .header h1 { font-size: 24px; text-shadow: 0 0 10px #00ff00; letter-spacing: 2px; }
+        .status-bar { font-size: 14px; color: #00cc00; display: flex; gap: 20px; }
 
-        .panel-card { background: var(--card); border-radius: 20px; border: 1px solid var(--border); padding: 25px; }
-        .panel-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 20px; color: var(--accent); display: flex; align-items: center; gap: 10px; }
+        .content {
+            flex: 1; padding: 20px; overflow-y: auto;
+            display: flex; flex-direction: column;
+        }
 
-        /* Link Listesi */
-        .site-list { background: rgba(0,0,0,0.2); border-radius: 12px; overflow: hidden; margin-bottom: 15px; }
-        .site-item { display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid var(--border); gap: 10px; font-size: 0.9rem; }
-        .site-item a { color: var(--text); text-decoration: none; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .site-item a:hover { color: var(--accent); }
-        .btn-del { background: none; border: none; color: var(--danger); cursor: pointer; opacity: 0.5; }
-        .btn-del:hover { opacity: 1; }
+        /* Menü Grid (PC: 3 Sütun) */
+        .menu-screen { 
+            display: grid;
+            grid-template-columns: 1fr 1.3fr 1fr; 
+            gap: 20px; 
+            height: 100%;
+        }
 
-        /* Araçlar */
-        .btn-action { width: 100%; padding: 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; color: #fff; text-align: left; cursor: pointer; margin-bottom: 10px; font-weight: 600; display: flex; justify-content: space-between; }
-        .btn-action:hover { border-color: var(--accent); background: rgba(72, 219, 251, 0.05); }
+        .panel-box {
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            background: rgba(0, 30, 0, 0.4);
+            border-radius: 8px; padding: 15px;
+            display: flex; flex-direction: column; gap: 10px; position: relative;
+        }
+        .panel-title {
+            color: #fff; background: #004400; padding: 8px; border-radius: 4px;
+            text-align: center; font-weight: bold; margin-bottom: 5px; border: 1px solid #00ff00;
+        }
 
-        .rates-box { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .rate-item { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; text-align: center; }
-        .rate-val { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #fff; font-size: 1.2rem; }
-        .rate-lbl { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; margin-top: 5px; }
+        /* Ortak Inputlar */
+        input {
+            width: 100%; padding: 12px; background: rgba(0, 20, 0, 0.8);
+            border: 1px solid #006600; color: #00ff00;
+            font-family: inherit; font-size: 16px; text-align: center; border-radius: 6px;
+        }
+        input:focus { outline: none; border-color: #00ff88; box-shadow: 0 0 15px rgba(0, 255, 136, 0.4); }
 
-        /* Input Group */
-        .add-group { display: flex; gap: 8px; }
-        .add-group input { flex: 1; background: var(--bg); border: 1px solid var(--border); padding: 10px; border-radius: 8px; color: #fff; }
+        /* Butonlar */
+        .btn {
+            padding: 12px; background: linear-gradient(90deg, rgba(0,40,0,0.8) 0%, rgba(0,80,0,0.8) 100%);
+            border: 1px solid #00ff00; color: #00ff00;
+            font-family: inherit; font-size: 15px; cursor: pointer; border-radius: 6px;
+            text-align: left; display: flex; align-items: center; justify-content: space-between;
+            transition: 0.2s;
+        }
+        .btn:hover { background: #00ff00; color: #000; box-shadow: 0 0 15px #00ff00; font-weight: bold; }
+        
+        .btn-large { text-align: center; justify-content: center; font-size: 18px; padding: 18px; font-weight: bold; border-width: 2px; }
+        .btn-x { background: rgba(29, 161, 242, 0.2); border-color: #1da1f2; color: #1da1f2; }
+        .btn-x:hover { background: #1da1f2; color: #fff; box-shadow: 0 0 15px #1da1f2; }
+        .btn-gem { background: linear-gradient(90deg, rgba(70, 130, 180, 0.3) 0%, rgba(138, 43, 226, 0.3) 100%); border-color: #8a2be2; color: #e0b0ff; }
+        .btn-gem:hover { background: linear-gradient(90deg, #4682b4 0%, #8a2be2 100%); color: #fff; box-shadow: 0 0 15px #8a2be2; }
+
+        /* Site Listesi */
+        .site-list {
+            flex: 1; overflow-y: auto; background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,255,0,0.1); border-radius: 4px; padding: 5px; margin-bottom: 10px;
+            min-height: 150px;
+        }
+        .site-item {
+            padding: 10px; border-bottom: 1px solid rgba(0,255,0,0.1);
+            font-size: 14px; color: #aaa; display: flex; justify-content: space-between; align-items: center;
+        }
+        .site-item a { color: #00cc00; text-decoration: none; word-break: break-all; margin-right: 10px; }
+        .site-item a:hover { color: #fff; text-decoration: underline; }
+
+        .add-site-area {
+            border-top: 1px solid #00ff00; padding-top: 10px;
+            background: rgba(0, 50, 0, 0.2); border-radius: 0 0 8px 8px;
+        }
+        .add-group { display: flex; gap: 5px; }
+        .add-group input { margin: 0; text-align: left; font-size: 13px; }
+        .add-group .btn { width: auto; padding: 0 15px; justify-content: center; }
+
+        /* Modallar */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 100; justify-content: center; align-items: center;
+        }
+        .modal.active { display: flex; }
+        .modal-box { 
+            background: #111; border: 2px solid #00ff00; padding: 30px; border-radius: 10px; 
+            width: 500px; max-width: 90%; text-align: center; box-shadow: 0 0 30px rgba(0,255,0,0.3);
+            max-height: 90vh; overflow-y: auto;
+        }
+
+        /* 3D Hesaplama */
+        .calc-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .calc-col { flex: 1; }
+        .calc-col label { display: block; font-size: 12px; color: #aaa; margin-bottom: 5px; text-align: left; }
+        .calc-result { margin-top: 20px; padding: 15px; background: rgba(0,255,0,0.1); border: 1px solid #00ff00; border-radius: 8px; display: none; text-align: left; }
+        .calc-line { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px; color: #ccc; }
+        .calc-final { font-size: 24px; color: #00ff00; font-weight: bold; text-align: center; margin-top: 10px; display: block; }
+
+        /* MOBİL UYUMLULUK */
+        @media (max-width: 768px) {
+            body { 
+                overflow-y: auto; height: auto; min-height: 100vh;
+                align-items: flex-start; padding: 10px;
+            }
+            .container { width: 100%; height: auto; max-height: none; margin-bottom: 20px; }
+            .header h1 { font-size: 18px; }
+            .status-bar { font-size: 11px; gap: 10px; }
+            .menu-screen { display: flex; flex-direction: column; gap: 15px; }
+            .site-list { max-height: 300px; }
+            .btn { padding: 15px; font-size: 16px; }
+            .panel-title { font-size: 18px; padding: 10px; }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #004400; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00ff00; }
     </style>
 </head>
 <body>
+    <canvas id="matrixCanvas"></canvas>
 
-    <div id="lockScreen">
-        <div class="lock-box">
-            <div style="font-size: 3rem; margin-bottom: 10px;">🔐</div>
-            <h2 style="font-weight: 900;">Giriş Gerekli</h2>
-            <p style="color: var(--text-dim); font-size: 0.8rem;">Bu alan şifre ile korunmaktadır.</p>
-            <input type="password" id="passInput" placeholder="Şifreyi girin..." onkeypress="if(event.key==='Enter') checkPass()">
-            <button onclick="checkPass()">PANELİ AÇ</button>
-            <p id="errorMsg" style="color: var(--danger); font-size: 0.8rem; margin-top: 15px; display: none;">Hatalı şifre!</p>
+    <div class="container">
+        <div class="header">
+            <h1>ByNoKTa PANEL <sup>v5.4</sup></h1>
+            <div class="status-bar">
+                <span id="clock">00:00:00</span>
+                <span>|</span>
+                <span id="date">...</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <div id="menuScreen" class="menu-screen">
+                
+                <div class="panel-box">
+                    <div class="panel-title">🚀 BAŞLATICI</div>
+                    <button class="btn btn-large" onclick="openAll()">TÜMÜNÜ AÇ</button>
+                    <button class="btn" onclick="openAI()">🤖 Sadece AI Siteleri</button>
+                    <button class="btn" onclick="openWhatsapp()">💬 WhatsApp Web</button>
+                    
+                    <div style="border-top: 1px solid #00ff00; margin: 10px 0; opacity: 0.3;"></div>
+                    
+                    <div class="panel-title" style="background: #0d2838; border-color: #1da1f2; color: #1da1f2;">🐦 X (TWITTER)</div>
+                    <div style="display: flex; gap: 5px;">
+                        <input type="text" id="xSearchInput" placeholder="X'te Ara..." style="font-size: 14px; border-color: #1da1f2; color: #1da1f2;">
+                        <button class="btn btn-x" onclick="searchX()" style="width: auto; padding: 0 15px;">🔍</button>
+                    </div>
+                    <button class="btn btn-x" onclick="openXTrends()" style="justify-content: center; font-weight: bold;">🔥 GÜNDEM</button>
+
+                    <div style="border-top: 1px solid #00ff00; margin: 10px 0; opacity: 0.3;"></div>
+                    <div class="panel-title" style="background: #2a0a3b; border-color: #8a2be2; color: #e0b0ff;">💎 ÖZEL AI</div>
+                    <button class="btn btn-gem" onclick="window.open('https://gemini.google.com/gem/893b96918fb3', '_blank')" style="justify-content: center; font-weight: bold; font-size: 16px;">
+                        🖼️ RESİM GEM
+                    </button>
+                </div>
+
+                <div class="panel-box">
+                    <div class="panel-title">📋 KAYITLI SİTELER</div>
+                    <div class="site-list" id="siteListDisplay"></div>
+                    <div class="add-site-area">
+                        <div style="font-size: 11px; color: #aaa; margin-bottom: 5px;">Yeni Site Ekle:</div>
+                        <div class="add-group">
+                            <input type="text" id="newSiteUrlInput" placeholder="https://ornek.com">
+                            <button class="btn" onclick="addNewSitePersistent()">EKLE</button>
+                        </div>
+                        <div style="font-size: 10px; color: #666; margin-top: 5px;">* İnen dosyayı eskisinin üzerine kaydet.</div>
+                    </div>
+                </div>
+
+                <div class="panel-box">
+                    <div class="panel-title">🛠️ ARAÇLAR & PİYASA</div>
+                    
+                    <button class="btn" onclick="open3DCalc()" style="background: rgba(0,255,100,0.15); border-color: #00ffaa; color: #00ffaa;">
+                        <span>🖨️ 3D Maliyet Hesapla</span>
+                        <span>➤</span>
+                    </button>
+
+                    <button class="btn" onclick="toggleWifi()">
+                        <span>📶 WiFi Şifresi</span>
+                        <span id="wifiText" style="filter: blur(5px);">.....</span>
+                    </button>
+
+                    <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin: 10px 0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>💵 USD:</span> <span id="rateUsd" style="color:#fff">...</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>💶 EUR:</span> <span id="rateEur" style="color:#fff">...</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>🥇 Altın:</span> <span id="rateGold" style="color:#fff">...</span>
+                        </div>
+                        <button class="btn" style="margin-top: 10px; padding: 5px; font-size: 12px; text-align: center; display: block; width: 100%;" onclick="fetchRates()">Yenile</button>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn" onclick="openSpeedTest()" style="flex:1; font-size:12px;">⚡ Hız Testi</button>
+                        <button class="btn" onclick="window.open('https://erzurum.sarrafiye.net/', '_blank')" style="flex:1; font-size:12px;">🏛️ Sarrafiye</button>
+                    </div>
+
+                    <div style="margin-top: 15px;"></div>
+                    <button class="btn" style="border-color: red; color: #ff6666;" onclick="closeAllConfirm()">⚠️ Oturumları Kapat</button>
+                    <button class="btn" onclick="window.close()" style="margin-top: 5px; border-color: #666; color: #aaa;">✖ Çıkış</button>
+                </div>
+
+            </div>
         </div>
     </div>
 
-    <div class="container" id="mainPanel">
-        <a href="index.html" class="back-link">← Portal'a Dön</a>
-        
-        <div class="header">
-            <h1>Kolay Panel <sup>v1.0</sup></h1>
-            <div id="clock" style="font-family: 'JetBrains Mono'; font-weight: 700; color: var(--accent);">00:00:00</div>
-        </div>
-
-        <div class="panel-grid">
-            <div class="panel-card">
-                <div class="panel-title"><i class="fas fa-link"></i> Link Deposu</div>
-                <div class="site-list" id="siteListDisplay"></div>
-                <div class="add-group">
-                    <input type="text" id="newSiteUrl" placeholder="https://...">
-                    <button onclick="addSite()" style="padding: 10px 20px; border-radius: 8px; background: var(--accent); color: #000; border: none; font-weight: bold; cursor: pointer;">EKLE</button>
-                </div>
+    <div class="modal" id="calcModal">
+        <div class="modal-box">
+            <h2 style="color: #00ff88; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">ByNoKTa 3D PRO</h2>
+            <div class="calc-col"><label>Filament Fiyatı (1 KG - TL):</label><input type="number" id="fiyat" value="1000"></div>
+            <div class="calc-row" style="margin-top: 10px;">
+                <div class="calc-col"><label>Model (Gram):</label><input type="number" id="gram" placeholder="Gram"></div>
+                <div class="calc-col"><label>Süre (Saat):</label><input type="number" id="sureSaat" placeholder="Saat"></div>
             </div>
+            <div class="calc-row">
+                <div class="calc-col"><label>Elektrik kW (TL):</label><input type="number" id="elekFiyat" value="5.50" step="0.1"></div>
+                <div class="calc-col"><label>Kâr Oranı (%):</label><input type="number" id="karOrani" value="150"></div>
+            </div>
+            <button class="btn" onclick="hesapla3D()" style="justify-content: center; font-weight: bold; background: #00ff88; color: #000; margin-top: 15px;">HESAPLA</button>
+            <div id="calcSonuc" class="calc-result"></div>
+            <button class="btn" onclick="document.getElementById('calcModal').classList.remove('active')" style="margin-top: 15px; justify-content: center; border-color: #666; color: #aaa;">KAPAT</button>
+        </div>
+    </div>
 
-            <div class="panel-card">
-                <div class="panel-title"><i class="fas fa-tools"></i> Araçlar & Piyasa</div>
-                
-                <button class="btn-action" onclick="window.open('https://web.whatsapp.com', '_blank')">
-                    <span>💬 WhatsApp Web</span> <i class="fas fa-external-link-alt"></i>
-                </button>
-                
-                <button class="btn-action" onclick="toggleWifi()">
-                    <span>📶 WiFi Şifresi</span> <span id="wifiText" style="filter: blur(5px);">••••••••</span>
-                </button>
-
-                <div class="rates-box">
-                    <div class="rate-item"><div class="rate-val" id="rateUsd">...</div><div class="rate-lbl">Dolar</div></div>
-                    <div class="rate-item"><div class="rate-val" id="rateEur">...</div><div class="rate-lbl">Euro</div></div>
-                    <div class="rate-item" style="grid-column: span 2;"><div class="rate-val" id="rateGold">...</div><div class="rate-lbl">Gram Altın</div></div>
-                </div>
-
-                <div style="margin-top: 20px; display: flex; gap: 10px;">
-                    <button class="btn-action" style="flex: 1; font-size: 0.8rem;" onclick="window.open('https://www.speedtest.net/', '_blank')">⚡ Hız Testi</button>
-                    <button class="btn-action" style="flex: 1; font-size: 0.8rem;" onclick="fetchRates()">🔄 Yenile</button>
-                </div>
+    <div class="modal" id="closeModal">
+        <div class="modal-box">
+            <h2 style="color: red; margin-bottom: 15px;">⚠️ DİKKAT</h2>
+            <p>Açık olan tüm sekmeler kapatılacak.</p>
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button class="btn" onclick="doCloseAll()">EVET, KAPAT</button>
+                <button class="btn" onclick="document.getElementById('closeModal').classList.remove('active')" style="border-color: #666; color: #aaa;">İPTAL</button>
             </div>
         </div>
     </div>
 
     <script>
-        const CORRECT_PASS = "bynokta2026";
-        const WIFI_SIFRE = "-B?u7Qd-NK$+M:6-"; // v12'den gelen şifre
+        const WIFI_SIFRE = "-B?u7Qd-NK$+M:6-";
 
-        let SITELERIM = JSON.parse(localStorage.getItem('byn_links')) || [
+        var SITELERIM = [
             "https://chatgpt.com/",
             "https://gemini.google.com/",
-            "https://claude.ai/",
-            "https://cursor.com/"
+            "https://claude.ai/new",
+            "https://higgsfield.ai/",
+            "https://www.meshy.ai/",
+            "https://cursor.com/",
+            "https://3d.hunyuanglobal.com/"
         ];
 
-        function checkPass() {
-            const inp = document.getElementById('passInput').value;
-            if(inp === CORRECT_PASS) {
-                document.getElementById('lockScreen').style.display = 'none';
-                document.getElementById('mainPanel').style.display = 'block';
-                initPanel();
-            } else {
-                document.getElementById('errorMsg').style.display = 'block';
-                document.getElementById('passInput').value = '';
-            }
-        }
-
-        function initPanel() {
-            renderSites();
-            fetchRates();
-            setInterval(() => {
-                document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-            }, 1000);
-        }
-
-        function renderSites() {
-            const list = document.getElementById('siteListDisplay');
-            list.innerHTML = '';
-            SITELERIM.forEach((site, i) => {
-                list.innerHTML += `
-                    <div class="site-item">
-                        <i class="fas fa-globe" style="color: var(--text-dim);"></i>
-                        <a href="${site}" target="_blank">${site}</a>
-                        <button class="btn-del" onclick="deleteSite(${i})"><i class="fas fa-times"></i></button>
-                    </div>`;
-            });
-            localStorage.setItem('byn_links', JSON.stringify(SITELERIM));
-        }
-
-        function addSite() {
-            const input = document.getElementById('newSiteUrl');
+        function addNewSitePersistent() {
+            const input = document.getElementById('newSiteUrlInput');
             let url = input.value.trim();
-            if (!url) return;
-            if (!url.startsWith("http")) url = "https://" + url;
+            if (!url) { alert("Lütfen bir URL girin!"); return; }
+            if (!url.startsWith("http")) { url = "https://" + url; }
             SITELERIM.push(url);
-            input.value = "";
-            renderSites();
+            let htmlContent = document.documentElement.outerHTML;
+            let yeniListeMetni = 'var SITELERIM = ' + JSON.stringify(SITELERIM, null, 4) + ';';
+            const regex = /var SITELERIM\s*=\s*\[[\s\S]*?\];/;
+            if (regex.test(htmlContent)) {
+                let yeniHtml = htmlContent.replace(regex, yeniListeMetni);
+                downloadFile("ByNoKTa_Panel.html", yeniHtml);
+                alert("✅ EKLENDİ! İnen dosyayı eskisinin üzerine kaydet.");
+                loadSites();
+                input.value = "";
+            } else { alert("Hata: Kayıt listesi bulunamadı."); }
         }
 
-        function deleteSite(i) {
-            if(confirm("Bu link silinsin mi?")) {
-                SITELERIM.splice(i, 1);
-                renderSites();
+        function downloadFile(filename, content) {
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/html;charset=utf-8,' + encodeURIComponent("<!DOCTYPE html>\n" + content));
+            element.setAttribute('download', filename);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+
+        function searchX() {
+            const query = document.getElementById('xSearchInput').value;
+            if(query) window.open('https://twitter.com/search?q=' + encodeURIComponent(query) + '&src=typed_query', '_blank');
+            else alert("Lütfen aranacak bir şey yazın!");
+        }
+        document.getElementById('xSearchInput').addEventListener('keypress', function (e) { if (e.key === 'Enter') searchX(); });
+        function openXTrends() { window.open('https://twitter.com/explore/tabs/trending', '_blank'); }
+
+        function open3DCalc() { document.getElementById('calcModal').classList.add('active'); }
+        function hesapla3D() {
+            let filFiyat = parseFloat(document.getElementById('fiyat').value), gram = parseFloat(document.getElementById('gram').value);
+            let sure = parseFloat(document.getElementById('sureSaat').value), elekKw = parseFloat(document.getElementById('elekFiyat').value);
+            let kar = parseFloat(document.getElementById('karOrani').value);
+            if(filFiyat && gram && sure) {
+                let mal = (filFiyat/1000)*gram, elek = sure*0.2*elekKw, yip = sure*6;
+                let net = mal+elek+yip, satis = net*(1+kar/100);
+                let d = document.getElementById('calcSonuc'); d.style.display='block';
+                d.innerHTML = `<div class="calc-line"><span>Malzeme:</span><span>${mal.toFixed(2)} TL</span></div><div class="calc-line"><span>Elektrik:</span><span>${elek.toFixed(2)} TL</span></div><div class="calc-line"><span>Yıpranma:</span><span>${yip.toFixed(2)} TL</span></div><hr style="border-color:#333;margin:10px 0;"><div class="calc-line" style="color:#aaa"><span>Net:</span><span>${net.toFixed(2)} TL</span></div><span class="calc-final">${satis.toFixed(2)} TL</span>`;
+            } else alert("Bilgileri giriniz!");
+        }
+
+        const canvas = document.getElementById('matrixCanvas'); const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポ';
+        const alphabet = katakana + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        const fontSize = 16; const columns = canvas.width/fontSize; const drops = Array(Math.floor(columns)).fill(1);
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#0F0'; ctx.font = fontSize + 'px monospace';
+            for(let i=0; i<drops.length; i++) {
+                ctx.fillText(alphabet.charAt(Math.floor(Math.random()*alphabet.length)), i*fontSize, drops[i]*fontSize);
+                if(drops[i]*fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
             }
         }
+        setInterval(drawMatrix, 60); window.onresize = () => { canvas.width=window.innerWidth; canvas.height=window.innerHeight; };
+
+        setInterval(() => { const now = new Date(); document.getElementById('clock').innerText = now.toLocaleTimeString(); document.getElementById('date').innerText = now.toLocaleDateString(); }, 1000);
+
+        function loadSites() {
+            const list = document.getElementById('siteListDisplay'); list.innerHTML = '';
+            SITELERIM.forEach((site, i) => {
+                list.innerHTML += `<div class="site-item"><span style="display:flex;align-items:center;overflow:hidden;"><span style="color:#666;margin-right:8px;">${i+1}.</span><a href="${site}" target="_blank">${site}</a></span><button onclick="deleteSite(${i})" style="background:none;border:none;color:#ff4444;font-weight:bold;">×</button></div>`;
+            });
+        }
+        function deleteSite(i) {
+            if(confirm("Silinsin mi?")) {
+                SITELERIM.splice(i, 1);
+                let html = document.documentElement.outerHTML;
+                let newList = 'var SITELERIM = ' + JSON.stringify(SITELERIM, null, 4) + ';';
+                let newHtml = html.replace(/var SITELERIM\s*=\s*\[[\s\S]*?\];/, newList);
+                downloadFile("ByNoKTa_Panel.html", newHtml); loadSites();
+            }
+        }
+        window.onload = function() { loadSites(); fetchRates(); };
+
+        let openedWins = [];
+        function openAll() { [...SITELERIM, "https://web.whatsapp.com/"].forEach((s,i)=>setTimeout(()=>{let w=window.open(s,'_blank');if(w)openedWins.push(w)},i*200)); }
+        function openAI() { SITELERIM.filter(s=>s.includes('ai')||s.includes('gpt')||s.includes('gemini')||s.includes('chat')||s.includes('hunyuan')).forEach((s,i)=>setTimeout(()=>{let w=window.open(s,'_blank');if(w)openedWins.push(w)},i*200)); }
+        function openWhatsapp() { openedWins.push(window.open('https://web.whatsapp.com/', '_blank')); }
+        function openSpeedTest() { window.open('https://www.speedtest.net/', '_blank'); }
+        function closeAllConfirm() { document.getElementById('closeModal').classList.add('active'); }
+        function doCloseAll() { openedWins.forEach(w => w.close()); window.open('https://www.youtube.com/', '_blank'); window.close(); }
 
         let wifiVisible = false;
         function toggleWifi() {
             const el = document.getElementById('wifiText');
-            if(!wifiVisible) { el.style.filter = 'none'; el.innerText = WIFI_SIFRE; }
-            else { el.style.filter = 'blur(5px)'; el.innerText = "••••••••"; }
+            if(!wifiVisible) {
+                el.style.filter = 'none'; el.innerText = WIFI_SIFRE;
+                const t = document.createElement("input"); t.value = WIFI_SIFRE; document.body.appendChild(t); t.select();
+                try { document.execCommand("copy"); alert("✅ Kopyalandı: " + WIFI_SIFRE); } catch(e) { prompt("Kopyala:", WIFI_SIFRE); }
+                document.body.removeChild(t);
+            } else { el.style.filter = 'blur(5px)'; el.innerText = "....."; }
             wifiVisible = !wifiVisible;
         }
 
         async function fetchRates() {
+            // USD
             try {
-                const r = await fetch('https://api.frankfurter.app/latest?from=USD&to=TRY,EUR');
-                const d = await r.json();
-                document.getElementById('rateUsd').innerText = d.rates.TRY.toFixed(2) + " ₺";
-                document.getElementById('rateEur').innerText = (d.rates.TRY / d.rates.USD).toFixed(2) + " ₺";
-                // Altın verisi için v12'deki mantık kullanılabilir veya sabit bırakılabilir
-                document.getElementById('rateGold').innerText = "2.940 ₺"; 
-            } catch(e) { console.log("Kur hatası"); }
+                const r1 = await fetch('https://api.frankfurter.app/latest?from=USD&to=TRY');
+                const d1 = await r1.json();
+                window.dollarRate = d1.rates.TRY; 
+                document.getElementById('rateUsd').innerText = window.dollarRate.toFixed(2) + " ₺";
+            } catch(e) { document.getElementById('rateUsd').innerText = "---"; }
+
+            // EUR
+            try {
+                const r2 = await fetch('https://api.frankfurter.app/latest?from=EUR&to=TRY');
+                const d2 = await r2.json();
+                document.getElementById('rateEur').innerText = d2.rates.TRY.toFixed(2) + " ₺";
+            } catch(e) { document.getElementById('rateEur').innerText = "---"; }
+
+            // ALTIN (Gram) - Yedekli Sistem (Binance -> Coingecko)
+            try {
+                // 1. Deneme: Binance
+                const r3 = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT');
+                const d3 = await r3.json();
+                if(window.dollarRate) {
+                    const gram = (parseFloat(d3.price) * window.dollarRate) / 31.1035;
+                    document.getElementById('rateGold').innerText = gram.toFixed(0) + " ₺";
+                } else { throw new Error("Dolar yok"); }
+            } catch(e) {
+                // 2. Deneme: CoinGecko (Yedek)
+                try {
+                    const r4 = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=try');
+                    const d4 = await r4.json();
+                    const gram = d4['pax-gold']['try'] / 31.1035;
+                    document.getElementById('rateGold').innerText = gram.toFixed(0) + " ₺";
+                } catch(e2) {
+                    document.getElementById('rateGold').innerText = "Hata";
+                }
+            }
         }
     </script>
 </body>
