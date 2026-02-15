@@ -2,174 +2,65 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Frekans Pro - ByNoKTa</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-primary: #06080f;
-            --bg-secondary: #111627;
-            --accent-cyan: #00f0ff;
-            --accent-magenta: #ff00aa;
-            --accent-red: #ff4444;
-            --text-primary: #e8f4f8;
-            --text-secondary: #8b9dc3;
-            --border: rgba(255, 255, 255, 0.1);
-        }
-
+        :root { --bg: #06080f; --card: #111627; --cyan: #00f0ff; --magenta: #ff00aa; --text: #e8f4f8; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'JetBrains Mono', monospace; background: var(--bg); color: var(--text); min-height: 100vh; padding: 10px; overflow-x: hidden; }
+        
+        .back-link { position: absolute; top: 15px; left: 15px; color: #8b9dc3; text-decoration: none; font-weight: bold; font-size: 14px; z-index: 100; }
+        
+        .container { width: 100%; max-width: 1000px; margin: 45px auto 10px; background: rgba(17, 22, 39, 0.9); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); padding: 15px; }
+        h1 { font-family: 'Orbitron', sans-serif; font-size: 22px; text-align: center; margin-bottom: 20px; background: linear-gradient(135deg, var(--cyan), var(--magenta)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        body {
-            font-family: 'JetBrains Mono', monospace;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
-            overflow-x: hidden;
-            user-select: none; /* Metin seçmeyi engeller */
-        }
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
 
-        /* Geri Dön Linki */
-        .back-link {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            z-index: 100;
-        }
+        .panel { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 15px; }
+        .control-group { margin-bottom: 15px; }
+        label { display: flex; justify-content: space-between; font-size: 12px; color: var(--cyan); margin-bottom: 5px; font-weight: bold; }
+        input[type="range"] { width: 100%; cursor: pointer; }
+        select, input[type="number"] { width: 100%; padding: 8px; background: #000; border: 1px solid #333; border-radius: 5px; color: #fff; font-size: 14px; }
 
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            background: rgba(17, 22, 39, 0.8);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            padding: 20px;
-            margin: 40px auto 10px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
-        }
+        .main-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
+        .btn { padding: 10px 5px; border: none; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-weight: bold; font-size: 10px; cursor: pointer; }
+        .btn-play { background: var(--cyan); color: #000; }
+        .btn-stop { background: #333; color: #fff; }
+        .btn-rec { background: #ff4444; color: #fff; }
 
-        .header-area { text-align: center; margin-bottom: 20px; }
-        h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .category-scroll { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 10px; scrollbar-width: none; }
+        .cat-btn { padding: 6px 12px; background: #1a1f2e; border: 1px solid #333; border-radius: 15px; color: #8b9dc3; white-space: nowrap; font-size: 11px; cursor: pointer; }
+        .cat-btn.active { background: var(--cyan); color: #000; border-color: var(--cyan); }
 
-        /* GRID YAPISI */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1.2fr;
-            gap: 20px;
-        }
-
-        /* MOBİL UYUM */
-        @media (max-width: 850px) {
-            .main-grid { grid-template-columns: 1fr; }
-            .header-area h1 { font-size: 1.5rem; }
-            .back-link { top: 10px; left: 10px; }
-        }
-
-        .controls-panel, .presets-panel {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 15px;
-            padding: 15px;
-            border: 1px solid var(--border);
-        }
-
-        .control-group { margin-bottom: 20px; }
-        label { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--accent-cyan); margin-bottom: 8px; font-weight: 700; }
-        .value-display { color: var(--accent-magenta); font-family: 'Orbitron', sans-serif; }
-
-        input[type="range"] { width: 100%; cursor: pointer; height: 6px; border-radius: 10px; }
-        select, input[type="number"] {
-            width: 100%; padding: 10px; background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);
-        }
-
-        /* Butonlar */
-        .main-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 20px; }
-        .btn-big {
-            padding: 12px 5px; border: none; border-radius: 10px; font-family: 'Orbitron', sans-serif;
-            font-weight: 700; font-size: 0.7rem; cursor: pointer; transition: 0.3s;
-        }
-        .btn-play { background: var(--accent-cyan); color: #000; }
-        .btn-play.active { background: var(--accent-magenta); color: #fff; }
-        .btn-stop { background: rgba(255, 255, 255, 0.1); color: #fff; }
-        .btn-rec { background: var(--accent-red); color: #fff; }
-        .btn-rec.recording { animation: pulse 1.5s infinite; }
-
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
-        /* Kategori Menüsü */
-        .category-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; }
-        .cat-btn {
-            padding: 8px 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border);
-            border-radius: 20px; color: var(--text-secondary); white-space: nowrap; font-size: 0.75rem;
-        }
-        .cat-btn.active { background: var(--accent-cyan); color: #000; }
-
-        /* Preset Grid */
-        .preset-grid { display: none; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; }
+        .preset-grid { display: none; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 8px; }
         .preset-grid.active { display: grid; }
-        .preset-item {
-            padding: 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border);
-            border-radius: 8px; font-size: 0.7rem; text-align: center; cursor: pointer;
-        }
+        .preset-item { padding: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; font-size: 10px; text-align: center; cursor: pointer; }
+        .preset-item:hover { border-color: var(--magenta); }
 
-        .visualizer { width: 100%; height: 60px; display: flex; align-items: flex-end; justify-content: center; gap: 2px; margin-top: 15px; }
-        .bar { flex: 1; background: var(--accent-cyan); min-height: 2px; }
-
-        /* Modal */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: var(--bg-secondary); border: 1px solid var(--accent-magenta); padding: 25px; border-radius: 20px; text-align: center; max-width: 400px; }
-        .agree-btn { margin-top: 20px; padding: 12px 30px; background: var(--accent-cyan); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .visualizer { width: 100%; height: 50px; display: flex; align-items: flex-end; justify-content: center; gap: 2px; margin-top: 15px; background: rgba(0,0,0,0.2); border-radius: 8px; }
+        .bar { flex: 1; background: var(--cyan); min-height: 2px; }
     </style>
 </head>
 <body>
 
-    <div class="modal-overlay" id="disclaimerModal">
-        <div class="modal-content">
-            <h2 style="color: var(--accent-magenta); margin-bottom: 15px;">⚠️ UYARI</h2>
-            <p style="font-size: 0.85rem; line-height: 1.5; color: var(--text-secondary);">
-                Bu uygulama yüksek hassasiyetli frekanslar üretir. 
-                Epilepsi hastaları ve kalp pili kullananlar için riskli olabilir.
-            </p>
-            <button class="agree-btn" id="acceptButton">ANLADIM, BAŞLA</button>
-        </div>
-    </div>
-
     <a href="index.html" class="back-link">← PORTAL</a>
 
     <div class="container">
-        <div class="header-area">
-            <h1>FREKANS PRO</h1>
-        </div>
+        <h1>FREKANS PRO</h1>
 
         <div class="main-grid">
-            <div class="controls-panel">
+            <div class="panel">
                 <div class="control-group">
-                    <label>Frekans (Hz) <span class="value-display" id="freqValue">440</span></label>
-                    <input type="range" id="frequency" min="20" max="1000" value="440">
-                    <input type="number" id="freqInput" value="440" style="margin-top:10px; text-align:center;">
+                    <label>Frekans: <span id="freqVal">440</span> Hz</label>
+                    <input type="range" id="freqRange" min="20" max="1000" value="440">
+                    <input type="number" id="freqNum" value="440" style="margin-top:8px">
                 </div>
-
                 <div class="control-group">
-                    <label>Ses <span class="value-display" id="volValue">50</span></label>
-                    <input type="range" id="volume" min="0" max="100" value="50">
+                    <label>Ses Seviyesi: <span id="volVal">50</span></label>
+                    <input type="range" id="volRange" min="0" max="100" value="50">
                 </div>
-
                 <div class="control-group">
                     <label>Dalga Tipi</label>
                     <select id="waveType">
@@ -178,171 +69,106 @@
                         <option value="sawtooth">Testere (Keskin)</option>
                     </select>
                 </div>
-
                 <div class="main-buttons">
-                    <button class="btn-big btn-play" id="playBtn">BAŞLAT</button>
-                    <button class="btn-big btn-stop" id="stopBtn">DURDUR</button>
-                    <button class="btn-big btn-rec" id="recBtn">REC</button>
+                    <button class="btn btn-play" id="startBtn">BAŞLAT</button>
+                    <button class="btn btn-stop" id="stopBtn">DURDUR</button>
+                    <button class="btn btn-rec" id="recBtn">REC</button>
                 </div>
             </div>
 
-            <div class="presets-panel">
+            <div class="panel">
                 <div class="category-scroll">
-                    <button class="cat-btn active" onclick="showCategory('head', this)">🧠 Kafa</button>
-                    <button class="cat-btn" onclick="showCategory('organs', this)">❤️ Organ</button>
-                    <button class="cat-btn" onclick="showCategory('solf', this)">🎵 Solfeggio</button>
-                    <button class="cat-btn" onclick="showCategory('chakra', this)">🌈 Çakra</button>
+                    <button class="cat-btn active" onclick="setCat('head', this)">🧠 Kafa</button>
+                    <button class="cat-btn" onclick="setCat('body', this)">❤️ Organ</button>
+                    <button class="cat-btn" onclick="setCat('solf', this)">🎵 Solfeggio</button>
+                    <button class="cat-btn" onclick="setCat('chak', this)">🌈 Çakra</button>
                 </div>
-
                 <div id="cat-head" class="preset-grid active">
-                    <div class="preset-item" onclick="setPreset(40, 'sine')">Baş Ağrısı</div>
-                    <div class="preset-item" onclick="setPreset(50, 'sine')">Boyun</div>
-                    <div class="preset-item" onclick="setPreset(120, 'square')">Sinüs</div>
-                    <div class="preset-item" onclick="setPreset(741, 'sine')">Tiroid</div>
+                    <div class="preset-item" onclick="setF(40,'sine')">Baş Ağrısı</div>
+                    <div class="preset-item" onclick="setF(50,'sine')">Boyun</div>
+                    <div class="preset-item" onclick="setF(120,'square')">Sinüs</div>
+                    <div class="preset-item" onclick="setF(741,'sine')">Tiroid</div>
                 </div>
-
-                <div id="cat-organs" class="preset-grid">
-                    <div class="preset-item" onclick="setPreset(337, 'sine')">Kan</div>
-                    <div class="preset-item" onclick="setPreset(639, 'sine')">Kalp</div>
-                    <div class="preset-item" onclick="setPreset(319, 'sine')">Böbrek</div>
-                    <div class="preset-item" onclick="setPreset(111, 'square')">Bağırsak</div>
+                <div id="cat-body" class="preset-grid">
+                    <div class="preset-item" onclick="setF(337,'sine')">Kan Dolaşım</div>
+                    <div class="preset-item" onclick="setF(639,'sine')">Kalp Ritm</div>
+                    <div class="preset-item" onclick="setF(319,'sine')">Böbrek</div>
+                    <div class="preset-item" onclick="setF(111,'square')">Bağırsak</div>
                 </div>
-
                 <div id="cat-solf" class="preset-grid">
-                    <div class="preset-item" onclick="setPreset(174, 'sine')">174Hz</div>
-                    <div class="preset-item" onclick="setPreset(396, 'sine')">396Hz</div>
-                    <div class="preset-item" onclick="setPreset(528, 'sine')">528Hz</div>
-                    <div class="preset-item" onclick="setPreset(852, 'sine')">852Hz</div>
+                    <div class="preset-item" onclick="setF(174,'sine')">174Hz (Ağrı)</div>
+                    <div class="preset-item" onclick="setF(396,'sine')">396Hz (Korku)</div>
+                    <div class="preset-item" onclick="setF(528,'sine')">528Hz (DNA)</div>
+                    <div class="preset-item" onclick="setF(852,'sine')">852Hz (Sezgi)</div>
                 </div>
-
-                <div id="cat-chakra" class="preset-grid">
-                    <div class="preset-item" onclick="setPreset(194, 'sine')">🔴 Kök</div>
-                    <div class="preset-item" onclick="setPreset(126, 'sine')">🟡 Solar</div>
-                    <div class="preset-item" onclick="setPreset(136, 'sine')">🟢 Kalp</div>
-                    <div class="preset-item" onclick="setPreset(141, 'sine')">🟣 Taç</div>
+                <div id="cat-chak" class="preset-grid">
+                    <div class="preset-item" onclick="setF(194,'sine')">🔴 Kök</div>
+                    <div class="preset-item" onclick="setF(126,'sine')">🟡 Solar</div>
+                    <div class="preset-item" onclick="setF(136,'sine')">🟢 Kalp</div>
+                    <div class="preset-item" onclick="setF(141,'sine')">🟣 Taç</div>
                 </div>
-                
-                <div class="visualizer" id="visualizer"></div>
+                <div class="visualizer" id="vis"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- SES MOTORU ---
-        let audioCtx, osc, gainNode, analyser, isPlaying = false;
-        let mediaRecorder, recordedChunks = [];
-        const bars = [];
+        let ctx, osc, gain, analyzer, active=false, recorder, chunks=[];
+        const bars=[]; 
+        for(let i=0;i<20;i++){const b=document.createElement('div');b.className='bar';document.getElementById('vis').appendChild(b);bars.push(b);}
 
-        for(let i=0; i<20; i++) {
-            const bar = document.createElement('div');
-            bar.className = 'bar';
-            document.getElementById('visualizer').appendChild(bar);
-            bars.push(bar);
-        }
-
-        function initAudio() {
-            if(!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                gainNode = audioCtx.createGain();
-                analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 64;
-                gainNode.connect(analyser);
-                analyser.connect(audioCtx.destination);
+        function init(){
+            if(!ctx){
+                ctx=new(window.AudioContext||window.webkitAudioContext)();
+                gain=ctx.createGain(); analyzer=ctx.createAnalyser(); analyzer.fftSize=64;
+                gain.connect(analyzer); analyzer.connect(ctx.destination);
             }
         }
-
-        function startSound() {
-            initAudio();
-            if(isPlaying) stopSound();
-            osc = audioCtx.createOscillator();
-            osc.type = document.getElementById('waveType').value;
-            osc.frequency.value = document.getElementById('frequency').value;
-            osc.connect(gainNode);
-            gainNode.gain.value = document.getElementById('volume').value / 100;
-            osc.start();
-            isPlaying = true;
-            document.getElementById('playBtn').classList.add('active');
-            draw();
+        function start(){
+            init(); if(active) stop();
+            osc=ctx.createOscillator(); osc.type=document.getElementById('waveType').value;
+            osc.frequency.value=document.getElementById('freqRange').value;
+            osc.connect(gain); gain.gain.value=document.getElementById('volRange').value/100;
+            osc.start(); active=true; draw();
         }
-
-        function stopSound() {
-            if(osc) { osc.stop(); osc.disconnect(); }
-            isPlaying = false;
-            document.getElementById('playBtn').classList.remove('active');
+        function stop(){ if(osc){osc.stop();osc.disconnect();} active=false; }
+        function setF(f,w){
+            document.getElementById('freqRange').value=f; document.getElementById('freqNum').value=f;
+            document.getElementById('freqVal').innerText=f; document.getElementById('waveType').value=w;
+            if(active) start();
         }
-
-        function setPreset(f, w) {
-            document.getElementById('frequency').value = f;
-            document.getElementById('freqInput').value = f;
-            document.getElementById('freqValue').innerText = f;
-            document.getElementById('waveType').value = w;
-            if(isPlaying) startSound();
+        function setCat(id,btn){
+            document.querySelectorAll('.preset-grid').forEach(g=>g.classList.remove('active'));
+            document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+            document.getElementById('cat-'+id).classList.add('active'); btn.classList.add('active');
         }
-
-        function showCategory(id, btn) {
-            document.querySelectorAll('.preset-grid').forEach(g => g.classList.remove('active'));
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('cat-' + id).classList.add('active');
-            btn.classList.add('active');
+        function draw(){
+            if(!active) return; requestAnimationFrame(draw);
+            const data=new Uint8Array(analyzer.frequencyBinCount); analyzer.getByteFrequencyData(data);
+            bars.forEach((b,i)=> b.style.height=(data[i]||0)/3+'px');
         }
-
-        function draw() {
-            if(!isPlaying) return;
-            requestAnimationFrame(draw);
-            const dataArray = new Uint8Array(analyser.frequencyBinCount);
-            analyser.getByteFrequencyData(dataArray);
-            bars.forEach((bar, i) => {
-                const val = dataArray[i] || 0;
-                bar.style.height = (val / 3) + 'px';
-            });
-        }
-
-        // --- EVENTLER ---
-        document.getElementById('playBtn').addEventListener('click', startSound);
-        document.getElementById('stopBtn').addEventListener('click', stopSound);
-        document.getElementById('acceptButton').addEventListener('click', () => document.getElementById('disclaimerModal').style.display = 'none');
-        
-        document.getElementById('frequency').addEventListener('input', (e) => {
-            document.getElementById('freqValue').innerText = e.target.value;
-            document.getElementById('freqInput').value = e.target.value;
-            if(isPlaying) osc.frequency.value = e.target.value;
-        });
-
-        document.getElementById('recBtn').addEventListener('click', async () => {
-            if(!isPlaying) { alert("Önce sesi başlatın!"); return; }
-            const sec = prompt("Kaç saniye kayıt edilsin?", "30");
-            if(!sec) return;
-            
-            const dest = audioCtx.createMediaStreamDestination();
-            gainNode.connect(dest);
-            mediaRecorder = new MediaRecorder(dest.stream);
-            recordedChunks = [];
-            
-            mediaRecorder.ondataavailable = e => recordedChunks.push(e.data);
-            mediaRecorder.onstop = () => {
-                const blob = new Blob(recordedChunks, { type: 'audio/webm' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `Frekans_${document.getElementById('frequency').value}Hz.webm`;
-                a.click();
-                document.getElementById('recBtn').classList.remove('recording');
-                document.getElementById('recBtn').innerText = "REC";
+        document.getElementById('startBtn').onclick=start;
+        document.getElementById('stopBtn').onclick=stop;
+        document.getElementById('freqRange').oninput=(e)=>{
+            document.getElementById('freqVal').innerText=e.target.value;
+            document.getElementById('freqNum').value=e.target.value;
+            if(active) osc.frequency.value=e.target.value;
+        };
+        document.getElementById('recBtn').onclick=async()=>{
+            if(!active){alert("Önce BAŞLAT'a basın!");return;}
+            const s=prompt("Kaç saniye?","30"); if(!s)return;
+            const dest=ctx.createMediaStreamDestination(); gain.connect(dest);
+            recorder=new MediaRecorder(dest.stream); chunks=[];
+            recorder.ondataavailable=e=>chunks.push(e.data);
+            recorder.onstop=()=>{
+                const blob=new Blob(chunks,{type:'audio/webm'}); const url=URL.createObjectURL(blob);
+                const a=document.createElement('a'); a.href=url; a.download=`ByNoKTa_Freq_${document.getElementById('freqRange').value}Hz.webm`; a.click();
             };
-
-            mediaRecorder.start();
-            document.getElementById('recBtn').classList.add('recording');
-            document.getElementById('recBtn').innerText = "REC...";
-            setTimeout(() => mediaRecorder.stop(), sec * 1000);
-        });
-
-        // --- GÜVENLİK (SAĞ TIK ENGELLEME) ---
-        window.addEventListener('contextmenu', e => e.preventDefault());
-        window.addEventListener('keydown', e => {
-            if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || (e.ctrlKey && e.keyCode === 85)) {
-                e.preventDefault();
-            }
-        });
+            recorder.start(); setTimeout(()=>recorder.stop(),s*1000);
+        };
+        // Güvenlik
+        window.addEventListener('contextmenu',e=>e.preventDefault());
+        window.addEventListener('keydown',e=>{if(e.keyCode===123||(e.ctrlKey&&e.shiftKey&&(e.keyCode===73||e.keyCode===74))||(e.ctrlKey&&e.keyCode===85))e.preventDefault();});
     </script>
 </body>
 </html>
