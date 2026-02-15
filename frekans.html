@@ -11,15 +11,13 @@
             --bg-secondary: #111627;
             --accent-cyan: #00f0ff;
             --accent-magenta: #ff00aa;
-            --accent-yellow: #ffea00;
-            --accent-red: #ff4444; /* Kayıt butonu için */
+            --accent-red: #ff4444;
             --text-primary: #e8f4f8;
             --text-secondary: #8b9dc3;
-            --glow-cyan: 0 0 15px rgba(0, 240, 255, 0.4);
             --border: rgba(255, 255, 255, 0.1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: 'JetBrains Mono', monospace;
@@ -28,755 +26,323 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding: 20px;
+            padding: 10px;
             overflow-x: hidden;
-        }
-
-        /* Arkaplan Efekti */
-        body::before {
-            content: '';
-            position: fixed;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(0, 240, 255, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 80% 50%, rgba(255, 0, 170, 0.08) 0%, transparent 50%);
-            z-index: -1;
-            pointer-events: none;
+            user-select: none; /* Metin seçmeyi engeller */
         }
 
         /* Geri Dön Linki */
         .back-link {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 15px;
+            left: 15px;
             color: var(--text-secondary);
             text-decoration: none;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: color 0.3s;
+            gap: 5px;
             z-index: 100;
         }
-        .back-link:hover { color: var(--accent-cyan); }
 
         .container {
             width: 100%;
             max-width: 1200px;
             background: rgba(17, 22, 39, 0.8);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
             border: 1px solid var(--border);
-            padding: 30px;
-            margin-top: 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            margin: 40px auto 10px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
         }
 
-        .header-area {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 20px;
-        }
-
+        .header-area { text-align: center; margin-bottom: 20px; }
         h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 900;
+            font-size: 1.8rem;
             background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: var(--glow-cyan);
-            margin-bottom: 5px;
         }
 
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-        }
-
+        /* GRID YAPISI */
         .main-grid {
             display: grid;
             grid-template-columns: 1fr 1.2fr;
-            gap: 30px;
-            align-items: start;
-        }
-
-        @media (max-width: 900px) {
-            .main-grid { grid-template-columns: 1fr; }
-        }
-
-        .controls-panel {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 16px;
-            padding: 20px;
-            border: 1px solid var(--border);
-        }
-
-        .presets-panel {
-            display: flex;
-            flex-direction: column;
             gap: 20px;
         }
 
-        .control-group { margin-bottom: 25px; }
-        
-        label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--accent-cyan);
-            font-weight: 700;
+        /* MOBİL UYUM */
+        @media (max-width: 850px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .header-area h1 { font-size: 1.5rem; }
+            .back-link { top: 10px; left: 10px; }
         }
 
-        .value-display {
-            color: var(--accent-magenta);
-            font-family: 'Orbitron', sans-serif;
-        }
-
-        input[type="range"] {
-            width: 100%;
-            height: 6px;
-            border-radius: 10px;
-            background: linear-gradient(to right, var(--accent-cyan), var(--accent-magenta));
-            outline: none;
-            -webkit-appearance: none;
-            cursor: pointer;
-        }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 20px; height: 20px;
-            border-radius: 50%;
-            background: #fff;
-            box-shadow: 0 0 10px var(--accent-cyan);
-            margin-top: -7px;
-        }
-        input[type="range"]::-webkit-slider-runnable-track {
-            height: 6px;
-            border-radius: 10px;
-        }
-
-        select, input[type="number"] {
-            width: 100%;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-family: 'JetBrains Mono', monospace;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        select:focus, input[type="number"]:focus { border-color: var(--accent-cyan); }
-        
-        /* Ana Butonlar */
-        .main-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr; /* 3 Buton için ayarlandı */
-            gap: 10px;
-            margin-top: 30px;
-        }
-
-        .btn-big {
-            padding: 15px;
-            border: none;
-            border-radius: 12px;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.9rem; /* Butonlar sığsın diye biraz küçülttüm */
-        }
-
-        .btn-play {
-            background: linear-gradient(135deg, var(--accent-cyan), #00a8cc);
-            color: #000;
-            box-shadow: var(--glow-cyan);
-        }
-        .btn-play:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--accent-cyan); }
-        .btn-play.active { background: linear-gradient(135deg, var(--accent-magenta), #cc0088); color: #fff; }
-
-        .btn-stop {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border: 1px solid var(--border);
-        }
-        .btn-stop:hover { background: rgba(255, 255, 255, 0.2); }
-
-        /* Kayıt Butonu Stili */
-        .btn-rec {
-            background: linear-gradient(135deg, var(--accent-red), #cc0000);
-            color: #fff;
-            box-shadow: 0 0 10px rgba(255, 68, 68, 0.4);
-        }
-        .btn-rec:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--accent-red); }
-        .btn-rec.recording { animation: pulseRed 1.5s infinite; background: #cc0000; }
-
-        @keyframes pulseRed {
-            0% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 68, 68, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); }
-        }
-
-        .category-scroll {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--accent-cyan) transparent;
-        }
-        .category-scroll::-webkit-scrollbar { height: 4px; }
-        .category-scroll::-webkit-scrollbar-thumb { background: var(--accent-cyan); border-radius: 4px; }
-
-        .cat-btn {
-            padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            color: var(--text-secondary);
-            white-space: nowrap;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: all 0.2s;
-        }
-        .cat-btn:hover, .cat-btn.active {
-            background: var(--accent-cyan);
-            color: #000;
-            border-color: var(--accent-cyan);
-            font-weight: bold;
-        }
-
-        .preset-grid {
-            display: none;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 10px;
-            animation: fadeIn 0.3s ease;
-        }
-        .preset-grid.active { display: grid; }
-
-        .preset-item {
-            padding: 12px;
+        .controls-panel, .presets-panel {
             background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-size: 0.8rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .preset-item:hover {
-            border-color: var(--accent-magenta);
-            background: rgba(255, 0, 170, 0.1);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .info-box {
-            background: rgba(0, 240, 255, 0.05);
-            border-left: 3px solid var(--accent-cyan);
+            border-radius: 15px;
             padding: 15px;
-            margin-top: 20px;
-            border-radius: 0 10px 10px 0;
-            font-size: 0.85rem;
-            line-height: 1.5;
-            color: var(--text-secondary);
-            display: none;
-        }
-
-        .visualizer {
-            width: 100%;
-            height: 100px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
             border: 1px solid var(--border);
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            gap: 2px;
-            padding: 10px;
-            margin-top: 20px;
-            overflow: hidden;
-        }
-        .bar {
-            flex: 1;
-            background: linear-gradient(to top, var(--accent-cyan), var(--accent-magenta));
-            border-radius: 2px;
-            min-height: 2px;
-            transition: height 0.05s ease;
         }
 
-        .manual-input-row {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .btn-small {
-            padding: 0 15px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--accent-cyan);
-            color: var(--accent-cyan);
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btn-small:hover { background: var(--accent-cyan); color: #000; }
+        .control-group { margin-bottom: 20px; }
+        label { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--accent-cyan); margin-bottom: 8px; font-weight: 700; }
+        .value-display { color: var(--accent-magenta); font-family: 'Orbitron', sans-serif; }
 
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+        input[type="range"] { width: 100%; cursor: pointer; height: 6px; border-radius: 10px; }
+        select, input[type="number"] {
+            width: 100%; padding: 10px; background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);
         }
-        .modal-content {
-            background: var(--bg-secondary);
-            border: 1px solid var(--accent-magenta);
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 500px;
-            text-align: center;
-            box-shadow: 0 0 30px rgba(255, 0, 170, 0.2);
-        }
-        .warning-text { color: #ff4444; font-weight: bold; margin-bottom: 15px; }
-        .agree-btn {
-            margin-top: 20px;
-            padding: 12px 30px;
-            background: var(--accent-cyan);
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .agree-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+        /* Butonlar */
+        .main-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 20px; }
+        .btn-big {
+            padding: 12px 5px; border: none; border-radius: 10px; font-family: 'Orbitron', sans-serif;
+            font-weight: 700; font-size: 0.7rem; cursor: pointer; transition: 0.3s;
+        }
+        .btn-play { background: var(--accent-cyan); color: #000; }
+        .btn-play.active { background: var(--accent-magenta); color: #fff; }
+        .btn-stop { background: rgba(255, 255, 255, 0.1); color: #fff; }
+        .btn-rec { background: var(--accent-red); color: #fff; }
+        .btn-rec.recording { animation: pulse 1.5s infinite; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* Kategori Menüsü */
+        .category-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; }
+        .cat-btn {
+            padding: 8px 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border);
+            border-radius: 20px; color: var(--text-secondary); white-space: nowrap; font-size: 0.75rem;
+        }
+        .cat-btn.active { background: var(--accent-cyan); color: #000; }
+
+        /* Preset Grid */
+        .preset-grid { display: none; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; }
+        .preset-grid.active { display: grid; }
+        .preset-item {
+            padding: 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border);
+            border-radius: 8px; font-size: 0.7rem; text-align: center; cursor: pointer;
+        }
+
+        .visualizer { width: 100%; height: 60px; display: flex; align-items: flex-end; justify-content: center; gap: 2px; margin-top: 15px; }
+        .bar { flex: 1; background: var(--accent-cyan); min-height: 2px; }
+
+        /* Modal */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: var(--bg-secondary); border: 1px solid var(--accent-magenta); padding: 25px; border-radius: 20px; text-align: center; max-width: 400px; }
+        .agree-btn { margin-top: 20px; padding: 12px 30px; background: var(--accent-cyan); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="modal-overlay" id="disclaimerModal">
         <div class="modal-content">
-            <h2 style="color: var(--accent-magenta); margin-bottom: 20px;">⚠️ ÖNEMLİ UYARI</h2>
-            <p class="warning-text">EPİLEPSİ RİSKİ</p>
-            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
-                Bu uygulama beyin dalgalarını etkileyebilecek binaural sesler ve frekanslar üretir. 
-                Epilepsi, kalp pili veya ciddi psikolojik rahatsızlığı olanlar kullanmamalıdır.
-                Tıbbi tedavi yerine geçmez.
+            <h2 style="color: var(--accent-magenta); margin-bottom: 15px;">⚠️ UYARI</h2>
+            <p style="font-size: 0.85rem; line-height: 1.5; color: var(--text-secondary);">
+                Bu uygulama yüksek hassasiyetli frekanslar üretir. 
+                Epilepsi hastaları ve kalp pili kullananlar için riskli olabilir.
             </p>
-            <div style="margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <input type="checkbox" id="agreeCheck">
-                <label for="agreeCheck" style="margin: 0; font-size: 0.8rem; cursor: pointer;">Okudum ve kabul ediyorum</label>
-            </div>
-            <button class="agree-btn" id="acceptButton" disabled>BAŞLA</button>
+            <button class="agree-btn" id="acceptButton">ANLADIM, BAŞLA</button>
         </div>
     </div>
 
-    <a href="index.html" class="back-link">← Ana Sayfaya Dön</a>
+    <a href="index.html" class="back-link">← PORTAL</a>
 
     <div class="container">
         <div class="header-area">
             <h1>FREKANS PRO</h1>
-            <div class="subtitle">Gelişmiş Ses Terapisi ve Sinyal Üretici v3.0</div>
         </div>
 
         <div class="main-grid">
             <div class="controls-panel">
                 <div class="control-group">
-                    <label>Frekans (Hz) <span class="value-display" id="freqValue">440.00</span></label>
-                    <input type="range" id="frequency" min="20" max="1000" value="440" step="1">
-                    <div class="manual-input-row">
-                        <input type="number" id="freqInput" value="440" step="0.01">
-                        <button class="btn-small" onclick="applyFreqInput()">Ayarla</button>
-                    </div>
+                    <label>Frekans (Hz) <span class="value-display" id="freqValue">440</span></label>
+                    <input type="range" id="frequency" min="20" max="1000" value="440">
+                    <input type="number" id="freqInput" value="440" style="margin-top:10px; text-align:center;">
                 </div>
 
                 <div class="control-group">
-                    <label>Ses Seviyesi <span class="value-display" id="volValue">50</span></label>
+                    <label>Ses <span class="value-display" id="volValue">50</span></label>
                     <input type="range" id="volume" min="0" max="100" value="50">
                 </div>
 
                 <div class="control-group">
                     <label>Dalga Tipi</label>
                     <select id="waveType">
-                        <option value="sine">Sinüs (Yumuşak - Organlar)</option>
-                        <option value="square">Kare (Sert - Kemik/Bağırsak)</option>
-                        <option value="sawtooth">Testere (Keskin - Uyarıcı)</option>
-                        <option value="triangle">Üçgen (Dengeli)</option>
+                        <option value="sine">Sinüs (Yumuşak)</option>
+                        <option value="square">Kare (Sert)</option>
+                        <option value="sawtooth">Testere (Keskin)</option>
                     </select>
-                </div>
-
-                <div class="control-group">
-                    <label>Mod</label>
-                    <select id="modeSelect">
-                        <option value="normal">Normal Mod</option>
-                        <option value="binaural">Binaural Beats (Kulaklık Şart)</option>
-                    </select>
-                </div>
-
-                <div class="control-group" id="binauralControl" style="display: none; background: rgba(0,240,255,0.1); padding: 10px; border-radius: 8px;">
-                    <label>Beyin Farkı (Hz) <span class="value-display" id="binauralDiffValue">4.0</span></label>
-                    <input type="range" id="binauralDiff" min="0.5" max="40" value="4" step="0.5">
-                    <div style="font-size: 0.75rem; color: var(--accent-cyan); margin-top: 5px; text-align: right;" id="brainWaveInfo">Theta (Meditasyon)</div>
                 </div>
 
                 <div class="main-buttons">
                     <button class="btn-big btn-play" id="playBtn">BAŞLAT</button>
                     <button class="btn-big btn-stop" id="stopBtn">DURDUR</button>
-                    <button class="btn-big btn-rec" id="recBtn">KAYIT</button>
+                    <button class="btn-big btn-rec" id="recBtn">REC</button>
                 </div>
             </div>
 
             <div class="presets-panel">
-                <label>KATEGORİLER</label>
                 <div class="category-scroll">
-                    <button class="cat-btn active" onclick="showCategory('head')">🧠 Kafa/Boyun</button>
-                    <button class="cat-btn" onclick="showCategory('organs')">❤️ Organlar</button>
-                    <button class="cat-btn" onclick="showCategory('solfeggio')">🎵 Solfeggio</button>
-                    <button class="cat-btn" onclick="showCategory('chakra')">🌈 Çakralar</button>
-                    <button class="cat-btn" onclick="showCategory('brain')">🧘 Beyin</button>
+                    <button class="cat-btn active" onclick="showCategory('head', this)">🧠 Kafa</button>
+                    <button class="cat-btn" onclick="showCategory('organs', this)">❤️ Organ</button>
+                    <button class="cat-btn" onclick="showCategory('solf', this)">🎵 Solfeggio</button>
+                    <button class="cat-btn" onclick="showCategory('chakra', this)">🌈 Çakra</button>
                 </div>
 
                 <div id="cat-head" class="preset-grid active">
-                    <div class="preset-item" onclick="setPreset(40, 'sine', 'Baş Ağrısı: Beta dalgalarını sakinleştirir.')">🤕 Baş Ağrısı (40Hz)</div>
-                    <div class="preset-item" onclick="setPreset(50, 'sine', 'Boyun Ağrısı: Kas spazmını çözer.')">😰 Boyun (50Hz)</div>
-                    <div class="preset-item" onclick="setPreset(120, 'square', 'Sinüs: Mukusu titreştirir.')">👃 Sinüs (120Hz)</div>
-                    <div class="preset-item" onclick="setPreset(741, 'sine', 'Tiroid: Boğaz çakrası aktivasyonu.')">🗣️ Tiroid (741Hz)</div>
+                    <div class="preset-item" onclick="setPreset(40, 'sine')">Baş Ağrısı</div>
+                    <div class="preset-item" onclick="setPreset(50, 'sine')">Boyun</div>
+                    <div class="preset-item" onclick="setPreset(120, 'square')">Sinüs</div>
+                    <div class="preset-item" onclick="setPreset(741, 'sine')">Tiroid</div>
                 </div>
 
                 <div id="cat-organs" class="preset-grid">
-                    <div class="preset-item" onclick="setPreset(337, 'sine', 'Kan Dolaşımı: Dolaşımı hızlandırır.')">🩸 Kan (337Hz)</div>
-                    <div class="preset-item" onclick="setPreset(639, 'sine', 'Kalp: Kalp ritmini dengeler.')">💚 Kalp (639Hz)</div>
-                    <div class="preset-item" onclick="setPreset(319.88, 'sine', 'Böbrek: Toksin atımını destekler.')">💧 Böbrek (319Hz)</div>
-                    <div class="preset-item" onclick="setPreset(111, 'square', 'Bağırsak: Sindirimi düzenler.')">🔄 Bağırsak (111Hz)</div>
+                    <div class="preset-item" onclick="setPreset(337, 'sine')">Kan</div>
+                    <div class="preset-item" onclick="setPreset(639, 'sine')">Kalp</div>
+                    <div class="preset-item" onclick="setPreset(319, 'sine')">Böbrek</div>
+                    <div class="preset-item" onclick="setPreset(111, 'square')">Bağırsak</div>
                 </div>
 
-                <div id="cat-solfeggio" class="preset-grid">
-                    <div class="preset-item" onclick="setPreset(174, 'sine', '174 Hz: Ağrı azaltıcı.')">174 Hz</div>
-                    <div class="preset-item" onclick="setPreset(285, 'sine', '285 Hz: Doku iyileşmesi.')">285 Hz</div>
-                    <div class="preset-item" onclick="setPreset(396, 'sine', '396 Hz: Korkudan arınma.')">396 Hz</div>
-                    <div class="preset-item" onclick="setPreset(417, 'sine', '417 Hz: Değişim ve çözüm.')">417 Hz</div>
-                    <div class="preset-item" onclick="setPreset(528, 'sine', '528 Hz: Mucize ve DNA.')">528 Hz</div>
-                    <div class="preset-item" onclick="setPreset(639, 'sine', '639 Hz: İlişkiler.')">639 Hz</div>
+                <div id="cat-solf" class="preset-grid">
+                    <div class="preset-item" onclick="setPreset(174, 'sine')">174Hz</div>
+                    <div class="preset-item" onclick="setPreset(396, 'sine')">396Hz</div>
+                    <div class="preset-item" onclick="setPreset(528, 'sine')">528Hz</div>
+                    <div class="preset-item" onclick="setPreset(852, 'sine')">852Hz</div>
                 </div>
 
                 <div id="cat-chakra" class="preset-grid">
-                    <div class="preset-item" style="border-color:#ff0000" onclick="setPreset(194.18, 'sine', 'Kök Çakra: Güven ve topraklanma.')">🔴 Kök (194Hz)</div>
-                    <div class="preset-item" style="border-color:#ff8800" onclick="setPreset(210.42, 'sine', 'Sakral Çakra: Yaratıcılık.')">🟠 Sakral (210Hz)</div>
-                    <div class="preset-item" style="border-color:#ffff00" onclick="setPreset(126.22, 'sine', 'Solar Plexus: İrade.')">🟡 Solar (126Hz)</div>
-                    <div class="preset-item" style="border-color:#00ff00" onclick="setPreset(136.10, 'sine', 'Kalp Çakra: Sevgi.')">🟢 Kalp (136Hz)</div>
+                    <div class="preset-item" onclick="setPreset(194, 'sine')">🔴 Kök</div>
+                    <div class="preset-item" onclick="setPreset(126, 'sine')">🟡 Solar</div>
+                    <div class="preset-item" onclick="setPreset(136, 'sine')">🟢 Kalp</div>
+                    <div class="preset-item" onclick="setPreset(141, 'sine')">🟣 Taç</div>
                 </div>
-
-                <div id="cat-brain" class="preset-grid">
-                    <div class="preset-item" onclick="setBinaural(1, 'Delta: Derin uyku.')">😴 Delta (Uyku)</div>
-                    <div class="preset-item" onclick="setBinaural(6, 'Theta: Derin meditasyon.')">🧘 Theta (Meditasyon)</div>
-                    <div class="preset-item" onclick="setBinaural(10, 'Alpha: Rahatlama ve öğrenme.')">😌 Alpha (Rahat)</div>
-                    <div class="preset-item" onclick="setBinaural(20, 'Beta: Odaklanma ve enerji.')">⚡ Beta (Odak)</div>
-                </div>
-
-                <div class="info-box" id="infoPanel">
-                    <strong>Bilgi:</strong> <span id="infoText">Bir frekans seçin...</span>
-                </div>
+                
+                <div class="visualizer" id="visualizer"></div>
             </div>
         </div>
-
-        <div class="visualizer" id="visualizer"></div>
     </div>
 
     <script>
-        // Ses Değişkenleri
-        let audioCtx = null;
-        let osc = null;
-        let oscL = null;
-        let oscR = null;
-        let gainNode = null;
-        let analyser = null;
-        let isPlaying = false;
-        let bars = [];
-        let mediaRecorder = null;
-        let recordedChunks = [];
+        // --- SES MOTORU ---
+        let audioCtx, osc, gainNode, analyser, isPlaying = false;
+        let mediaRecorder, recordedChunks = [];
+        const bars = [];
 
-        // DOM Elemanları
-        const playBtn = document.getElementById('playBtn');
-        const stopBtn = document.getElementById('stopBtn');
-        const recBtn = document.getElementById('recBtn');
-        const freqSlider = document.getElementById('frequency');
-        const freqInput = document.getElementById('freqInput');
-        const freqDisplay = document.getElementById('freqValue');
-        const volSlider = document.getElementById('volume');
-        const volDisplay = document.getElementById('volValue');
-        const waveSelect = document.getElementById('waveType');
-        const modeSelect = document.getElementById('modeSelect');
-        const infoPanel = document.getElementById('infoPanel');
-        const infoText = document.getElementById('infoText');
-        const visualizer = document.getElementById('visualizer');
-
-        // Uyarı Modalı
-        const modal = document.getElementById('disclaimerModal');
-        const acceptBtn = document.getElementById('acceptButton');
-        const check = document.getElementById('agreeCheck');
-
-        check.addEventListener('change', () => { acceptBtn.disabled = !check.checked; });
-        acceptBtn.addEventListener('click', () => { modal.style.display = 'none'; });
-
-        // Görselleştirici Çubuklarını Oluştur
-        for(let i=0; i<30; i++) {
+        for(let i=0; i<20; i++) {
             const bar = document.createElement('div');
             bar.className = 'bar';
-            bar.style.height = '5px';
-            visualizer.appendChild(bar);
+            document.getElementById('visualizer').appendChild(bar);
             bars.push(bar);
         }
 
-        // Kategori Değiştirme
-        window.showCategory = function(catId) {
-            document.querySelectorAll('.preset-grid').forEach(el => el.classList.remove('active'));
-            document.getElementById('cat-' + catId).classList.add('active');
-            
-            document.querySelectorAll('.cat-btn').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
-        };
-
-        // Preset Seçimi
-        window.setPreset = function(freq, wave, info) {
-            freqSlider.value = freq;
-            freqInput.value = freq;
-            freqDisplay.textContent = freq;
-            waveSelect.value = wave;
-            modeSelect.value = 'normal';
-            document.getElementById('binauralControl').style.display = 'none';
-            
-            showInfo(info);
-            
-            if(isPlaying) updateSound();
-        };
-
-        // Binaural Preset
-        window.setBinaural = function(diff, info) {
-            modeSelect.value = 'binaural';
-            document.getElementById('binauralControl').style.display = 'block';
-            document.getElementById('binauralDiff').value = diff;
-            document.getElementById('binauralDiffValue').textContent = diff;
-            freqSlider.value = 200;
-            freqInput.value = 200;
-            freqDisplay.textContent = 200;
-            
-            showInfo(info);
-            if(isPlaying) stopSound();
-        };
-
-        function showInfo(text) {
-            infoText.textContent = text;
-            infoPanel.style.display = 'block';
-        }
-
-        // Manuel Giriş
-        window.applyFreqInput = function() {
-            const val = parseFloat(freqInput.value);
-            if(val > 0 && val < 20000) {
-                freqSlider.value = val;
-                freqDisplay.textContent = val;
-                if(isPlaying) updateSound();
-            }
-        };
-
-        // Slider Kontrolleri
-        freqSlider.addEventListener('input', (e) => {
-            freqInput.value = e.target.value;
-            freqDisplay.textContent = e.target.value;
-            if(isPlaying) updateSound();
-        });
-
-        volSlider.addEventListener('input', (e) => {
-            volDisplay.textContent = e.target.value;
-            if(gainNode) gainNode.gain.value = e.target.value / 100;
-        });
-
-        modeSelect.addEventListener('change', (e) => {
-            const isBin = e.target.value === 'binaural';
-            document.getElementById('binauralControl').style.display = isBin ? 'block' : 'none';
-            if(isPlaying) {
-                stopSound();
-                startSound();
-            }
-        });
-
-        document.getElementById('binauralDiff').addEventListener('input', (e) => {
-            document.getElementById('binauralDiffValue').textContent = e.target.value;
-            if(isPlaying && modeSelect.value === 'binaural') updateSound();
-        });
-
-        waveSelect.addEventListener('change', () => {
-            if(isPlaying) updateSound();
-        });
-
-        // Ses Motoru
         function initAudio() {
-            if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if(audioCtx.state === 'suspended') audioCtx.resume();
+            if(!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                gainNode = audioCtx.createGain();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 64;
+                gainNode.connect(analyser);
+                analyser.connect(audioCtx.destination);
+            }
         }
 
         function startSound() {
             initAudio();
-            if(isPlaying) return;
-
-            gainNode = audioCtx.createGain();
-            gainNode.gain.value = volSlider.value / 100;
-            
-            analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 64;
-            gainNode.connect(analyser);
-            analyser.connect(audioCtx.destination);
-
-            const freq = parseFloat(freqSlider.value);
-            const wave = waveSelect.value;
-
-            if(modeSelect.value === 'binaural') {
-                const diff = parseFloat(document.getElementById('binauralDiff').value);
-                const merger = audioCtx.createChannelMerger(2);
-                
-                oscL = audioCtx.createOscillator();
-                oscL.type = wave;
-                oscL.frequency.value = freq - (diff/2);
-                oscL.connect(merger, 0, 0);
-
-                oscR = audioCtx.createOscillator();
-                oscR.type = wave;
-                oscR.frequency.value = freq + (diff/2);
-                oscR.connect(merger, 0, 1);
-
-                merger.connect(gainNode);
-                oscL.start();
-                oscR.start();
-            } else {
-                osc = audioCtx.createOscillator();
-                osc.type = wave;
-                osc.frequency.value = freq;
-                osc.connect(gainNode);
-                osc.start();
-            }
-
+            if(isPlaying) stopSound();
+            osc = audioCtx.createOscillator();
+            osc.type = document.getElementById('waveType').value;
+            osc.frequency.value = document.getElementById('frequency').value;
+            osc.connect(gainNode);
+            gainNode.gain.value = document.getElementById('volume').value / 100;
+            osc.start();
             isPlaying = true;
-            playBtn.classList.add('active');
-            drawVisualizer();
+            document.getElementById('playBtn').classList.add('active');
+            draw();
         }
 
         function stopSound() {
-            if(!isPlaying) return;
-            
-            if(osc) { osc.stop(); osc = null; }
-            if(oscL) { oscL.stop(); oscL = null; }
-            if(oscR) { oscR.stop(); oscR = null; }
-            
+            if(osc) { osc.stop(); osc.disconnect(); }
             isPlaying = false;
-            playBtn.classList.remove('active');
-            bars.forEach(b => b.style.height = '5px');
+            document.getElementById('playBtn').classList.remove('active');
         }
 
-        function updateSound() {
+        function setPreset(f, w) {
+            document.getElementById('frequency').value = f;
+            document.getElementById('freqInput').value = f;
+            document.getElementById('freqValue').innerText = f;
+            document.getElementById('waveType').value = w;
+            if(isPlaying) startSound();
+        }
+
+        function showCategory(id, btn) {
+            document.querySelectorAll('.preset-grid').forEach(g => g.classList.remove('active'));
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('cat-' + id).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function draw() {
             if(!isPlaying) return;
-            const freq = parseFloat(freqSlider.value);
-            
-            if(modeSelect.value === 'binaural') {
-                const diff = parseFloat(document.getElementById('binauralDiff').value);
-                if(oscL) oscL.frequency.value = freq - (diff/2);
-                if(oscR) oscR.frequency.value = freq + (diff/2);
-            } else {
-                if(osc) {
-                    osc.frequency.value = freq;
-                    osc.type = waveSelect.value;
-                }
-            }
+            requestAnimationFrame(draw);
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteFrequencyData(dataArray);
+            bars.forEach((bar, i) => {
+                const val = dataArray[i] || 0;
+                bar.style.height = (val / 3) + 'px';
+            });
         }
 
-        // --- SES KAYIT ÖZELLİĞİ ---
-        recBtn.addEventListener('click', async () => {
-            if (!isPlaying) {
-                alert('Kayıt almak için önce sesi başlatın!');
-                return;
-            }
+        // --- EVENTLER ---
+        document.getElementById('playBtn').addEventListener('click', startSound);
+        document.getElementById('stopBtn').addEventListener('click', stopSound);
+        document.getElementById('acceptButton').addEventListener('click', () => document.getElementById('disclaimerModal').style.display = 'none');
+        
+        document.getElementById('frequency').addEventListener('input', (e) => {
+            document.getElementById('freqValue').innerText = e.target.value;
+            document.getElementById('freqInput').value = e.target.value;
+            if(isPlaying) osc.frequency.value = e.target.value;
+        });
 
-            const durationStr = prompt("Kaç saniye kayıt edilsin? (Örn: 60)", "60");
-            if (!durationStr) return;
+        document.getElementById('recBtn').addEventListener('click', async () => {
+            if(!isPlaying) { alert("Önce sesi başlatın!"); return; }
+            const sec = prompt("Kaç saniye kayıt edilsin?", "30");
+            if(!sec) return;
             
-            const seconds = parseInt(durationStr);
-            if (isNaN(seconds) || seconds <= 0) {
-                alert("Geçersiz süre!");
-                return;
-            }
-
-            // Kayıt Başlat
             const dest = audioCtx.createMediaStreamDestination();
             gainNode.connect(dest);
             mediaRecorder = new MediaRecorder(dest.stream);
             recordedChunks = [];
-
-            mediaRecorder.ondataavailable = (e) => {
-                if (e.data.size > 0) recordedChunks.push(e.data);
-            };
-
+            
+            mediaRecorder.ondataavailable = e => recordedChunks.push(e.data);
             mediaRecorder.onstop = () => {
                 const blob = new Blob(recordedChunks, { type: 'audio/webm' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
-                a.style.display = 'none';
                 a.href = url;
-                a.download = `Frekans_${freqSlider.value}Hz_${new Date().getTime()}.webm`;
-                document.body.appendChild(a);
+                a.download = `Frekans_${document.getElementById('frequency').value}Hz.webm`;
                 a.click();
-                window.URL.revokeObjectURL(url);
-                alert("✅ Kayıt tamamlandı ve indirildi!");
-                recBtn.classList.remove('recording');
-                recBtn.textContent = "KAYIT";
+                document.getElementById('recBtn').classList.remove('recording');
+                document.getElementById('recBtn').innerText = "REC";
             };
 
             mediaRecorder.start();
-            recBtn.classList.add('recording');
-            recBtn.textContent = `KAYIT (${seconds}s)`;
-
-            // Süre bitince durdur
-            let timeLeft = seconds;
-            const countdown = setInterval(() => {
-                timeLeft--;
-                recBtn.textContent = `KAYIT (${timeLeft}s)`;
-                if (timeLeft <= 0) {
-                    clearInterval(countdown);
-                    mediaRecorder.stop();
-                }
-            }, 1000);
+            document.getElementById('recBtn').classList.add('recording');
+            document.getElementById('recBtn').innerText = "REC...";
+            setTimeout(() => mediaRecorder.stop(), sec * 1000);
         });
 
-        playBtn.addEventListener('click', startSound);
-        stopBtn.addEventListener('click', stopSound);
-
-        function drawVisualizer() {
-            if(!isPlaying) return;
-            requestAnimationFrame(drawVisualizer);
-            
-            const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-            analyser.getByteFrequencyData(dataArray);
-
-            bars.forEach((bar, index) => {
-                const val = dataArray[index % bufferLength];
-                bar.style.height = Math.max(5, (val / 2)) + 'px';
-            });
-        }
-
+        // --- GÜVENLİK (SAĞ TIK ENGELLEME) ---
+        window.addEventListener('contextmenu', e => e.preventDefault());
+        window.addEventListener('keydown', e => {
+            if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || (e.ctrlKey && e.keyCode === 85)) {
+                e.preventDefault();
+            }
+        });
     </script>
 </body>
 </html>
