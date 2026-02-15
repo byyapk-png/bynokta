@@ -2,65 +2,308 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Frekans Pro - ByNoKTa</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #06080f; --card: #111627; --cyan: #00f0ff; --magenta: #ff00aa; --text: #e8f4f8; }
+        :root {
+            --bg-primary: #06080f;
+            --bg-secondary: #111627;
+            --accent-cyan: #00f0ff;
+            --accent-magenta: #ff00aa;
+            --accent-yellow: #ffea00;
+            --accent-red: #ff4444;
+            --text-primary: #e8f4f8;
+            --text-secondary: #8b9dc3;
+            --glow-cyan: 0 0 15px rgba(0, 240, 255, 0.4);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'JetBrains Mono', monospace; background: var(--bg); color: var(--text); min-height: 100vh; padding: 10px; overflow-x: hidden; }
-        
-        .back-link { position: absolute; top: 15px; left: 15px; color: #8b9dc3; text-decoration: none; font-weight: bold; font-size: 14px; z-index: 100; }
-        
-        .container { width: 100%; max-width: 1000px; margin: 45px auto 10px; background: rgba(17, 22, 39, 0.9); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); padding: 15px; }
-        h1 { font-family: 'Orbitron', sans-serif; font-size: 22px; text-align: center; margin-bottom: 20px; background: linear-gradient(135deg, var(--cyan), var(--magenta)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            overflow-x: hidden;
+        }
 
-        .panel { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 15px; }
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 240, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(255, 0, 170, 0.08) 0%, transparent 50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .back-link {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s;
+            z-index: 100;
+        }
+        .back-link:hover { color: var(--accent-cyan); }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            background: rgba(17, 22, 39, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            padding: 20px;
+            margin-top: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .header-area {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: var(--glow-cyan);
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        @media (max-width: 850px) {
+            .main-grid { grid-template-columns: 1fr; gap: 15px; }
+            .container { padding: 15px; }
+        }
+
+        .controls-panel, .presets-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 15px;
+            border: 1px solid var(--border);
+        }
+
         .control-group { margin-bottom: 15px; }
-        label { display: flex; justify-content: space-between; font-size: 12px; color: var(--cyan); margin-bottom: 5px; font-weight: bold; }
-        input[type="range"] { width: 100%; cursor: pointer; }
-        select, input[type="number"] { width: 100%; padding: 8px; background: #000; border: 1px solid #333; border-radius: 5px; color: #fff; font-size: 14px; }
+        
+        label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-cyan);
+            font-weight: 700;
+        }
 
-        .main-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
-        .btn { padding: 10px 5px; border: none; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-weight: bold; font-size: 10px; cursor: pointer; }
-        .btn-play { background: var(--cyan); color: #000; }
-        .btn-stop { background: #333; color: #fff; }
-        .btn-rec { background: #ff4444; color: #fff; }
+        .value-display {
+            color: var(--accent-magenta);
+            font-family: 'Orbitron', sans-serif;
+        }
 
-        .category-scroll { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 10px; scrollbar-width: none; }
-        .cat-btn { padding: 6px 12px; background: #1a1f2e; border: 1px solid #333; border-radius: 15px; color: #8b9dc3; white-space: nowrap; font-size: 11px; cursor: pointer; }
-        .cat-btn.active { background: var(--cyan); color: #000; border-color: var(--cyan); }
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 6px;
+            border-radius: 10px;
+            background: linear-gradient(to right, var(--accent-cyan), var(--accent-magenta));
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 0 10px var(--accent-cyan);
+            margin-top: -6px;
+        }
 
-        .preset-grid { display: none; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 8px; }
+        select, input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .main-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .btn-big {
+            padding: 12px 5px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.7rem;
+        }
+
+        .btn-play { background: var(--accent-cyan); color: #000; box-shadow: var(--glow-cyan); }
+        .btn-play.active { background: var(--accent-magenta); color: #fff; box-shadow: 0 0 15px var(--accent-magenta); }
+        .btn-stop { background: rgba(255, 255, 255, 0.1); color: #fff; }
+        .btn-rec { background: var(--accent-red); color: #fff; }
+        .btn-rec.recording { animation: pulseRed 1.5s infinite; background: #900; }
+
+        @keyframes pulseRed { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+
+        .category-scroll {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            scrollbar-width: none;
+        }
+        .category-scroll::-webkit-scrollbar { display: none; }
+
+        .cat-btn {
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: 0.2s;
+        }
+        .cat-btn.active { background: var(--accent-cyan); color: #000; font-weight: bold; }
+
+        .preset-grid {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 8px;
+        }
         .preset-grid.active { display: grid; }
-        .preset-item { padding: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; font-size: 10px; text-align: center; cursor: pointer; }
-        .preset-item:hover { border-color: var(--magenta); }
 
-        .visualizer { width: 100%; height: 50px; display: flex; align-items: flex-end; justify-content: center; gap: 2px; margin-top: 15px; background: rgba(0,0,0,0.2); border-radius: 8px; }
-        .bar { flex: 1; background: var(--cyan); min-height: 2px; }
+        .preset-item {
+            padding: 10px 5px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.7rem;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .visualizer {
+            width: 100%;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 2px;
+            padding: 5px;
+            margin-top: 15px;
+        }
+        .bar { flex: 1; background: var(--accent-cyan); min-height: 2px; }
+
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-content {
+            background: var(--bg-secondary); border: 1px solid var(--accent-magenta);
+            border-radius: 20px; padding: 25px; text-align: center; max-width: 400px;
+        }
+        .agree-btn {
+            margin-top: 20px; padding: 12px 30px; background: var(--accent-cyan);
+            border: none; border-radius: 10px; font-weight: bold; cursor: pointer;
+        }
+        .agree-btn:disabled { opacity: 0.5; }
     </style>
 </head>
 <body>
 
-    <a href="index.html" class="back-link">← PORTAL</a>
+    <div class="modal-overlay" id="disclaimerModal">
+        <div class="modal-content">
+            <h2 style="color: var(--accent-magenta); margin-bottom: 15px; font-size: 1.2rem;">⚠️ DİKKAT</h2>
+            <p style="color: var(--text-secondary); font-size: 0.8rem; line-height: 1.6;">
+                Bu uygulama beyin dalgalarını etkileyebilecek binaural sesler üretir. 
+                Epilepsi, kalp pili veya psikolojik rahatsızlığı olanlar kullanmamalıdır.
+            </p>
+            <div style="margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <input type="checkbox" id="agreeCheck">
+                <label for="agreeCheck" style="margin: 0; font-size: 0.75rem; cursor: pointer;">Kabul ediyorum</label>
+            </div>
+            <button class="agree-btn" id="acceptButton" disabled>BAŞLA</button>
+        </div>
+    </div>
+
+    <a href="index.html" class="back-link">← GERİ DÖN</a>
 
     <div class="container">
-        <h1>FREKANS PRO</h1>
+        <div class="header-area">
+            <h1>FREKANS PRO</h1>
+            <div class="subtitle">Ses Terapisi & Sinyal Üretici</div>
+        </div>
 
         <div class="main-grid">
-            <div class="panel">
+            <div class="controls-panel">
                 <div class="control-group">
-                    <label>Frekans: <span id="freqVal">440</span> Hz</label>
-                    <input type="range" id="freqRange" min="20" max="1000" value="440">
-                    <input type="number" id="freqNum" value="440" style="margin-top:8px">
+                    <label>Frekans: <span class="value-display" id="freqValue">440</span> Hz</label>
+                    <input type="range" id="frequency" min="20" max="1000" value="440">
+                    <input type="number" id="freqInput" value="440" style="margin-top:10px; text-align:center;">
                 </div>
+
                 <div class="control-group">
-                    <label>Ses Seviyesi: <span id="volVal">50</span></label>
-                    <input type="range" id="volRange" min="0" max="100" value="50">
+                    <label>Ses: <span class="value-display" id="volValue">50</span></label>
+                    <input type="range" id="volume" min="0" max="100" value="50">
                 </div>
+
                 <div class="control-group">
                     <label>Dalga Tipi</label>
                     <select id="waveType">
@@ -69,106 +312,183 @@
                         <option value="sawtooth">Testere (Keskin)</option>
                     </select>
                 </div>
+
+                <div class="control-group">
+                    <label>Mod</label>
+                    <select id="modeSelect">
+                        <option value="normal">Normal Mod</option>
+                        <option value="binaural">Binaural (Kulaklık Şart)</option>
+                    </select>
+                </div>
+
                 <div class="main-buttons">
-                    <button class="btn btn-play" id="startBtn">BAŞLAT</button>
-                    <button class="btn btn-stop" id="stopBtn">DURDUR</button>
-                    <button class="btn btn-rec" id="recBtn">REC</button>
+                    <button class="btn-big btn-play" id="playBtn">BAŞLAT</button>
+                    <button class="btn-big btn-stop" id="stopBtn">DURDUR</button>
+                    <button class="btn-big btn-rec" id="recBtn">REC</button>
                 </div>
             </div>
 
-            <div class="panel">
+            <div class="presets-panel">
                 <div class="category-scroll">
-                    <button class="cat-btn active" onclick="setCat('head', this)">🧠 Kafa</button>
-                    <button class="cat-btn" onclick="setCat('body', this)">❤️ Organ</button>
-                    <button class="cat-btn" onclick="setCat('solf', this)">🎵 Solfeggio</button>
-                    <button class="cat-btn" onclick="setCat('chak', this)">🌈 Çakra</button>
+                    <button class="cat-btn active" onclick="showCategory('head', this)">🧠 Kafa</button>
+                    <button class="cat-btn" onclick="showCategory('body', this)">❤️ Organ</button>
+                    <button class="cat-btn" onclick="showCategory('solf', this)">🎵 Solfeggio</button>
+                    <button class="cat-btn" onclick="showCategory('chak', this)">🌈 Çakra</button>
                 </div>
+
                 <div id="cat-head" class="preset-grid active">
-                    <div class="preset-item" onclick="setF(40,'sine')">Baş Ağrısı</div>
-                    <div class="preset-item" onclick="setF(50,'sine')">Boyun</div>
-                    <div class="preset-item" onclick="setF(120,'square')">Sinüs</div>
-                    <div class="preset-item" onclick="setF(741,'sine')">Tiroid</div>
+                    <div class="preset-item" onclick="setPreset(40, 'sine')">Baş Ağrısı</div>
+                    <div class="preset-item" onclick="setPreset(50, 'sine')">Boyun</div>
+                    <div class="preset-item" onclick="setPreset(120, 'square')">Sinüs</div>
+                    <div class="preset-item" onclick="setPreset(741, 'sine')">Tiroid</div>
                 </div>
+
                 <div id="cat-body" class="preset-grid">
-                    <div class="preset-item" onclick="setF(337,'sine')">Kan Dolaşım</div>
-                    <div class="preset-item" onclick="setF(639,'sine')">Kalp Ritm</div>
-                    <div class="preset-item" onclick="setF(319,'sine')">Böbrek</div>
-                    <div class="preset-item" onclick="setF(111,'square')">Bağırsak</div>
+                    <div class="preset-item" onclick="setPreset(337, 'sine')">Kan</div>
+                    <div class="preset-item" onclick="setPreset(639, 'sine')">Kalp</div>
+                    <div class="preset-item" onclick="setPreset(319, 'sine')">Böbrek</div>
+                    <div class="preset-item" onclick="setPreset(111, 'square')">Bağırsak</div>
                 </div>
+
                 <div id="cat-solf" class="preset-grid">
-                    <div class="preset-item" onclick="setF(174,'sine')">174Hz (Ağrı)</div>
-                    <div class="preset-item" onclick="setF(396,'sine')">396Hz (Korku)</div>
-                    <div class="preset-item" onclick="setF(528,'sine')">528Hz (DNA)</div>
-                    <div class="preset-item" onclick="setF(852,'sine')">852Hz (Sezgi)</div>
+                    <div class="preset-item" onclick="setPreset(174, 'sine')">174Hz</div>
+                    <div class="preset-item" onclick="setPreset(396, 'sine')">396Hz</div>
+                    <div class="preset-item" onclick="setPreset(528, 'sine')">528Hz</div>
+                    <div class="preset-item" onclick="setPreset(852, 'sine')">852Hz</div>
                 </div>
+
                 <div id="cat-chak" class="preset-grid">
-                    <div class="preset-item" onclick="setF(194,'sine')">🔴 Kök</div>
-                    <div class="preset-item" onclick="setF(126,'sine')">🟡 Solar</div>
-                    <div class="preset-item" onclick="setF(136,'sine')">🟢 Kalp</div>
-                    <div class="preset-item" onclick="setF(141,'sine')">🟣 Taç</div>
+                    <div class="preset-item" onclick="setPreset(194, 'sine')">🔴 Kök</div>
+                    <div class="preset-item" onclick="setPreset(126, 'sine')">🟡 Solar</div>
+                    <div class="preset-item" onclick="setPreset(136, 'sine')">🟢 Kalp</div>
+                    <div class="preset-item" onclick="setPreset(141, 'sine')">🟣 Taç</div>
                 </div>
-                <div class="visualizer" id="vis"></div>
+
+                <div class="visualizer" id="visualizer"></div>
             </div>
         </div>
     </div>
 
     <script>
-        let ctx, osc, gain, analyzer, active=false, recorder, chunks=[];
-        const bars=[]; 
-        for(let i=0;i<20;i++){const b=document.createElement('div');b.className='bar';document.getElementById('vis').appendChild(b);bars.push(b);}
+        let audioCtx, osc, gainNode, analyser, isPlaying = false;
+        let mediaRecorder, recordedChunks = [];
+        const bars = [];
 
-        function init(){
-            if(!ctx){
-                ctx=new(window.AudioContext||window.webkitAudioContext)();
-                gain=ctx.createGain(); analyzer=ctx.createAnalyser(); analyzer.fftSize=64;
-                gain.connect(analyzer); analyzer.connect(ctx.destination);
+        // Visualizer bar setup
+        for(let i=0; i<25; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'bar';
+            document.getElementById('visualizer').appendChild(bar);
+            bars.push(bar);
+        }
+
+        function initAudio() {
+            if(!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                gainNode = audioCtx.createGain();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 64;
+                gainNode.connect(analyser);
+                analyser.connect(audioCtx.destination);
             }
         }
-        function start(){
-            init(); if(active) stop();
-            osc=ctx.createOscillator(); osc.type=document.getElementById('waveType').value;
-            osc.frequency.value=document.getElementById('freqRange').value;
-            osc.connect(gain); gain.gain.value=document.getElementById('volRange').value/100;
-            osc.start(); active=true; draw();
+
+        function startSound() {
+            initAudio();
+            if(isPlaying) stopSound();
+            osc = audioCtx.createOscillator();
+            osc.type = document.getElementById('waveType').value;
+            osc.frequency.value = document.getElementById('frequency').value;
+            osc.connect(gainNode);
+            gainNode.gain.value = document.getElementById('volume').value / 100;
+            osc.start();
+            isPlaying = true;
+            document.getElementById('playBtn').classList.add('active');
+            draw();
         }
-        function stop(){ if(osc){osc.stop();osc.disconnect();} active=false; }
-        function setF(f,w){
-            document.getElementById('freqRange').value=f; document.getElementById('freqNum').value=f;
-            document.getElementById('freqVal').innerText=f; document.getElementById('waveType').value=w;
-            if(active) start();
+
+        function stopSound() {
+            if(osc) { osc.stop(); osc.disconnect(); }
+            isPlaying = false;
+            document.getElementById('playBtn').classList.remove('active');
+            bars.forEach(b => b.style.height = '2px');
         }
-        function setCat(id,btn){
-            document.querySelectorAll('.preset-grid').forEach(g=>g.classList.remove('active'));
-            document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
-            document.getElementById('cat-'+id).classList.add('active'); btn.classList.add('active');
+
+        function setPreset(f, w) {
+            document.getElementById('frequency').value = f;
+            document.getElementById('freqInput').value = f;
+            document.getElementById('freqValue').innerText = f;
+            document.getElementById('waveType').value = w;
+            if(isPlaying) startSound();
         }
-        function draw(){
-            if(!active) return; requestAnimationFrame(draw);
-            const data=new Uint8Array(analyzer.frequencyBinCount); analyzer.getByteFrequencyData(data);
-            bars.forEach((b,i)=> b.style.height=(data[i]||0)/3+'px');
+
+        function showCategory(id, btn) {
+            document.querySelectorAll('.preset-grid').forEach(g => g.classList.remove('active'));
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('cat-' + id).classList.add('active');
+            btn.classList.add('active');
         }
-        document.getElementById('startBtn').onclick=start;
-        document.getElementById('stopBtn').onclick=stop;
-        document.getElementById('freqRange').oninput=(e)=>{
-            document.getElementById('freqVal').innerText=e.target.value;
-            document.getElementById('freqNum').value=e.target.value;
-            if(active) osc.frequency.value=e.target.value;
+
+        function draw() {
+            if(!isPlaying) return;
+            requestAnimationFrame(draw);
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteFrequencyData(dataArray);
+            bars.forEach((bar, i) => {
+                const val = dataArray[i] || 0;
+                bar.style.height = Math.max(2, val / 2.5) + 'px';
+            });
+        }
+
+        document.getElementById('playBtn').onclick = startSound;
+        document.getElementById('stopBtn').onclick = stopSound;
+        
+        document.getElementById('frequency').oninput = (e) => {
+            document.getElementById('freqValue').innerText = e.target.value;
+            document.getElementById('freqInput').value = e.target.value;
+            if(isPlaying) osc.frequency.value = e.target.value;
         };
-        document.getElementById('recBtn').onclick=async()=>{
-            if(!active){alert("Önce BAŞLAT'a basın!");return;}
-            const s=prompt("Kaç saniye?","30"); if(!s)return;
-            const dest=ctx.createMediaStreamDestination(); gain.connect(dest);
-            recorder=new MediaRecorder(dest.stream); chunks=[];
-            recorder.ondataavailable=e=>chunks.push(e.data);
-            recorder.onstop=()=>{
-                const blob=new Blob(chunks,{type:'audio/webm'}); const url=URL.createObjectURL(blob);
-                const a=document.createElement('a'); a.href=url; a.download=`ByNoKTa_Freq_${document.getElementById('freqRange').value}Hz.webm`; a.click();
+
+        document.getElementById('volume').oninput = (e) => {
+            document.getElementById('volValue').innerText = e.target.value;
+            if(gainNode) gainNode.gain.value = e.target.value / 100;
+        };
+
+        document.getElementById('agreeCheck').onchange = (e) => {
+            document.getElementById('acceptButton').disabled = !e.target.checked;
+        };
+
+        document.getElementById('acceptButton').onclick = () => {
+            document.getElementById('disclaimerModal').style.display = 'none';
+        };
+
+        document.getElementById('recBtn').onclick = async () => {
+            if(!isPlaying) { alert("Önce BAŞLAT'a basın!"); return; }
+            const sec = prompt("Kaç saniye kayıt edilsin?", "30");
+            if(!sec) return;
+            
+            const dest = audioCtx.createMediaStreamDestination();
+            gainNode.connect(dest);
+            mediaRecorder = new MediaRecorder(dest.stream);
+            recordedChunks = [];
+            
+            mediaRecorder.ondataavailable = e => recordedChunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `ByNoKTa_Freq_${document.getElementById('frequency').value}Hz.webm`;
+                a.click();
+                document.getElementById('recBtn').classList.remove('recording');
+                document.getElementById('recBtn').innerText = "REC";
             };
-            recorder.start(); setTimeout(()=>recorder.stop(),s*1000);
+
+            mediaRecorder.start();
+            document.getElementById('recBtn').classList.add('recording');
+            document.getElementById('recBtn').innerText = "REC...";
+            setTimeout(() => mediaRecorder.stop(), sec * 1000);
         };
-        // Güvenlik
-        window.addEventListener('contextmenu',e=>e.preventDefault());
-        window.addEventListener('keydown',e=>{if(e.keyCode===123||(e.ctrlKey&&e.shiftKey&&(e.keyCode===73||e.keyCode===74))||(e.ctrlKey&&e.keyCode===85))e.preventDefault();});
     </script>
 </body>
 </html>
