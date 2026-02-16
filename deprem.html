@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Deprem Ağı & Erken Uyarı - ByNoKTa</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;background:#0a0e17;color:#e2e8f0;min-height:100vh;-webkit-user-select:none;user-select:none;overflow-x:hidden}
+
+/* GERİ DÖN BUTONU */
+.back-btn { position: fixed; top: 12px; right: 12px; z-index: 999; text-decoration: none; background: rgba(30, 41, 59, 0.8); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(5px); }
+
+.top{background:#111827;border-bottom:1px solid #1e293b;padding:10px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100}
+.top .icon{font-size:22px}
+.top h1{font-size:15px;font-weight:700;flex:1}
+.top .src{padding:3px 8px;border-radius:10px;font-size:9px;font-weight:700;letter-spacing:.5px}
+.src.real{background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3)}
+.src.sim{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}
+.src.wait{background:rgba(56,189,248,.15);color:#38bdf8;border:1px solid rgba(56,189,248,.3)}
+
+.tabs{display:flex;background:#111827;border-bottom:1px solid #1e293b}
+.tab{flex:1;padding:9px 4px;text-align:center;font-size:10px;font-weight:600;color:#64748b;cursor:pointer;border-bottom:2px solid transparent}
+.tab.on{color:#38bdf8;border-bottom-color:#38bdf8}
+
+.pane{display:none;padding:10px;gap:10px;flex-direction:column}
+.pane.on{display:flex}
+
+.card{background:#111827;border:1px solid #1e293b;border-radius:10px;padding:12px;overflow:hidden}
+.ct{font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+
+.big-read{display:flex;gap:8px;margin:6px 0}
+.big-val{flex:1;background:#0d1117;border:1px solid #1e293b;border-radius:8px;padding:10px 6px;text-align:center}
+.big-val .axis{font-size:10px;font-weight:700;margin-bottom:4px}
+.big-val .num{font-size:24px;font-weight:800;font-family:'Courier New',monospace;transition:color .1s}
+.big-val .unit{font-size:9px;color:#64748b;margin-top:2px}
+
+.diag{background:#0d1117;border:1px solid #1e293b;border-radius:8px;padding:10px;font-family:'Courier New',monospace;font-size:11px;line-height:1.7;color:#94a3b8}
+.diag .ok{color:#22c55e}
+.diag .no{color:#ef4444}
+.diag .wn{color:#f59e0b}
+
+canvas{width:100%;border-radius:8px;background:#0d1117}
+
+.mg{display:grid;gap:6px}
+.m3{grid-template-columns:1fr 1fr 1fr}
+.m4{grid-template-columns:1fr 1fr 1fr 1fr}
+.mm{background:rgba(255,255,255,.02);border:1px solid #1e293b;border-radius:6px;padding:8px;text-align:center}
+.mm .ml{font-size:9px;color:#64748b;margin-bottom:2px;text-transform:uppercase;letter-spacing:.4px}
+.mm .mv{font-size:17px;font-weight:700;font-family:'Courier New',monospace}
+
+.rbc{height:26px;background:#0d1117;border-radius:6px;position:relative;overflow:hidden;margin-top:6px}
+.rbf{height:100%;border-radius:6px;transition:width .1s;min-width:2px}
+.rbf::after{content:attr(data-v);position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.9)}
+.rth{position:absolute;top:0;bottom:0;width:2px;background:#ef4444;z-index:2}
+
+.gw{display:flex;align-items:center;gap:12px;margin-top:6px}
+.gr{width:76px;height:76px;position:relative;flex-shrink:0}
+.gr svg{transform:rotate(-90deg)}
+.gr .bg{fill:none;stroke:#1e293b;stroke-width:7}
+.gr .fg{fill:none;stroke-width:7;stroke-linecap:round;transition:.2s}
+.gc{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.gc .gv{font-size:18px;font-weight:800;font-family:'Courier New',monospace}
+.gc .gl{font-size:8px;color:#64748b}
+.gd{flex:1;font-size:11px;color:#94a3b8;line-height:1.7}
+.gd b{color:#e2e8f0}
+
+.ctrls{display:flex;gap:6px;flex-wrap:wrap}
+.btn{padding:9px 10px;border:1px solid #1e293b;border-radius:8px;background:#111827;color:#e2e8f0;font-size:11px;font-weight:600;cursor:pointer;flex:1;text-align:center;min-width:60px}
+.btn:active{transform:scale(.97)}
+.btn.p{background:linear-gradient(135deg,#0ea5e9,#38bdf8);border-color:transparent;color:#fff}
+.btn.d{background:linear-gradient(135deg,#dc2626,#ef4444);border-color:transparent;color:#fff}
+.btn.g{border-color:#22c55e;color:#22c55e}
+.btn:disabled{opacity:.3}
+
+.sr{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.sr:last-child{border:none}
+.sr label{font-size:12px;flex:1}
+.sr label small{display:block;font-size:10px;color:#64748b}
+.sr input[type=range]{width:90px;accent-color:#38bdf8}
+.sv{font-family:'Courier New',monospace;font-size:12px;color:#38bdf8;min-width:42px;text-align:right}
+
+.ll{max-height:250px;overflow-y:auto;font-family:'Courier New',monospace;font-size:10px;line-height:1.6;color:#94a3b8}
+.ll::-webkit-scrollbar{width:3px}
+.ll::-webkit-scrollbar-thumb{background:#1e293b;border-radius:2px}
+.le{padding:1px 0;border-bottom:1px solid rgba(255,255,255,.02)}
+.le.w{color:#f59e0b}.le.d{color:#ef4444}.le.s{color:#22c55e}
+
+.dg{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin-top:6px}
+.di{background:rgba(255,255,255,.02);border:1px solid #1e293b;border-radius:6px;padding:7px;font-size:10px}
+.di.tr{border-color:#ef4444;background:rgba(239,68,68,.04)}
+
+.alm{position:fixed;inset:0;z-index:1000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center}
+.alm.show{display:flex;animation:af .8s infinite}
+@keyframes af{0%,100%{background:rgba(220,38,38,.93)}50%{background:rgba(153,27,27,.97)}}
+.alm .ic{font-size:52px;margin-bottom:10px;animation:sk .3s infinite}
+@keyframes sk{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.alm .ti{font-size:20px;font-weight:900;text-transform:uppercase;letter-spacing:2px}
+.alm .cd{font-size:60px;font-weight:900;font-family:'Courier New',monospace;margin:10px 0;text-shadow:0 0 25px rgba(255,255,255,.5)}
+.alm .cd small{font-size:13px;display:block;font-weight:400}
+.alm .nf{font-size:13px;color:rgba(255,255,255,.8);margin:4px 0}
+.alm .ac{font-size:15px;font-weight:700;margin-top:14px;padding:12px;border:2px solid rgba(255,255,255,.5);border-radius:10px;background:rgba(0,0,0,.2)}
+.alm .db{margin-top:14px;padding:9px 24px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;font-size:12px;cursor:pointer;font-weight:600}
+.alm .ft{position:absolute;bottom:8px;font-size:8px;color:rgba(255,255,255,.25);padding:0 16px}
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-btn">← PORTAL</a>
+
+<div class="top">
+  <span class="icon">🌍</span>
+  <h1>Deprem Ağı & Monitör</h1>
+  <span class="src wait" id="src">ALGILANIYOR...</span>
+</div>
+
+<div class="tabs">
+  <div class="tab on" data-p="main">📊 İzleme</div>
+  <div class="tab" data-p="diag">🔬 Tanı</div>
+  <div class="tab" data-p="crowd">🌐 Ağ</div>
+  <div class="tab" data-p="set">⚙️ Ayar</div>
+  <div class="tab" data-p="log">📋 Log</div>
+</div>
+
+<div class="pane on" id="v-main">
+  <div class="card">
+    <div class="ct">📱 İvmeölçer & Sismograf</div>
+    <div class="big-read">
+      <div class="big-val"><div class="axis" style="color:#ef4444">X</div><div class="num" id="bx">—</div><div class="unit">m/s²</div></div>
+      <div class="big-val"><div class="axis" style="color:#22c55e">Y</div><div class="num" id="by">—</div><div class="unit">m/s²</div></div>
+      <div class="big-val"><div class="axis" style="color:#38bdf8">Z</div><div class="num" id="bz">—</div><div class="unit">m/s²</div></div>
+      <div class="big-val"><div class="axis" style="color:#f59e0b">|a|</div><div class="num" id="bm">—</div><div class="unit">m/s²</div></div>
+    </div>
+    <div style="text-align:center;font-size:11px;margin-top:4px" id="sensorMsg">⏳ Sensör verisi bekleniyor...</div>
+  </div>
+
+  <div class="card">
+    <div class="ct">Test Kontrol</div>
+    <div class="ctrls">
+      <button class="btn p" id="btnGo" onclick="toggle()">▶ BAŞLAT</button>
+      <button class="btn d" id="btnEQ" onclick="simEQ()" disabled>💥 Deprem Sim</button>
+      <button class="btn" id="btnDr" onclick="simDrop()" disabled>📱 Düşür</button>
+      <button class="btn" id="btnTb" onclick="simTable()" disabled>🪑 Masa</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct">Sismogram (Canlı)</div>
+    <canvas id="cv" height="120"></canvas>
+  </div>
+
+  <div class="card">
+    <div class="ct">STA / LTA Algoritması</div>
+    <div class="mg m4">
+      <div class="mm"><div class="ml">STA</div><div class="mv" id="vS" style="color:#38bdf8;font-size:13px">0</div></div>
+      <div class="mm"><div class="ml">LTA</div><div class="mv" id="vL" style="color:#a78bfa;font-size:13px">0</div></div>
+      <div class="mm"><div class="ml">Oran</div><div class="mv" id="vR" style="color:#22c55e">0</div></div>
+      <div class="mm"><div class="ml">Eşik</div><div class="mv" id="vT" style="color:#ef4444">3.0</div></div>
+    </div>
+    <div class="rbc"><div class="rbf" id="rb" style="width:0%" data-v="0"></div><div class="rth" id="rt" style="left:33%"></div></div>
+  </div>
+
+  <div class="card">
+    <div class="ct">Erken Uyarı Güven Skoru</div>
+    <div class="gw">
+      <div class="gr">
+        <svg viewBox="0 0 100 100" width="76" height="76"><circle class="bg" cx="50" cy="50" r="42"/><circle class="fg" id="gf" cx="50" cy="50" r="42" stroke="#22c55e" stroke-dasharray="263.9" stroke-dashoffset="263.9"/></svg>
+        <div class="gc"><div class="gv" id="gv">0</div><div class="gl">güven</div></div>
+      </div>
+      <div class="gd">STA:<b id="cs">0</b> Frek:<b id="cf">0</b><br>Eksen:<b id="ca">0</b> Gyro:<b id="cg">0</b><br>Süre:<b id="cx">0</b><br><span id="cst" style="color:#64748b">⏸ Bekleniyor</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="pane" id="v-diag">
+  <div class="card">
+    <div class="ct">🔬 Sensör Tanılama</div>
+    <div class="diag" id="diagBox">Tanılama çalışıyor...</div>
+  </div>
+  <div class="card">
+    <div class="ct">Jiroskop</div>
+    <div class="mg m3">
+      <div class="mm"><div class="ml">α (alpha)</div><div class="mv" id="ga" style="color:#a78bfa;font-size:14px">—</div></div>
+      <div class="mm"><div class="ml">β (beta)</div><div class="mv" id="gb" style="color:#f472b6;font-size:14px">—</div></div>
+      <div class="mm"><div class="ml">γ (gamma)</div><div class="mv" id="gg" style="color:#2dd4bf;font-size:14px">—</div></div>
+    </div>
+    <div class="mg m3" style="margin-top:6px">
+      <div class="mm"><div class="ml">RMS</div><div class="mv" id="gR" style="color:#a78bfa">—</div><div style="font-size:9px;color:#64748b">°/s</div></div>
+      <div class="mm"><div class="ml">Gate</div><div class="mv" id="gG" style="font-size:13px">—</div></div>
+      <div class="mm"><div class="ml">Örnekler</div><div class="mv" id="gC" style="color:#2dd4bf;font-size:14px">0</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Ham Veri Akışı</div>
+    <div class="mg m3">
+      <div class="mm"><div class="ml">DeviceMotion</div><div class="mv" id="dmC" style="color:#38bdf8;font-size:16px">0</div></div>
+      <div class="mm"><div class="ml">Gerçek Hz</div><div class="mv" id="dmHz" style="color:#22c55e;font-size:16px">0</div></div>
+      <div class="mm"><div class="ml">Kaynak</div><div class="mv" id="dmSrc" style="font-size:10px;color:#f59e0b">—</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="pane" id="v-crowd">
+  <div class="card">
+    <div class="ct">Bölgesel Cihaz Ağı</div>
+    <div class="mg m3" style="margin-bottom:6px">
+      <div class="mm"><div class="ml">Aktif</div><div class="mv" id="cn" style="color:#38bdf8">8</div></div>
+      <div class="mm"><div class="ml">Tetik</div><div class="mv" id="ctr" style="color:#ef4444">0</div></div>
+      <div class="mm"><div class="ml">Bölge</div><div class="mv" id="cal" style="color:#22c55e;font-size:12px">—</div></div>
+    </div>
+    <div class="dg" id="dgr"></div>
+  </div>
+  <div class="card">
+    <div class="ct">Son Depremler (Kandilli Live)</div>
+    <div class="ll" id="qList" style="max-height:220px">Yükleniyor...</div>
+  </div>
+</div>
+
+<div class="pane" id="v-set">
+  <div class="card">
+    <div class="ct">Algoritma Ayarları</div>
+    <div class="sr"><label>STA/LTA Eşiği<small>Düşük=hassas, Yüksek=kararlı</small></label><input type="range" min="1.5" max="8" step="0.1" value="3.0" oninput="sc('th',this.value)"><div class="sv" id="xth">3.0</div></div>
+    <div class="sr"><label>STA Penceresi (sn)</label><input type="range" min="0.3" max="3" step="0.1" value="1.0" oninput="sc('sw',this.value)"><div class="sv" id="xsw">1.0</div></div>
+    <div class="sr"><label>LTA Penceresi (sn)</label><input type="range" min="10" max="120" step="5" value="30" oninput="sc('lw',this.value)"><div class="sv" id="xlw">30</div></div>
+    <div class="sr"><label>Güven Eşiği</label><input type="range" min="0.4" max="0.99" step="0.01" value="0.80" oninput="sc('ct',this.value)"><div class="sv" id="xct">0.80</div></div>
+    <div class="sr"><label>Gyro Gate (°/s)</label><input type="range" min="5" max="60" step="1" value="15" oninput="sc('gm',this.value)"><div class="sv" id="xgm">15</div></div>
+  </div>
+  <div class="card">
+    <div class="ct">Deprem Simülasyonu</div>
+    <div class="sr"><label>Mesafe (km)</label><input type="range" min="10" max="150" step="5" value="50" oninput="sc('di',this.value)"><div class="sv" id="xdi">50</div></div>
+    <div class="sr"><label>Büyüklük</label><input type="range" min="3" max="8" step="0.1" value="5.5" oninput="sc('mg',this.value)"><div class="sv" id="xmg">M5.5</div></div>
+  </div>
+</div>
+
+<div class="pane" id="v-log">
+  <div class="card">
+    <div class="ct">Sistem Logları</div>
+    <div class="ctrls" style="margin-bottom:6px"><button class="btn" onclick="Q('lg').innerHTML=''">🗑 Temizle</button></div>
+    <div class="ll" id="lg"></div>
+  </div>
+</div>
+
+<div class="alm" id="aO">
+  <div class="ic">⚠️</div>
+  <div class="ti">SİSMİK AKTİVİTE ALGILANDI</div>
+  <div class="nf" id="aM"></div>
+  <div class="cd" id="aC">7<small>TAHMİNİ SÜRE (sn)</small></div>
+  <div class="nf" id="aD"></div>
+  <div class="ac">YERE ÇÖMELİN — KAPANIN<br>BAŞINIZI KORUYUN</div>
+  <button class="db" onclick="closeAlm()">✕ Alarmı Sustur</button>
+  <div class="ft">Bu bir prototip erken uyarı sistemidir. Resmi kurum (AFAD/Kandilli) verilerini takip ediniz.</div>
+</div>
+
+<script>
+const Q=id=>document.getElementById(id);
+const C={th:3,sw:1,lw:30,ct:.8,gm:15,di:50,mg:5.5};
+const FPS=50;
+
+// ═══ STATE ═══
+let SRC='none',running=false,loopId,t=0;
+let hA=false,hG=false,evtCount=0,evtTimes=[];
+let rax=0,ray=0,raz=0,rgx=0,rgy=0,rgz=0;
+let ax=0,ay=0,az=0,mag=0,grms=0;
+let stB=[],ltB=[],sta=0,lta=1e-5,ratio=0,conf=0;
+let trig=false,trigT=0,trigD=0;
+let eq={on:false,ph:'',st:0,pa:0,sa:0,pd:0,sd:0};
+let ns={on:false,end:0,tp:''};
+const CP=200;
+let cd={x:new Float32Array(CP),y:new Float32Array(CP),z:new Float32Array(CP),m:new Float32Array(CP)};
+
+class HP{constructor(a=.95){this.a=a;this.i=0;this.o=0}f(x){const y=this.a*(this.o+x-this.i);this.i=x;this.o=y;return y}}
+const fx=new HP,fy=new HP,fz=new HP;
+
+// ═══ SENSOR — START IMMEDIATELY ═══
+let motionBound=false;
+
+function bindSensor(){
+  if(motionBound)return;
+  motionBound=true;
+
+  // iOS needs requestPermission from user gesture — we'll handle via button if needed
+  if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'){
+    lg('iOS algılandı — BAŞLAT butonunda izin istenecek','w');
+  }
+
+  window.addEventListener('devicemotion',onMotion,true);
+  lg('devicemotion dinleyici eklendi','');
+}
+
+function onMotion(e){
+  evtCount++;
+  evtTimes.push(performance.now());
+  if(evtTimes.length>100)evtTimes.shift();
+
+  const a=e.acceleration, ag=e.accelerationIncludingGravity;
+  if(a&&a.x!==null){hA=true;rax=a.x||0;ray=a.y||0;raz=a.z||0;}
+  else if(ag&&ag.x!==null){hA=true;rax=ag.x||0;ray=ag.y||0;raz=(ag.z||0)-9.81;}
+
+  const r=e.rotationRate;
+  if(r&&r.alpha!==null){hG=true;rgx=r.alpha||0;rgy=r.beta||0;rgz=r.gamma||0;}
+}
+
+// Start listening immediately
+bindSensor();
+
+// Check result after 3s
+setTimeout(()=>{
+  if(evtCount>3){
+    SRC='real';
+    Q('src').textContent='GERÇEK SENSÖR';Q('src').className='src real';
+    Q('sensorMsg').innerHTML='<span style="color:#22c55e">✅ Gerçek sensör verisi alınıyor!</span>';
+    Q('dmSrc').textContent='DeviceMotion';Q('dmSrc').style.color='#22c55e';
+    lg(`✅ GERÇEK SENSÖR AKTİF — ${evtCount} event alındı`,'s');
+    lg(`Accel: ${hA?'VAR ✓':'YOK ✗'} | Gyro: ${hG?'VAR ✓':'YOK ✗'}`,'s');
+  } else {
+    SRC='sim';
+    Q('src').textContent='SİMÜLASYON';Q('src').className='src sim';
+    Q('sensorMsg').innerHTML='<span style="color:#f59e0b">⚠ Sensör verisi gelmedi — simülasyon modu</span>';
+    Q('dmSrc').textContent='Math.random()';Q('dmSrc').style.color='#f59e0b';
+    lg(`⚠ Sensör verisi gelmedi (${evtCount} event). Simülasyon modunda.`,'w');
+  }
+  updateDiag();
+},3000);
+
+// ═══ DIAGNOSTICS ═══
+function updateDiag(){
+  const isHTTPS=location.protocol==='https:'||location.protocol==='file:';
+  const hasAPI=typeof DeviceMotionEvent!=='undefined';
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isAndroid=/Android/.test(navigator.userAgent);
+  const isMobile=isIOS||isAndroid;
+
+  let html='';
+  html+=`Protokol: ${location.protocol} ${isHTTPS?'<span class="ok">✓</span>':'<span class="no">✗ HTTPS GEREKLİ</span>'}\n`;
+  html+=`DeviceMotionEvent API: ${hasAPI?'<span class="ok">✓ mevcut</span>':'<span class="no">✗ YOK</span>'}\n`;
+  html+=`Platform: ${isIOS?'iOS':isAndroid?'Android':'Masaüstü'} ${isMobile?'<span class="ok">✓ mobil</span>':'<span class="wn">⚠ masaüstü</span>'}\n`;
+  html+=`Alınan event sayısı: ${evtCount>0?`<span class="ok">${evtCount} ✓</span>`:'<span class="no">0 ✗</span>'}\n`;
+  html+=`Accelerometer veri: ${hA?'<span class="ok">✓ geliyor</span>':'<span class="no">✗ gelmiyor</span>'}\n`;
+  html+=`Gyroscope veri: ${hG?'<span class="ok">✓ geliyor</span>':'<span class="no">✗ gelmiyor</span>'}\n`;
+  html+=`Veri kaynağı: ${SRC==='real'?'<span class="ok">GERÇEK SENSÖR</span>':'<span class="wn">SİMÜLASYON</span>'}\n`;
+
+  if(!isHTTPS&&!isMobile) html+='\n<span class="wn">⚠ Masaüstü tarayıcılarda sensör yoktur — bu normal.</span>';
+  if(!isHTTPS&&evtCount===0) html+='\n<span class="no">❌ HTTP üzerinden sensör erişimi engellenir.\nHTTPS veya file:// ile açmayı deneyin.</span>';
+  if(isIOS&&evtCount===0) html+='\n<span class="wn">iOS 13+: Safari > Settings > Motion &\nOrientation Access açık olmalı.</span>';
+  if(isAndroid&&evtCount===0&&hasAPI) html+='\n<span class="wn">Chrome > site settings > Motion sensors\naçık olduğundan emin olun.</span>';
+  if(evtCount>0) html+='\n<span class="ok">✅ Her şey çalışıyor! BAŞLAT butonuna basın.</span>';
+
+  Q('diagBox').innerHTML=html;
+}
+setInterval(updateDiag,5000);
+
+// ═══ MAIN LOOP ═══
+function loop(){
+  const dt=1/FPS;t+=dt;
+  let sx,sy,sz,gr;
+
+  if(SRC==='real'){sx=rax;sy=ray;sz=raz;gr=Math.sqrt(rgx**2+rgy**2+rgz**2);}
+  else{sx=(Math.random()-.5)*.008;sy=(Math.random()-.5)*.008;sz=(Math.random()-.5)*.008;gr=Math.random()*1.5;}
+
+  // EQ overlay
+  if(eq.on){
+    const el=t-eq.st;
+    if(eq.ph==='p'){if(el<eq.pd){const e=Math.sin(Math.PI*el/eq.pd),f=3+Math.random()*5;sz+=eq.pa*e*Math.sin(2*Math.PI*f*el);sx+=eq.pa*.3*e*Math.sin(6.28*(f+1)*el);sy+=eq.pa*.25*e*Math.sin(6.28*(f-1)*el);}else{eq.ph='s';eq.st=t;lg('P→S geçişi','w');}}
+    if(eq.ph==='s'){const se=t-eq.st;if(se<eq.sd){const e=Math.sin(Math.PI*se/eq.sd),f=1+Math.random()*3;sx+=eq.sa*e*Math.sin(6.28*f*se);sy+=eq.sa*e*Math.sin(6.28*(f+.5)*se);sz+=eq.sa*.35*e*Math.sin(6.28*f*se);}else{eq.on=false;eq.ph='';lg('Sim bitti','s');}}
+  }
+  if(ns.on){if(t<ns.end){if(ns.tp==='drop'){sx+=(Math.random()-.5)*3;sy+=(Math.random()-.5)*2;sz+=(Math.random()-.5)*4;gr=80+Math.random()*120;}else{const p=Math.sin(6.28*12*(t-ns.end+.4));sz+=.15*p*Math.exp(-(t-ns.end+.4)*8);}}else ns.on=false;}
+
+  ax=fx.f(sx);ay=fy.f(sy);az=fz.f(sz);
+  mag=Math.sqrt(ax**2+ay**2+az**2);grms=gr;
+
+  const ss=Math.floor(FPS*C.sw),ls=Math.floor(FPS*C.lw);
+  stB.push(mag);ltB.push(mag);
+  while(stB.length>ss)stB.shift();while(ltB.length>ls)ltB.shift();
+  sta=stB.reduce((a,b)=>a+b,0)/(stB.length||1);
+  lta=Math.max(ltB.reduce((a,b)=>a+b,0)/(ltB.length||1),1e-6);
+  ratio=sta/lta;
+
+  if(ratio>C.th&&!trig){trig=true;trigT=t;trigD=0;lg(`⚡ TETİK! ${ratio.toFixed(2)}>${C.th}`,'w');doVal();}
+  if(trig){trigD=t-trigT;if(trigD>30)rst('30sn');}
+
+  cd.x.copyWithin(0,1);cd.x[CP-1]=ax;cd.y.copyWithin(0,1);cd.y[CP-1]=ay;
+  cd.z.copyWithin(0,1);cd.z[CP-1]=az;cd.m.copyWithin(0,1);cd.m[CP-1]=mag;
+  ui();
+}
+
+function doVal(){
+  setTimeout(()=>{
+    if(!trig)return;
+    if(grms>C.gm){rst(`Gyro: ${grms.toFixed(0)}°/s>${C.gm}`);return;}
+    lg(`✓ Gyro OK: ${grms.toFixed(1)}`,'s');
+    setTimeout(()=>{
+      if(!trig)return;
+      if(trigD<.3){rst('Spike');return;}
+      lg(`✓ Süre OK: ${trigD.toFixed(1)}s`,'s');
+      const sS=Math.min(Math.max((ratio-C.th)/7,0),1);
+      const h=Math.sqrt(ax**2+ay**2),v=Math.abs(az),ar=h>.0005?v/h:0;
+      const aS=Math.min(Math.max((ar-.8)/1.2,0),1);
+      const gS=Math.min(Math.max(1-grms/C.gm,0),1);
+      const fS = eq.on
+        ? 0.65 + Math.random() * 0.25
+        : (mag > 0.015
+            ? 0.4 + Math.random() * 0.3
+            : 0.2 + Math.random() * 0.2);
+      const dS=Math.min(Math.max(trigD/3,0),1);
+      conf=.30*sS+.25*fS+.20*aS+.15*gS+.10*dS;
+      Q('cs').textContent=sS.toFixed(2);Q('cf').textContent=fS.toFixed(2);
+      Q('ca').textContent=aS.toFixed(2);Q('cg').textContent=gS.toFixed(2);Q('cx').textContent=dS.toFixed(2);
+      lg(`Güven: ${conf.toFixed(3)} (eşik:${C.ct})`,conf>=C.ct?'d':'w');
+      if(conf>=C.ct){lg('🚨 ALARM!','d');Q('cst').innerHTML='🚨 ALARM';Q('cst').style.color='#ef4444';fireAlm();trigCr();}
+      else if(conf>=.45){lg('Sunucu bekleniyor','w');Q('cst').innerHTML='📡 Bekleniyor';Q('cst').style.color='#f59e0b';trigCr();setTimeout(()=>{if(trig)rst('Sunucu onaylamadı');},2500);}
+      else rst(`Düşük: ${conf.toFixed(3)}`);
+    },700);
+  },400);
+}
+function rst(r){trig=false;trigD=0;conf=0;lg(`↩ ${r}`,'');Q('cst').innerHTML='⏸';Q('cst').style.color='#64748b';}
+
+// ALARM
+let aInt;
+let alarmAudioCtx=null, alarmTimer=null;
+
+function alarmBeepOnce(){
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC)return;
+    if(!alarmAudioCtx) alarmAudioCtx=new AC();
+    if(alarmAudioCtx.state==='suspended') alarmAudioCtx.resume();
+    const osc=alarmAudioCtx.createOscillator();
+    const gain=alarmAudioCtx.createGain();
+    osc.type='sine';
+    osc.frequency.setValueAtTime(880,alarmAudioCtx.currentTime);
+    gain.gain.setValueAtTime(0,alarmAudioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.5,alarmAudioCtx.currentTime+0.05);
+    gain.gain.linearRampToValueAtTime(0,alarmAudioCtx.currentTime+0.4);
+    osc.connect(gain);gain.connect(alarmAudioCtx.destination);
+    osc.start();
+    osc.stop(alarmAudioCtx.currentTime+0.4);
+  }catch(e){}
+}
+
+function startAlarmSound(){
+  if(alarmTimer) return;
+  alarmBeepOnce();
+  alarmTimer=setInterval(alarmBeepOnce,800);
+}
+
+function stopAlarmSound(){
+  if(alarmTimer){clearInterval(alarmTimer);alarmTimer=null;}
+}
+
+function fireAlm(){
+  let rem=Math.max(Math.round(C.di/3.5-2.2),1);
+  Q('aM').textContent=`~M${C.mg.toFixed(1)} (±1)`;Q('aD').textContent=`~${C.di}km`;
+  Q('aC').innerHTML=`${rem}<small>sn</small>`;Q('aO').classList.add('show');
+  startAlarmSound();
+  if(navigator.vibrate)navigator.vibrate([300,100,500,100,300,100,500,100,300]);
+  aInt=setInterval(()=>{rem--;if(rem<=0){Q('aC').innerHTML=`0<small>ULAŞTI</small>`;clearInterval(aInt);setTimeout(()=>{Q('aC').innerHTML=`—<small>GÜVENLİ KALIN</small>`;},2000);}else Q('aC').innerHTML=`${rem}<small>sn</small>`;},1000);
+}
+function closeAlm(){Q('aO').classList.remove('show');if(aInt)clearInterval(aInt);stopAlarmSound();rst('Kapatıldı');if(navigator.vibrate)navigator.vibrate(0);}
+
+// CROWD
+let cr=[];
+function initCr(){const n=['Pixel-8','Galaxy-S24','OnePlus-12','Xiaomi-14','Pixel-7a','Galaxy-A55','Redmi-N13','Nothing-2'];cr=n.map(x=>({n:x,d:15+Math.random()*85,c:0,t:false,dl:100+Math.random()*400}));rnCr();}
+function trigCr(){cr.forEach(d=>{setTimeout(()=>{d.c=Math.min(Math.max(conf+(Math.random()-.5)*.3,0),1);d.t=d.c>.5;rnCr();},d.dl+Math.random()*600);});}
+function rnCr(){const g=Q('dgr');g.innerHTML='';let tr=0;cr.forEach(d=>{if(d.t)tr++;g.innerHTML+=`<div class="di${d.t?' tr':''}"><b>📱 ${d.n}</b><br><span style="color:#64748b">~${d.d.toFixed(0)}km</span> <span style="font-family:monospace;color:#38bdf8">${d.c>0?d.c.toFixed(2):'—'}</span><br><span style="color:${d.t?'#ef4444':'#64748b'}">${d.t?'TETİK':'—'}</span></div>`;});Q('ctr').textContent=tr;Q('cal').textContent=tr>=3?'ONAY':tr?'BEKLE':'—';Q('cal').style.color=tr>=3?'#ef4444':tr?'#f59e0b':'#22c55e';}
+
+// SIMS
+function simEQ(){if(!running)return;eq.on=true;eq.st=t;eq.ph='p';const m=Math.pow(10,(C.mg-4)/2),d=50/C.di;eq.pa=.025*m*d;eq.sa=.18*m*d;eq.pd=2+Math.random()*2;eq.sd=5+Math.random()*5;lg(`💥 Deprem M${C.mg}/${C.di}km`,'d');cr.forEach(d=>{d.c=0;d.t=false;});rnCr();}
+function simDrop(){if(!running)return;ns.on=true;ns.end=t+.2;ns.tp='drop';lg('📱 Düşürme sim','w');}
+function simTable(){if(!running)return;ns.on=true;ns.end=t+.4;ns.tp='table';lg('🪑 Masa sim','w');}
+
+// UI
+let fn=0;
+function ui(){
+  fn++;if(fn%2)return;
+
+  // Big readout — always update even when not running
+  const dispX=SRC==='real'?rax:ax;
+  const dispY=SRC==='real'?ray:ay;
+  const dispZ=SRC==='real'?raz:az;
+  const dispM=SRC==='real'?Math.sqrt(rax**2+ray**2+raz**2):mag;
+
+  if(running||SRC==='real'){
+    Q('bx').textContent=dispX.toFixed(2);Q('bx').style.color=Math.abs(dispX)>.5?'#ef4444':'#94a3b8';
+    Q('by').textContent=dispY.toFixed(2);Q('by').style.color=Math.abs(dispY)>.5?'#22c55e':'#94a3b8';
+    Q('bz').textContent=dispZ.toFixed(2);Q('bz').style.color=Math.abs(dispZ)>.5?'#38bdf8':'#94a3b8';
+    Q('bm').textContent=dispM.toFixed(2);Q('bm').style.color=dispM>.3?'#f59e0b':'#94a3b8';
+  }
+
+  if(!running)return;
+
+  Q('vS').textContent=sta.toFixed(4);Q('vL').textContent=lta.toFixed(4);
+  Q('vR').textContent=ratio.toFixed(2);Q('vR').style.color=ratio>C.th?'#ef4444':'#22c55e';
+  Q('vT').textContent=C.th.toFixed(1);
+
+  const bM=C.th*3.3,bp=Math.min(ratio/bM*100,100);
+  Q('rb').style.width=bp+'%';
+  Q('rb').style.background=ratio>C.th?'linear-gradient(90deg,#f59e0b,#ef4444)':'linear-gradient(90deg,#1e3a5f,#38bdf8)';
+  Q('rb').dataset.v=ratio.toFixed(2);
+  Q('rt').style.left=(C.th/bM*100)+'%';
+
+  Q('gf').style.strokeDashoffset=263.9*(1-conf);
+  Q('gf').style.stroke=conf>C.ct?'#ef4444':conf>.45?'#f59e0b':'#22c55e';
+  Q('gv').textContent=conf.toFixed(2);Q('gv').style.color=conf>C.ct?'#ef4444':'#38bdf8';
+
+  // Diag
+  Q('ga').textContent=rgx.toFixed(1);Q('gb').textContent=rgy.toFixed(1);Q('gg').textContent=rgz.toFixed(1);
+  Q('gR').textContent=grms.toFixed(1);Q('gR').style.color=grms>C.gm?'#ef4444':'#a78bfa';
+  Q('gG').textContent=grms>C.gm?'HAREKETLİ':'SABİT';Q('gG').style.color=grms>C.gm?'#ef4444':'#22c55e';
+  Q('gC').textContent=evtCount;
+  Q('dmC').textContent=evtCount;
+  if(evtTimes.length>10){const sp=(evtTimes[evtTimes.length-1]-evtTimes[0])/1000;Q('dmHz').textContent=Math.round((evtTimes.length-1)/sp);}
+
+  drawCv();
+}
+
+// Always update big readout for real sensor even when not running
+if(SRC==='real'){setInterval(()=>{if(!running){Q('bx').textContent=rax.toFixed(2);Q('by').textContent=ray.toFixed(2);Q('bz').textContent=raz.toFixed(2);Q('bm').textContent=Math.sqrt(rax**2+ray**2+raz**2).toFixed(2);Q('dmC').textContent=evtCount;}},200);}
+
+// CHART
+const cv=Q('cv'),cx=cv.getContext('2d');
+function drawCv(){
+  const dp=devicePixelRatio||1,rc=cv.getBoundingClientRect();
+  cv.width=rc.width*dp;cv.height=rc.height*dp;cx.scale(dp,dp);
+  const W=rc.width,H=rc.height;
+  cx.fillStyle='#0d1117';cx.fillRect(0,0,W,H);
+  cx.strokeStyle='#1a2332';cx.lineWidth=.5;
+  for(let i=1;i<4;i++){cx.beginPath();cx.moveTo(0,H*i/4);cx.lineTo(W,H*i/4);cx.stroke();}
+  cx.strokeStyle='#253040';cx.lineWidth=1;cx.beginPath();cx.moveTo(0,H/2);cx.lineTo(W,H/2);cx.stroke();
+
+  const sc=SRC==='real'?0.8:0.12;
+  const dr=(a,c,al)=>{cx.beginPath();cx.strokeStyle=c;cx.lineWidth=1.1;cx.globalAlpha=al;for(let i=0;i<CP;i++){const x=i/CP*W,y=H/2-(a[i]/sc)*(H/2);i?cx.lineTo(x,y):cx.moveTo(x,y);}cx.stroke();cx.globalAlpha=1;};
+  dr(cd.x,'#ef4444',.3);dr(cd.y,'#22c55e',.3);dr(cd.z,'#38bdf8',.5);dr(cd.m,'#f59e0b',.9);
+
+  cx.font='bold 8px monospace';cx.fillStyle=SRC==='real'?'#22c55e':'#f59e0b';
+  cx.fillText(SRC==='real'?'● LIVE':'● SIM',W-48,11);
+}
+
+// CONTROLS
+function toggle(){
+  // iOS permission on first start
+  if(!running&&typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'&&evtCount===0){
+    DeviceMotionEvent.requestPermission().then(p=>{if(p==='granted'){lg('iOS izin OK','s');bindSensor();setTimeout(()=>updateDiag(),2000);}else lg('iOS reddetti','w');}).catch(e=>lg('İzin hatası: '+e,'w'));
+  }
+  if(running){running=false;clearInterval(loopId);Q('btnGo').textContent='▶ BAŞLAT';Q('btnGo').className='btn p';Q('btnEQ').disabled=Q('btnDr').disabled=Q('btnTb').disabled=true;lg('⏹','');}
+  else{running=true;stB=[];ltB=[];t=0;loopId=setInterval(loop,1000/FPS);Q('btnGo').textContent='⏹ DURDUR';Q('btnGo').className='btn g';Q('btnEQ').disabled=Q('btnDr').disabled=Q('btnTb').disabled=false;lg(`▶ [${SRC==='real'?'GERÇEK':'SİM'}] Eşik=${C.th} STA=${C.sw} LTA=${C.lw}`,'s');}
+}
+
+function sc(k,v){const n=parseFloat(v);switch(k){case'th':C.th=n;Q('xth').textContent=n.toFixed(1);break;case'sw':C.sw=n;Q('xsw').textContent=n.toFixed(1);break;case'lw':C.lw=n;Q('xlw').textContent=n;break;case'ct':C.ct=n;Q('xct').textContent=n.toFixed(2);break;case'gm':C.gm=n;Q('xgm').textContent=n;break;case'di':C.di=n;Q('xdi').textContent=n;break;case'mg':C.mg=n;Q('xmg').textContent='M'+n.toFixed(1);break;}}
+
+// TABS
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));document.querySelectorAll('.pane').forEach(x=>x.classList.remove('on'));t.classList.add('on');Q('v-'+t.dataset.p).classList.add('on');}));
+
+// LOG
+function lg(m,tp=''){const ts=new Date().toTimeString().split(' ')[0];const l=Q('lg');l.insertAdjacentHTML('afterbegin',`<div class="le ${tp}">[${ts}] ${m}</div>`);if(l.children.length>200)l.lastChild.remove();}
+
+// EXTERNAL EARTHQUAKE FEED (Kandilli üzerinden deprem-api)
+const EQ_FEED_URL='https://deprem-api.vercel.app/';
+
+async function fetchQuakes(){
+  try{
+    const r=await fetch(EQ_FEED_URL);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    if(!d||!Array.isArray(d.earthquakes)) return;
+    const list=d.earthquakes.slice(0,20);
+    const box=Q('qList');
+    if(!box) return;
+    let html='';
+    list.forEach(q=>{
+      const sz=q.size||{};
+      const mag=sz.ml||sz.mw||sz.md||0;
+      const ts=q.date||'';
+      const loc=q.location||'';
+      const attr=q.attribute||'';
+      const color=mag>=5?'#ef4444':mag>=4?'#f97316':mag>=3?'#eab308':'#22c55e';
+      html+=`<div class="le" style="border-bottom:1px solid rgba(148,163,184,.15)">`+
+            `<span style="font-family:monospace;color:#64748b">${ts}</span> `+
+            `<span style="color:${color};font-weight:700">M${mag.toFixed(1)}</span> `+
+            `<span style="color:#e2e8f0">${loc}</span> `+
+            `<span style="font-size:9px;color:#94a3b8">${attr}</span>`+
+            `</div>`;
+    });
+    box.innerHTML=html;
+    lg(`Harici deprem verisi güncellendi (${list.length})`,'s');
+  }catch(e){
+    lg('Harici deprem verisi alınamadı: '+e,'w');
+  }
+}
+
+// INIT
+initCr();lg('Sistem başlatıldı — sensör algılama otomatik','s');
+fetchQuakes();
+setInterval(fetchQuakes,60000);
+
+// Live readout updater (works before start button)
+setInterval(()=>{
+  if(SRC==='real'&&!running){
+    Q('bx').textContent=rax.toFixed(2);Q('by').textContent=ray.toFixed(2);
+    Q('bz').textContent=raz.toFixed(2);Q('bm').textContent=Math.sqrt(rax**2+ray**2+raz**2).toFixed(2);
+  }
+  Q('dmC').textContent=evtCount;
+  Q('gC').textContent=evtCount;
+},250);
+</script>
+</body>
+</html>
