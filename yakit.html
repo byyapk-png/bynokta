@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YakıtPro – ByNoKTa</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+[data-theme="dark"] { --bg: #0c0c0e; --surface: #131316; --card: #18181c; --card2: #1e1e24; --border: #2a2a32; --border2: #34343e; --text: #f0edf8; --text2: #9994a8; --text3: #5a5668; --accent: #f59e0b; --accent2: #ef4444; --accent3: #10b981; --accent4: #6366f1; --blue: #3b82f6; --shadow: rgba(0,0,0,0.5); }
+[data-theme="light"] { --bg: #f5f4f8; --surface: #ffffff; --card: #ffffff; --card2: #f0eff6; --border: #e2e0ec; --border2: #d0cedf; --text: #1a1828; --text2: #6b6480; --text3: #9994a8; --accent: #d97706; --accent2: #dc2626; --accent3: #059669; --accent4: #4f46e5; --blue: #2563eb; --shadow: rgba(0,0,0,0.1); }
+*{margin:0;padding:0;box-sizing:border-box;}
+body{ background:var(--bg);color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; transition:background 0.3s,color 0.3s; }
+.back-btn { position: fixed; top: 12px; right: 12px; z-index: 999; text-decoration: none; background: rgba(30, 41, 59, 0.8); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(5px); }
+.bg-blob{ position:fixed;pointer-events:none;z-index:0;border-radius:50%;filter:blur(80px);opacity:0.06; transition:opacity 0.3s; }
+.blob1{width:500px;height:500px;background:var(--accent);top:-100px;left:-100px;}
+.blob2{width:400px;height:400px;background:var(--accent4);bottom:-80px;right:-80px;}
+.app{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{ background:var(--surface);border-bottom:1px solid var(--border); padding:0 1.5rem; display:flex;align-items:center;gap:1rem; position:sticky;top:0;z-index:100; box-shadow:0 2px 20px var(--shadow); }
+.logo{ display:flex;align-items:center;gap:0.75rem; padding:0.85rem 0; text-decoration:none; }
+.logo-icon{ width:38px;height:38px; background:linear-gradient(135deg,var(--accent),var(--accent2)); border-radius:10px; display:flex;align-items:center;justify-content:center; font-size:1.2rem; box-shadow:0 0 20px rgba(245,158,11,0.25); flex-shrink:0; }
+.logo-text{ font-family:'Bebas Neue',sans-serif; font-size:1.5rem;letter-spacing:0.08em; background:linear-gradient(90deg,var(--text),var(--text2)); -webkit-background-clip:text;-webkit-text-fill-color:transparent; }
+.fuel-ticker{ flex:1;display:flex;align-items:center;gap:0.5rem; overflow:hidden;padding:0 1rem; }
+.ticker-label{ font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase; color:var(--text3);white-space:nowrap; display:flex;align-items:center;gap:0.4rem; }
+.ticker-dot{width:6px;height:6px;border-radius:50%;background:var(--accent3);animation:pulse 2s infinite;} @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.ticker-items{display:flex;gap:1.25rem;overflow:hidden;}
+.ticker-item{ display:flex;align-items:center;gap:0.5rem; font-size:0.8rem;white-space:nowrap; padding:0.3rem 0.75rem; background:var(--card2);border:1px solid var(--border); border-radius:20px; }
+.ticker-item .ti-price{font-weight:600;color:var(--accent);}
+.topbar-actions{display:flex;align-items:center;gap:0.5rem;margin-left:auto;}
+.icon-btn{ width:36px;height:36px;border:1px solid var(--border);border-radius:9px; background:var(--card2);color:var(--text2); cursor:pointer;display:flex;align-items:center;justify-content:center; font-size:1rem;transition:all 0.2s; }
+.icon-btn:hover{border-color:var(--accent);color:var(--accent);}
+.tabs{ background:var(--surface);border-bottom:1px solid var(--border); padding:0 1.5rem;display:flex;gap:0; }
+.tab-btn{ padding:0.85rem 1.25rem; font-size:0.82rem;letter-spacing:0.05em;text-transform:uppercase; font-weight:500;color:var(--text3); cursor:pointer;border:none;background:none; border-bottom:2px solid transparent; transition:all 0.2s;display:flex;align-items:center;gap:0.5rem; margin-bottom:-1px;font-family:'DM Sans',sans-serif; }
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-panel{display:none;flex:1;} .tab-panel.active{display:block;}
+.calc-layout{ display:grid; grid-template-columns:400px 1fr; gap:0; height:calc(100vh - 96px); } @media(max-width:900px){ .calc-layout{grid-template-columns:1fr;height:auto;} }
+.sidebar{ border-right:1px solid var(--border); overflow-y:auto; padding:1.25rem; display:flex;flex-direction:column;gap:1rem; background:var(--surface); }
+.card{ background:var(--card);border:1px solid var(--border); border-radius:16px;padding:1.2rem; }
+.card-title{ font-family:'Bebas Neue',sans-serif;font-size:0.95rem;letter-spacing:0.1em; color:var(--accent);margin-bottom:1rem; display:flex;align-items:center;gap:0.5rem; }
+.field{margin-bottom:0.9rem;} label{ display:block;font-size:0.7rem;letter-spacing:0.07em; text-transform:uppercase;color:var(--text2);margin-bottom:0.4rem; }
+input,select{ width:100%;background:var(--card2);border:1px solid var(--border); border-radius:9px;padding:0.65rem 0.9rem; color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.88rem; outline:none; }
+.fuel-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;}
+.fuel-btn{ padding:0.55rem 0.5rem;border:1px solid var(--border);border-radius:9px; background:var(--card2);color:var(--text2);font-size:0.78rem; cursor:pointer;text-align:center; }
+.fuel-btn.active{border-color:var(--accent);background:rgba(245,158,11,0.1);color:var(--accent);}
+.route-wrap{display:flex;flex-direction:column;gap:0.5rem;}
+.city-pick{ display:flex;align-items:center;gap:0.6rem; }
+.city-pick-btn{ flex:1;background:var(--card2);border:1px solid var(--border); border-radius:9px;padding:0.6rem 0.9rem; color:var(--text);font-size:0.85rem;cursor:pointer; display:flex;align-items:center;gap:0.5rem; min-height:38px; }
+.swap-btn{ width:30px;height:30px;border:1px solid var(--border);border-radius:7px; background:var(--card2);color:var(--text3);font-size:0.9rem; cursor:pointer;display:flex;align-items:center;justify-content:center; }
+.calc-btn{ width:100%;padding:0.85rem; background:linear-gradient(135deg,var(--accent),var(--accent2)); border:none;border-radius:11px;color:#000; font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:0.1em; cursor:pointer; }
+.right-panel{ display:flex;flex-direction:column; overflow:hidden; }
+.map-container{ position:relative; flex:0 0 360px; border-bottom:1px solid var(--border); } #mainMap{height:360px;}
+.results-area{ flex:1;overflow-y:auto;padding:1.25rem; }
+.stats-grid{ display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem; margin-bottom:1rem; }
+.stat-card{ background:var(--card);border:1px solid var(--border); border-radius:13px;padding:1rem;position:relative;overflow:hidden; }
+.stat-card::before{ content:'';position:absolute;top:0;left:0;right:0;height:2px; background:var(--cl, var(--border));border-radius:13px 13px 0 0; }
+.stat-card.c1{--cl:var(--accent);} .stat-card.c2{--cl:var(--accent2);} .stat-card.c3{--cl:var(--accent3);} .stat-card.c4{--cl:var(--accent4);}
+.sc-val{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;line-height:1;margin-bottom:0.2rem;}
+.modal{ display:none;position:fixed;inset:0; background:rgba(0,0,0,0.8);z-index:1000; align-items:center;justify-content:center;padding:1rem; } .modal.open{display:flex;}
+.modal-box{ background:var(--surface);border:1px solid var(--border); border-radius:18px;overflow:hidden; width:100%;max-width:680px;max-height:88vh; display:flex;flex-direction:column; }
+.city-chips{padding:0.75rem 1.4rem;display:flex;flex-wrap:wrap;gap:0.4rem;max-height:110px;overflow-y:auto;border-bottom:1px solid var(--border);}
+.chip{ padding:0.3rem 0.75rem;background:var(--card2);border:1px solid var(--border); border-radius:20px;font-size:0.78rem;cursor:pointer;color:var(--text); }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-btn">← PORTAL</a>
+<div class="bg-blob blob1"></div><div class="bg-blob blob2"></div>
+
+<div class="app">
+<div class="topbar">
+  <div class="logo"><div class="logo-icon">⛽</div><div><div class="logo-text">YakıtPro</div><div class="logo-sub" style="font-size:0.65rem;color:var(--text3)">Gelişmiş Yakıt Hesaplayıcı</div></div></div>
+  <div class="fuel-ticker"><div class="ticker-label"><span class="ticker-dot"></span>Fiyatlar</div><div class="ticker-items" id="tickerItems"></div></div>
+  <div class="topbar-actions"><button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button></div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('calc',this)">⛽ Hesaplayıcı</button>
+  <button class="tab-btn" onclick="switchTab('range',this)">🔋 Menzil</button>
+</div>
+
+<div class="tab-panel active" id="tab-calc">
+  <div class="calc-layout">
+    <div class="sidebar">
+      <div class="card">
+        <div class="card-title">🚗 Araç & Yakıt</div>
+        <div class="field"><label>Yakıt Tipi</label><div class="fuel-grid">
+            <div class="fuel-btn active" onclick="setFuel('benzin',this)">⛽ Benzin 95</div>
+            <div class="fuel-btn" onclick="setFuel('dizel',this)">🛢️ Dizel</div>
+            <div class="fuel-btn" onclick="setFuel('lpg',this)">💨 LPG</div>
+            <div class="fuel-btn" onclick="setFuel('elektrik',this)">⚡ Elektrik</div>
+        </div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+          <div class="field"><label id="consumLbl">100km Tüketim</label><input type="number" id="consumption" value="7"></div>
+          <div class="field"><label id="priceLbl">Fiyat</label><input type="number" id="fuelPrice" value="42.00"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🗺️ Güzergah</div>
+        <div class="route-wrap">
+          <div class="city-pick"><div class="city-pick-btn" onclick="openModal('from')" id="fromBtn">📍 Nereden...</div></div>
+          <button class="swap-btn" onclick="swapCities()" style="align-self:center">⇅</button>
+          <div class="city-pick"><div class="city-pick-btn" onclick="openModal('to')" id="toBtn">📍 Nereye...</div></div>
+        </div>
+        <div id="distBadge" style="display:none;margin-top:10px;padding:5px;background:rgba(245,158,11,0.1);border-radius:5px;text-align:center;color:var(--accent)">📏 <span id="distBadgeVal">0 km</span></div>
+      </div>
+      <button class="calc-btn" onclick="calculate()">HESAPLA →</button>
+    </div>
+    <div class="right-panel">
+      <div class="map-container"><div id="mainMap"></div></div>
+      <div class="results-area" id="resultsArea">
+        <div class="stats-grid">
+            <div class="stat-card c1"><span class="sc-icon">📏</span><div class="sc-val" id="r_dist">—</div><div style="font-size:0.7rem;color:var(--text3)">Mesafe (km)</div></div>
+            <div class="stat-card c2"><span class="sc-icon">🧪</span><div class="sc-val" id="r_liters">—</div><div style="font-size:0.7rem;color:var(--text3)">Tüketim (L)</div></div>
+            <div class="stat-card c3"><span class="sc-icon">💰</span><div class="sc-val" id="r_cost">—</div><div style="font-size:0.7rem;color:var(--text3)">Maliyet (₺)</div></div>
+            <div class="stat-card c4"><span class="sc-icon">⏱️</span><div class="sc-val" id="r_time">—</div><div style="font-size:0.7rem;color:var(--text3)">Süre</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-range">
+  <div style="padding:2rem;max-width:600px;margin:0 auto">
+    <div class="card">
+      <div class="card-title">🔋 Menzil Hesapla</div>
+      <div class="field"><label>Depo (L)</label><input type="number" id="r_tank" value="60"></div>
+      <div class="field"><label>Doluluk %</label><input type="range" id="r_remaining" value="75" oninput="document.getElementById('r_rem_val').innerText=this.value+'%'"> <span id="r_rem_val" style="color:var(--accent)">75%</span></div>
+      <div class="field"><label>Tüketim (L/100km)</label><input type="number" id="r_consum" value="7"></div>
+      <button class="calc-btn" onclick="calcRange()">HESAPLA</button>
+      <div id="rangeResult" style="margin-top:20px;display:none;text-align:center">
+        <div style="font-size:3rem;color:var(--accent);font-family:'Bebas Neue'" id="rr_km">0</div>
+        <div style="color:var(--text2)">Tahmini Menzil (km)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="modal" id="cityModal">
+  <div class="modal-box">
+    <div style="padding:1rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between">
+      <span id="modalTitle" style="color:var(--accent);font-weight:bold">ŞEHİR SEÇ</span><button onclick="closeModal()" style="background:none;border:none;color:var(--text);cursor:pointer">✕</button>
+    </div>
+    <div style="padding:0.5rem"><input type="text" id="modalSearch" placeholder="Ara..." oninput="filterChips()" style="width:100%;padding:0.5rem"></div>
+    <div class="city-chips" id="cityChips"></div>
+    <div id="modalMap" style="flex:1;min-height:250px"></div>
+  </div>
+</div>
+
+<script>
+const FUEL_PRICES={benzin:{price:57.08,unit:'L'},dizel:{price:57.83,unit:'L'},lpg:{price:30.00,unit:'L'},elektrik:{price:9.90,unit:'kWh'}};
+const CITIES=[{n:"Adana",lat:37.00,lon:35.32},{n:"Ankara",lat:39.92,lon:32.85},{n:"Antalya",lat:36.89,lon:30.70},{n:"Bursa",lat:40.18,lon:29.06},{n:"Diyarbakır",lat:37.91,lon:40.23},{n:"Erzurum",lat:39.90,lon:41.27},{n:"Eskişehir",lat:39.78,lon:30.52},{n:"Gaziantep",lat:37.06,lon:37.38},{n:"İstanbul",lat:41.01,lon:28.95},{n:"İzmir",lat:38.42,lon:27.14},{n:"Kayseri",lat:38.73,lon:35.49},{n:"Konya",lat:37.87,lon:32.49},{n:"Mersin",lat:36.80,lon:34.63},{n:"Samsun",lat:41.29,lon:36.33},{n:"Trabzon",lat:41.00,lon:39.73},{n:"Van",lat:38.49,lon:43.38}];
+let fromCity=null,toCity=null,mainMap=null,modalMap=null,modalTarget='from',currentFuel='benzin';
+
+document.addEventListener('DOMContentLoaded',()=>{
+  renderTicker(); renderChips(); initMainMap();
+});
+
+function renderTicker(){
+  document.getElementById('tickerItems').innerHTML=Object.entries(FUEL_PRICES).map(([k,v])=>`<div class="ticker-item"><span style="color:var(--accent)">${v.price}</span> ₺</div>`).join('');
+}
+function toggleTheme(){
+  const h=document.documentElement; h.setAttribute('data-theme',h.getAttribute('data-theme')==='light'?'dark':'light');
+}
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active'); btn.classList.add('active');
+  if(id==='calc'&&mainMap)setTimeout(()=>mainMap.invalidateSize(),100);
+}
+function setFuel(t,b){
+  currentFuel=t; document.querySelectorAll('.fuel-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+  document.getElementById('fuelPrice').value=FUEL_PRICES[t].price;
+}
+function initMainMap(){
+  mainMap=L.map('mainMap',{zoomControl:false}).setView([39,35],6);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(mainMap);
+}
+function openModal(t){
+  modalTarget=t; document.getElementById('modalTitle').innerText=t==='from'?'NEREDEN':'NEREYE';
+  document.getElementById('cityModal').classList.add('open');
+  if(!modalMap){
+    setTimeout(()=>{
+      modalMap=L.map('modalMap',{zoomControl:false}).setView([39,35],5);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(modalMap);
+      renderChips();
+    },100);
+  }
+}
+function closeModal(){document.getElementById('cityModal').classList.remove('open');}
+function filterChips(){renderChips(document.getElementById('modalSearch').value);}
+function renderChips(q=''){
+  const el=document.getElementById('cityChips');
+  el.innerHTML=CITIES.filter(c=>c.n.toLowerCase().includes(q.toLowerCase())).map(c=>`<div class="chip" onclick='selCity(${JSON.stringify(c)})'>${c.n}</div>`).join('');
+}
+function selCity(c){
+  if(modalTarget==='from'){fromCity=c;document.getElementById('fromBtn').innerText=c.n;}
+  else{toCity=c;document.getElementById('toBtn').innerText=c.n;}
+  closeModal();
+}
+function haversine(lat1,lon1,lat2,lon2){
+  const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLon=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))*1.35);
+}
+function calculate(){
+  if(!fromCity||!toCity){alert('Şehir seçin');return;}
+  const dist=haversine(fromCity.lat,fromCity.lon,toCity.lat,toCity.lon);
+  const cons=parseFloat(document.getElementById('consumption').value);
+  const price=parseFloat(document.getElementById('fuelPrice').value);
+  const totalL=(dist*cons)/100;
+  const cost=totalL*price;
+  
+  document.getElementById('r_dist').innerText=dist;
+  document.getElementById('r_liters').innerText=totalL.toFixed(1);
+  document.getElementById('r_cost').innerText=Math.round(cost);
+  document.getElementById('r_time').innerText=Math.floor(dist/90)+'s';
+  
+  // Harita çizgi
+  if(window.line) mainMap.removeLayer(window.line);
+  window.line=L.polyline([[fromCity.lat,fromCity.lon],[toCity.lat,toCity.lon]],{color:'orange'}).addTo(mainMap);
+  mainMap.fitBounds(window.line.getBounds(),{padding:[50,50]});
+}
+function calcRange(){
+  const t=parseFloat(document.getElementById('r_tank').value);
+  const p=parseFloat(document.getElementById('r_remaining').value)/100;
+  const c=parseFloat(document.getElementById('r_consum').value);
+  const r=Math.round((t*p/c)*100);
+  document.getElementById('rr_km').innerText=r;
+  document.getElementById('rangeResult').style.display='block';
+}
+</script>
+</body>
+</html>
