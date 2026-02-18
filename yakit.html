@@ -3,234 +3,1568 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YakıtPro – ByNoKTa</title>
+<title>YakıtPro – Gelişmiş Yakıt Hesaplayıcı</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Leaflet CSS - 3 fallback -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+  onerror="this.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'"/>
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<!-- Leaflet JS: cdnjs → jsdelivr → unpkg sırasıyla dene -->
+<script>
+(function(){
+  var cdns = [
+    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js',
+    'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js',
+    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.min.js'
+  ];
+  var idx = 0;
+  function tryLoad() {
+    if (idx >= cdns.length) { window._leafletFailed = true; return; }
+    var s = document.createElement('script');
+    s.src = cdns[idx++];
+    s.onload = function(){ window._leafletLoaded = true; };
+    s.onerror = function(){ tryLoad(); };
+    document.head.appendChild(s);
+  }
+  tryLoad();
+})();
+</script>
 <style>
-[data-theme="dark"] { --bg: #0c0c0e; --surface: #131316; --card: #18181c; --card2: #1e1e24; --border: #2a2a32; --border2: #34343e; --text: #f0edf8; --text2: #9994a8; --text3: #5a5668; --accent: #f59e0b; --accent2: #ef4444; --accent3: #10b981; --accent4: #6366f1; --blue: #3b82f6; --shadow: rgba(0,0,0,0.5); }
-[data-theme="light"] { --bg: #f5f4f8; --surface: #ffffff; --card: #ffffff; --card2: #f0eff6; --border: #e2e0ec; --border2: #d0cedf; --text: #1a1828; --text2: #6b6480; --text3: #9994a8; --accent: #d97706; --accent2: #dc2626; --accent3: #059669; --accent4: #4f46e5; --blue: #2563eb; --shadow: rgba(0,0,0,0.1); }
+/* ===== THEME VARIABLES ===== */
+[data-theme="dark"] {
+  --bg: #0c0c0e;
+  --surface: #131316;
+  --card: #18181c;
+  --card2: #1e1e24;
+  --border: #2a2a32;
+  --border2: #34343e;
+  --text: #f0edf8;
+  --text2: #9994a8;
+  --text3: #5a5668;
+  --accent: #f59e0b;
+  --accent2: #ef4444;
+  --accent3: #10b981;
+  --accent4: #6366f1;
+  --blue: #3b82f6;
+  --shadow: rgba(0,0,0,0.5);
+}
+[data-theme="light"] {
+  --bg: #f5f4f8;
+  --surface: #ffffff;
+  --card: #ffffff;
+  --card2: #f0eff6;
+  --border: #e2e0ec;
+  --border2: #d0cedf;
+  --text: #1a1828;
+  --text2: #6b6480;
+  --text3: #9994a8;
+  --accent: #d97706;
+  --accent2: #dc2626;
+  --accent3: #059669;
+  --accent4: #4f46e5;
+  --blue: #2563eb;
+  --shadow: rgba(0,0,0,0.1);
+}
+
 *{margin:0;padding:0;box-sizing:border-box;}
-body{ background:var(--bg);color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; transition:background 0.3s,color 0.3s; }
-.back-btn { position: fixed; top: 12px; right: 12px; z-index: 999; text-decoration: none; background: rgba(30, 41, 59, 0.8); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(5px); }
-.bg-blob{ position:fixed;pointer-events:none;z-index:0;border-radius:50%;filter:blur(80px);opacity:0.06; transition:opacity 0.3s; }
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  min-height:100vh;
+  transition:background 0.3s,color 0.3s;
+}
+
+/* Background blobs */
+.bg-blob{
+  position:fixed;pointer-events:none;z-index:0;border-radius:50%;filter:blur(80px);opacity:0.06;
+  transition:opacity 0.3s;
+}
+[data-theme="light"] .bg-blob{opacity:0.04;}
 .blob1{width:500px;height:500px;background:var(--accent);top:-100px;left:-100px;}
 .blob2{width:400px;height:400px;background:var(--accent4);bottom:-80px;right:-80px;}
+
+/* ===== LAYOUT ===== */
 .app{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh;}
-.topbar{ background:var(--surface);border-bottom:1px solid var(--border); padding:0 1.5rem; display:flex;align-items:center;gap:1rem; position:sticky;top:0;z-index:100; box-shadow:0 2px 20px var(--shadow); }
-.logo{ display:flex;align-items:center;gap:0.75rem; padding:0.85rem 0; text-decoration:none; }
-.logo-icon{ width:38px;height:38px; background:linear-gradient(135deg,var(--accent),var(--accent2)); border-radius:10px; display:flex;align-items:center;justify-content:center; font-size:1.2rem; box-shadow:0 0 20px rgba(245,158,11,0.25); flex-shrink:0; }
-.logo-text{ font-family:'Bebas Neue',sans-serif; font-size:1.5rem;letter-spacing:0.08em; background:linear-gradient(90deg,var(--text),var(--text2)); -webkit-background-clip:text;-webkit-text-fill-color:transparent; }
-.fuel-ticker{ flex:1;display:flex;align-items:center;gap:0.5rem; overflow:hidden;padding:0 1rem; }
-.ticker-label{ font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase; color:var(--text3);white-space:nowrap; display:flex;align-items:center;gap:0.4rem; }
-.ticker-dot{width:6px;height:6px;border-radius:50%;background:var(--accent3);animation:pulse 2s infinite;} @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+/* ===== TOP BAR ===== */
+.topbar{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:0 1.5rem;
+  display:flex;align-items:center;gap:1rem;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 20px var(--shadow);
+}
+.logo{
+  display:flex;align-items:center;gap:0.75rem;
+  padding:0.85rem 0;
+  text-decoration:none;
+}
+.logo-icon{
+  width:38px;height:38px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.2rem;
+  box-shadow:0 0 20px rgba(245,158,11,0.25);
+  flex-shrink:0;
+}
+.logo-text{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.5rem;letter-spacing:0.08em;
+  background:linear-gradient(90deg,var(--text),var(--text2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.logo-sub{font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-top:-4px;}
+
+/* Fuel price ticker */
+.fuel-ticker{
+  flex:1;display:flex;align-items:center;gap:0.5rem;
+  overflow:hidden;padding:0 1rem;
+}
+.ticker-label{
+  font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--text3);white-space:nowrap;
+  display:flex;align-items:center;gap:0.4rem;
+}
+.ticker-dot{width:6px;height:6px;border-radius:50%;background:var(--accent3);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
 .ticker-items{display:flex;gap:1.25rem;overflow:hidden;}
-.ticker-item{ display:flex;align-items:center;gap:0.5rem; font-size:0.8rem;white-space:nowrap; padding:0.3rem 0.75rem; background:var(--card2);border:1px solid var(--border); border-radius:20px; }
+.ticker-item{
+  display:flex;align-items:center;gap:0.5rem;
+  font-size:0.8rem;white-space:nowrap;
+  padding:0.3rem 0.75rem;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:20px;
+}
+.ticker-item .ti-name{color:var(--text2);}
 .ticker-item .ti-price{font-weight:600;color:var(--accent);}
+.ticker-item .ti-unit{font-size:0.68rem;color:var(--text3);}
+
 .topbar-actions{display:flex;align-items:center;gap:0.5rem;margin-left:auto;}
-.icon-btn{ width:36px;height:36px;border:1px solid var(--border);border-radius:9px; background:var(--card2);color:var(--text2); cursor:pointer;display:flex;align-items:center;justify-content:center; font-size:1rem;transition:all 0.2s; }
+
+.icon-btn{
+  width:36px;height:36px;border:1px solid var(--border);border-radius:9px;
+  background:var(--card2);color:var(--text2);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:1rem;transition:all 0.2s;
+}
 .icon-btn:hover{border-color:var(--accent);color:var(--accent);}
-.tabs{ background:var(--surface);border-bottom:1px solid var(--border); padding:0 1.5rem;display:flex;gap:0; }
-.tab-btn{ padding:0.85rem 1.25rem; font-size:0.82rem;letter-spacing:0.05em;text-transform:uppercase; font-weight:500;color:var(--text3); cursor:pointer;border:none;background:none; border-bottom:2px solid transparent; transition:all 0.2s;display:flex;align-items:center;gap:0.5rem; margin-bottom:-1px;font-family:'DM Sans',sans-serif; }
+
+/* ===== TABS ===== */
+.tabs{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:0 1.5rem;display:flex;gap:0;
+}
+.tab-btn{
+  padding:0.85rem 1.25rem;
+  font-size:0.82rem;letter-spacing:0.05em;text-transform:uppercase;
+  font-weight:500;color:var(--text3);
+  cursor:pointer;border:none;background:none;
+  border-bottom:2px solid transparent;
+  transition:all 0.2s;display:flex;align-items:center;gap:0.5rem;
+  margin-bottom:-1px;font-family:'DM Sans',sans-serif;
+}
 .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
-.tab-panel{display:none;flex:1;} .tab-panel.active{display:block;}
-.calc-layout{ display:grid; grid-template-columns:400px 1fr; gap:0; height:calc(100vh - 96px); } @media(max-width:900px){ .calc-layout{grid-template-columns:1fr;height:auto;} }
-.sidebar{ border-right:1px solid var(--border); overflow-y:auto; padding:1.25rem; display:flex;flex-direction:column;gap:1rem; background:var(--surface); }
-.card{ background:var(--card);border:1px solid var(--border); border-radius:16px;padding:1.2rem; }
-.card-title{ font-family:'Bebas Neue',sans-serif;font-size:0.95rem;letter-spacing:0.1em; color:var(--accent);margin-bottom:1rem; display:flex;align-items:center;gap:0.5rem; }
-.field{margin-bottom:0.9rem;} label{ display:block;font-size:0.7rem;letter-spacing:0.07em; text-transform:uppercase;color:var(--text2);margin-bottom:0.4rem; }
-input,select{ width:100%;background:var(--card2);border:1px solid var(--border); border-radius:9px;padding:0.65rem 0.9rem; color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.88rem; outline:none; }
+.tab-btn:hover:not(.active){color:var(--text);}
+
+/* ===== TAB CONTENT ===== */
+.tab-panel{display:none;flex:1;}
+.tab-panel.active{display:block;}
+
+/* ===== MAIN CALC LAYOUT ===== */
+.calc-layout{
+  display:grid;
+  grid-template-columns:400px 1fr;
+  gap:0;
+  height:calc(100vh - 96px);
+}
+@media(max-width:900px){
+  .calc-layout{grid-template-columns:1fr;height:auto;}
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar{
+  border-right:1px solid var(--border);
+  overflow-y:auto;
+  padding:1.25rem;
+  display:flex;flex-direction:column;gap:1rem;
+  background:var(--surface);
+}
+.sidebar::-webkit-scrollbar{width:3px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* ===== CARDS ===== */
+.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:1.2rem;
+}
+.card-title{
+  font-family:'Bebas Neue',sans-serif;font-size:0.95rem;letter-spacing:0.1em;
+  color:var(--accent);margin-bottom:1rem;
+  display:flex;align-items:center;gap:0.5rem;
+}
+
+/* ===== FORM ELEMENTS ===== */
+.field{margin-bottom:0.9rem;}
+.field:last-child{margin-bottom:0;}
+label{
+  display:block;font-size:0.7rem;letter-spacing:0.07em;
+  text-transform:uppercase;color:var(--text2);margin-bottom:0.4rem;
+}
+input,select{
+  width:100%;background:var(--card2);border:1px solid var(--border);
+  border-radius:9px;padding:0.65rem 0.9rem;
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.88rem;
+  transition:border-color 0.2s,box-shadow 0.2s;outline:none;
+  -webkit-appearance:none;
+}
+input:focus,select:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(245,158,11,0.1);
+}
+select option{background:var(--card);}
+.input-wrap{position:relative;}
+.input-wrap input{padding-right:3.5rem;}
+.input-unit{
+  position:absolute;right:0.9rem;top:50%;transform:translateY(-50%);
+  font-size:0.72rem;color:var(--text3);pointer-events:none;
+}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;}
+
+/* Fuel buttons */
 .fuel-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;}
-.fuel-btn{ padding:0.55rem 0.5rem;border:1px solid var(--border);border-radius:9px; background:var(--card2);color:var(--text2);font-size:0.78rem; cursor:pointer;text-align:center; }
+.fuel-btn{
+  padding:0.55rem 0.5rem;border:1px solid var(--border);border-radius:9px;
+  background:var(--card2);color:var(--text2);font-size:0.78rem;
+  cursor:pointer;transition:all 0.2s;text-align:center;
+  font-family:'DM Sans',sans-serif;letter-spacing:0.03em;
+}
 .fuel-btn.active{border-color:var(--accent);background:rgba(245,158,11,0.1);color:var(--accent);}
+
+/* City picker */
 .route-wrap{display:flex;flex-direction:column;gap:0.5rem;}
-.city-pick{ display:flex;align-items:center;gap:0.6rem; }
-.city-pick-btn{ flex:1;background:var(--card2);border:1px solid var(--border); border-radius:9px;padding:0.6rem 0.9rem; color:var(--text);font-size:0.85rem;cursor:pointer; display:flex;align-items:center;gap:0.5rem; min-height:38px; }
-.swap-btn{ width:30px;height:30px;border:1px solid var(--border);border-radius:7px; background:var(--card2);color:var(--text3);font-size:0.9rem; cursor:pointer;display:flex;align-items:center;justify-content:center; }
-.calc-btn{ width:100%;padding:0.85rem; background:linear-gradient(135deg,var(--accent),var(--accent2)); border:none;border-radius:11px;color:#000; font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:0.1em; cursor:pointer; }
-.right-panel{ display:flex;flex-direction:column; overflow:hidden; }
-.map-container{ position:relative; flex:0 0 360px; border-bottom:1px solid var(--border); } #mainMap{height:360px;}
-.results-area{ flex:1;overflow-y:auto;padding:1.25rem; }
-.stats-grid{ display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem; margin-bottom:1rem; }
-.stat-card{ background:var(--card);border:1px solid var(--border); border-radius:13px;padding:1rem;position:relative;overflow:hidden; }
-.stat-card::before{ content:'';position:absolute;top:0;left:0;right:0;height:2px; background:var(--cl, var(--border));border-radius:13px 13px 0 0; }
-.stat-card.c1{--cl:var(--accent);} .stat-card.c2{--cl:var(--accent2);} .stat-card.c3{--cl:var(--accent3);} .stat-card.c4{--cl:var(--accent4);}
-.sc-val{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;line-height:1;margin-bottom:0.2rem;}
-.modal{ display:none;position:fixed;inset:0; background:rgba(0,0,0,0.8);z-index:1000; align-items:center;justify-content:center;padding:1rem; } .modal.open{display:flex;}
-.modal-box{ background:var(--surface);border:1px solid var(--border); border-radius:18px;overflow:hidden; width:100%;max-width:680px;max-height:88vh; display:flex;flex-direction:column; }
+.city-pick{
+  display:flex;align-items:center;gap:0.6rem;
+}
+.city-pick-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.dot-from{background:var(--accent);}
+.dot-to{background:var(--accent2);}
+.city-pick-btn{
+  flex:1;background:var(--card2);border:1px solid var(--border);
+  border-radius:9px;padding:0.6rem 0.9rem;
+  color:var(--text);font-size:0.85rem;cursor:pointer;
+  transition:border-color 0.2s;display:flex;align-items:center;gap:0.5rem;
+  min-height:38px;
+}
+.city-pick-btn:hover{border-color:var(--accent);}
+.city-pick-btn .ph{color:var(--text3);font-size:0.8rem;}
+.swap-btn{
+  align-self:center;margin-left:auto;
+  width:30px;height:30px;border:1px solid var(--border);border-radius:7px;
+  background:var(--card2);color:var(--text3);font-size:0.9rem;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;flex-shrink:0;
+}
+.swap-btn:hover{border-color:var(--accent);color:var(--accent);}
+.route-divider{height:1px;background:var(--border);margin:0.25rem 0;}
+
+.dist-badge{
+  display:none;
+  background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);
+  border-radius:9px;padding:0.5rem 0.9rem;
+  font-size:0.8rem;color:var(--text2);
+  justify-content:space-between;align-items:center;
+}
+.dist-badge span{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--accent);letter-spacing:0.05em;}
+
+/* Toll badge */
+.toll-badge{
+  display:none;
+  background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);
+  border-radius:9px;padding:0.5rem 0.9rem;
+  font-size:0.8rem;color:var(--text2);
+  justify-content:space-between;align-items:center;margin-top:0.5rem;
+}
+.toll-badge span{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--accent4);letter-spacing:0.05em;}
+
+/* ===== CALC BUTTON ===== */
+.calc-btn{
+  width:100%;padding:0.85rem;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:11px;color:#000;
+  font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:0.1em;
+  cursor:pointer;transition:all 0.2s;
+  box-shadow:0 4px 20px rgba(245,158,11,0.2);
+}
+.calc-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(245,158,11,0.35);}
+.calc-btn:active{transform:translateY(0);}
+
+/* ===== RIGHT PANEL ===== */
+.right-panel{
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+
+/* Map */
+.map-container{
+  position:relative;
+  flex:0 0 360px;
+  border-bottom:1px solid var(--border);
+}
+#mainMap{height:360px;}
+
+.map-overlay-badge{
+  position:absolute;top:10px;left:10px;z-index:500;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:10px;padding:0.5rem 0.75rem;
+  font-size:0.75rem;color:var(--text2);
+  display:none;flex-direction:column;gap:0.15rem;
+  box-shadow:0 4px 15px var(--shadow);
+}
+.map-overlay-badge .mob-city{font-weight:600;color:var(--text);font-size:0.85rem;}
+.map-overlay-badge .mob-dist{color:var(--accent);font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.04em;}
+
+/* Results */
+.results-area{
+  flex:1;overflow-y:auto;padding:1.25rem;
+}
+.results-area::-webkit-scrollbar{width:3px;}
+.results-area::-webkit-scrollbar-thumb{background:var(--border2);}
+
+/* Empty state */
+.empty-state{
+  height:100%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:0.75rem;
+  color:var(--text3);padding:3rem;
+}
+.empty-icon{font-size:3.5rem;opacity:0.3;}
+.empty-text{text-align:center;font-size:0.875rem;line-height:1.6;}
+
+/* Stats grid */
+.stats-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;
+  margin-bottom:1rem;
+}
+@media(max-width:1100px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+.stat-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:13px;padding:1rem;position:relative;overflow:hidden;
+  transition:transform 0.2s;
+}
+.stat-card:hover{transform:translateY(-1px);}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--cl, var(--border));border-radius:13px 13px 0 0;
+}
+.stat-card.c1{--cl:var(--accent);}
+.stat-card.c2{--cl:var(--accent2);}
+.stat-card.c3{--cl:var(--accent3);}
+.stat-card.c4{--cl:var(--accent4);}
+.stat-card.c5{--cl:var(--blue);}
+.sc-icon{font-size:1.1rem;margin-bottom:0.5rem;display:block;}
+.sc-val{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:0.03em;line-height:1;margin-bottom:0.2rem;}
+.stat-card.c1 .sc-val{color:var(--accent);}
+.stat-card.c2 .sc-val{color:var(--accent2);}
+.stat-card.c3 .sc-val{color:var(--accent3);}
+.stat-card.c4 .sc-val{color:var(--accent4);}
+.stat-card.c5 .sc-val{color:var(--blue);}
+.sc-lbl{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);}
+
+/* Bottom grid: table + chart */
+.bottom-grid{display:grid;grid-template-columns:1fr 260px;gap:0.75rem;}
+@media(max-width:1100px){.bottom-grid{grid-template-columns:1fr;}}
+
+/* Detail table */
+.detail-table{background:var(--card);border:1px solid var(--border);border-radius:13px;overflow:hidden;}
+.dt-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:0.65rem 1rem;border-bottom:1px solid var(--border);font-size:0.83rem;
+}
+.dt-row:last-child{border-bottom:none;}
+.dt-key{color:var(--text2);}
+.dt-val{font-weight:500;color:var(--text);}
+.dt-row.total{background:rgba(245,158,11,0.05);}
+.dt-row.total .dt-val{color:var(--accent);font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.04em;}
+.dt-row.return .dt-val{color:var(--accent3);}
+
+/* Chart card */
+.chart-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:13px;padding:1rem;display:flex;flex-direction:column;gap:0.75rem;
+}
+.chart-title{font-size:0.7rem;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);}
+.chart-wrap{position:relative;height:180px;display:flex;align-items:center;justify-content:center;}
+
+/* Print button */
+.print-bar{
+  display:flex;justify-content:flex-end;gap:0.5rem;margin-top:0.75rem;
+}
+.print-btn{
+  padding:0.5rem 1.1rem;
+  border:1px solid var(--border);border-radius:8px;
+  background:var(--card2);color:var(--text2);font-size:0.8rem;
+  cursor:pointer;display:flex;align-items:center;gap:0.4rem;
+  transition:all 0.2s;font-family:'DM Sans',sans-serif;
+}
+.print-btn:hover{border-color:var(--accent3);color:var(--accent3);}
+
+/* ===== MAP MODAL ===== */
+.modal{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.8);z-index:1000;
+  align-items:center;justify-content:center;padding:1rem;
+}
+.modal.open{display:flex;animation:fadeIn 0.2s;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-box{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:18px;overflow:hidden;
+  width:100%;max-width:680px;max-height:88vh;
+  display:flex;flex-direction:column;
+  box-shadow:0 25px 60px rgba(0,0,0,0.5);
+}
+.modal-header{
+  padding:1.1rem 1.4rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:0.07em;color:var(--accent);}
+.modal-search{padding:0.85rem 1.4rem;border-bottom:1px solid var(--border);}
+.modal-search input{background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:0.65rem 1rem;width:100%;color:var(--text);font-size:0.88rem;outline:none;font-family:'DM Sans',sans-serif;}
+.modal-search input:focus{border-color:var(--accent);}
 .city-chips{padding:0.75rem 1.4rem;display:flex;flex-wrap:wrap;gap:0.4rem;max-height:110px;overflow-y:auto;border-bottom:1px solid var(--border);}
-.chip{ padding:0.3rem 0.75rem;background:var(--card2);border:1px solid var(--border); border-radius:20px;font-size:0.78rem;cursor:pointer;color:var(--text); }
+.chip{
+  padding:0.3rem 0.75rem;background:var(--card2);border:1px solid var(--border);
+  border-radius:20px;font-size:0.78rem;cursor:pointer;color:var(--text);
+  transition:all 0.15s;
+}
+.chip:hover{border-color:var(--accent);color:var(--accent);background:rgba(245,158,11,0.08);}
+#modalMap{flex:1;min-height:250px;}
+
+/* ===== COMPARE TAB ===== */
+.compare-layout{padding:1.5rem;max-width:1100px;margin:0 auto;}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;}
+@media(max-width:700px){.compare-grid{grid-template-columns:1fr;}}
+.compare-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.25rem;}
+.compare-header{display:flex;align-items:center;gap:0.75rem;margin-bottom:1.1rem;}
+.compare-badge{
+  width:28px;height:28px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;
+}
+.badge-a{background:rgba(245,158,11,0.15);color:var(--accent);}
+.badge-b{background:rgba(99,102,241,0.15);color:var(--accent4);}
+.compare-name{font-weight:600;font-size:0.95rem;}
+.compare-btn{
+  width:100%;padding:0.75rem;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:11px;color:#000;
+  font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.1em;
+  cursor:pointer;transition:all 0.2s;box-shadow:0 4px 20px rgba(245,158,11,0.2);
+}
+.compare-btn:hover{transform:translateY(-2px);}
+.compare-results{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.cr-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.08em;color:var(--accent);}
+.cr-row{display:grid;grid-template-columns:1.5fr 1fr 1fr;border-bottom:1px solid var(--border);}
+.cr-row:last-child{border-bottom:none;}
+.cr-cell{padding:0.65rem 1.1rem;font-size:0.83rem;}
+.cr-cell.label{color:var(--text2);}
+.cr-cell.val-a{color:var(--accent);font-weight:600;}
+.cr-cell.val-b{color:var(--accent4);font-weight:600;}
+.cr-cell.winner{
+  position:relative;
+}
+.cr-cell.winner::after{
+  content:'✓';font-size:0.7rem;
+  background:var(--accent3);color:#000;
+  border-radius:10px;padding:0.1rem 0.35rem;
+  margin-left:0.4rem;vertical-align:middle;
+}
+.cr-head{background:var(--card2);}
+.cr-head .cr-cell{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);font-weight:500;}
+
+/* ===== RANGE TAB ===== */
+.range-layout{padding:1.5rem;max-width:700px;margin:0 auto;}
+.range-result{
+  margin-top:1.5rem;background:var(--card);border:1px solid var(--border);
+  border-radius:16px;overflow:hidden;
+}
+.range-hero{
+  padding:2rem;text-align:center;
+  background:linear-gradient(135deg,rgba(245,158,11,0.05),rgba(99,102,241,0.05));
+  border-bottom:1px solid var(--border);
+}
+.range-km{font-family:'Bebas Neue',sans-serif;font-size:4rem;color:var(--accent);letter-spacing:0.03em;line-height:1;}
+.range-sub{color:var(--text2);font-size:0.85rem;margin-top:0.25rem;}
+.range-bar-wrap{padding:1.25rem 1.5rem;}
+.range-bar-label{display:flex;justify-content:space-between;font-size:0.75rem;color:var(--text3);margin-bottom:0.4rem;}
+.range-bar-bg{height:12px;background:var(--card2);border-radius:6px;overflow:hidden;border:1px solid var(--border);}
+.range-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent3),var(--accent));border-radius:6px;transition:width 0.6s ease;}
+.range-details{padding:0 1.5rem 1.25rem;}
+
+/* ===== PRINT ===== */
+@media print{
+  .topbar,.tabs,.sidebar,.modal,.bg-blob,.print-bar,.map-overlay-badge{display:none!important;}
+  .calc-layout{display:block!important;height:auto!important;}
+  .right-panel{overflow:visible!important;}
+  .map-container{height:200px!important;}
+  body{background:#fff!important;color:#000!important;}
+  .stat-card,.detail-table,.chart-card{border:1px solid #ccc!important;background:#fff!important;}
+  .sc-val,.dt-val{color:#000!important;}
+}
+
+/* Divider */
+.divider{height:1px;background:var(--border);margin:0.75rem 0;}
+
+/* Range slider */
+input[type=range]{
+  -webkit-appearance:none;height:4px;background:var(--border2);border-radius:2px;outline:none;border:none;
+  padding:0;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+  background:var(--accent);cursor:pointer;box-shadow:0 0 6px rgba(245,158,11,0.4);
+}
+
+/* Leaflet overrides - use fixed colors to avoid CSS var() issues */
+.leaflet-tile-pane{ filter: none; }
+.leaflet-popup-content-wrapper{
+  background:#ffffff !important;
+  color:#1a1828 !important;
+  border:1px solid #e2e0ec !important;
+  border-radius:10px !important;
+  box-shadow:0 8px 30px rgba(0,0,0,0.15) !important;
+}
+.leaflet-popup-tip{background:#ffffff !important;}
+.leaflet-container a.leaflet-popup-close-button{color:#6b6480 !important;}
+.leaflet-control-zoom a{
+  background:#ffffff !important;
+  color:#1a1828 !important;
+  border-color:#e2e0ec !important;
+}
+
+.section-hdr{
+  display:flex;align-items:center;gap:0.5rem;
+  font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--text3);margin-bottom:0.6rem;
+}
 </style>
 </head>
 <body>
 
-<a href="index.html" class="back-btn">← PORTAL</a>
-<div class="bg-blob blob1"></div><div class="bg-blob blob2"></div>
+<div class="bg-blob blob1"></div>
+<div class="bg-blob blob2"></div>
 
 <div class="app">
+
+<!-- TOP BAR -->
 <div class="topbar">
-  <div class="logo"><div class="logo-icon">⛽</div><div><div class="logo-text">YakıtPro</div><div class="logo-sub" style="font-size:0.65rem;color:var(--text3)">Gelişmiş Yakıt Hesaplayıcı</div></div></div>
-  <div class="fuel-ticker"><div class="ticker-label"><span class="ticker-dot"></span>Fiyatlar</div><div class="ticker-items" id="tickerItems"></div></div>
-  <div class="topbar-actions"><button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button></div>
+  <div class="logo">
+    <div class="logo-icon">⛽</div>
+    <div>
+      <div class="logo-text">YakıtPro</div>
+      <div class="logo-sub">Gelişmiş Yakıt Hesaplayıcı</div>
+    </div>
+  </div>
+
+  <div class="fuel-ticker">
+    <div class="ticker-label"><span class="ticker-dot"></span>Güncel Fiyatlar</div>
+    <div class="ticker-items" id="tickerItems"></div>
+  </div>
+
+  <div class="topbar-actions">
+    <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Tema Değiştir">🌙</button>
+  </div>
 </div>
 
+<!-- TABS -->
 <div class="tabs">
   <button class="tab-btn active" onclick="switchTab('calc',this)">⛽ Hesaplayıcı</button>
-  <button class="tab-btn" onclick="switchTab('range',this)">🔋 Menzil</button>
+  <button class="tab-btn" onclick="switchTab('compare',this)">🔁 Araç Karşılaştır</button>
+  <button class="tab-btn" onclick="switchTab('range',this)">🔋 Menzil Hesabı</button>
 </div>
 
+<!-- ============ TAB 1: HESAPLAYICI ============ -->
 <div class="tab-panel active" id="tab-calc">
   <div class="calc-layout">
+
+    <!-- SIDEBAR -->
     <div class="sidebar">
+
+      <!-- Yakıt Tipi -->
       <div class="card">
         <div class="card-title">🚗 Araç & Yakıt</div>
-        <div class="field"><label>Yakıt Tipi</label><div class="fuel-grid">
+
+        <div class="field">
+          <label>Yakıt Tipi</label>
+          <div class="fuel-grid">
             <div class="fuel-btn active" onclick="setFuel('benzin',this)">⛽ Benzin 95</div>
+            <div class="fuel-btn" onclick="setFuel('benzin97',this)">⛽ Benzin 97</div>
             <div class="fuel-btn" onclick="setFuel('dizel',this)">🛢️ Dizel</div>
             <div class="fuel-btn" onclick="setFuel('lpg',this)">💨 LPG</div>
             <div class="fuel-btn" onclick="setFuel('elektrik',this)">⚡ Elektrik</div>
-        </div></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
-          <div class="field"><label id="consumLbl">100km Tüketim</label><input type="number" id="consumption" value="7"></div>
-          <div class="field"><label id="priceLbl">Fiyat</label><input type="number" id="fuelPrice" value="42.00"></div>
+            <div class="fuel-btn" onclick="setFuel('hibrit',this)">🔋 Hibrit</div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="field">
+            <label id="consumLbl">100km Tüketim</label>
+            <div class="input-wrap">
+              <input type="number" id="consumption" value="7" min="0.5" max="50" step="0.1">
+              <span class="input-unit" id="consumUnit">L</span>
+            </div>
+          </div>
+          <div class="field">
+            <label id="priceLbl">Yakıt Fiyatı</label>
+            <div class="input-wrap">
+              <input type="number" id="fuelPrice" value="57.08" min="0.1" step="0.01">
+              <span class="input-unit" id="priceUnit">₺/L</span>
+            </div>
+          </div>
         </div>
       </div>
+
+      <!-- Güzergah -->
       <div class="card">
         <div class="card-title">🗺️ Güzergah</div>
+
         <div class="route-wrap">
-          <div class="city-pick"><div class="city-pick-btn" onclick="openModal('from')" id="fromBtn">📍 Nereden...</div></div>
-          <button class="swap-btn" onclick="swapCities()" style="align-self:center">⇅</button>
-          <div class="city-pick"><div class="city-pick-btn" onclick="openModal('to')" id="toBtn">📍 Nereye...</div></div>
+          <div class="city-pick">
+            <span class="city-pick-dot dot-from"></span>
+            <div class="city-pick-btn" onclick="openModal('from')" id="fromBtn">
+              <span class="ph">📍 Nereden seç...</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.4rem;padding:0 0 0 1.2rem;">
+            <div style="width:1px;height:20px;background:var(--border);margin-left:3px;"></div>
+            <button class="swap-btn" onclick="swapCities()" title="Değiştir">⇅</button>
+          </div>
+          <div class="city-pick">
+            <span class="city-pick-dot dot-to"></span>
+            <div class="city-pick-btn" onclick="openModal('to')" id="toBtn">
+              <span class="ph">📍 Nereye seç...</span>
+            </div>
+          </div>
         </div>
-        <div id="distBadge" style="display:none;margin-top:10px;padding:5px;background:rgba(245,158,11,0.1);border-radius:5px;text-align:center;color:var(--accent)">📏 <span id="distBadgeVal">0 km</span></div>
+
+        <div class="dist-badge" id="distBadge">
+          <span style="color:var(--text2)">📏 Karayolu Mesafesi</span>
+          <span id="distBadgeVal">— km</span>
+        </div>
+        <div class="toll-badge" id="tollBadge">
+          <span style="color:var(--text2)">🅿️ Tahmini Geçiş Ücreti</span>
+          <span id="tollBadgeVal">— ₺</span>
+        </div>
       </div>
+
+      <!-- Ekstra Ayarlar -->
+      <div class="card">
+        <div class="card-title">⚙️ Detay Ayarları</div>
+
+        <div class="field">
+          <label>Manuel Mesafe (harita yerine)</label>
+          <div class="input-wrap">
+            <input type="number" id="manualDist" placeholder="Boş bırakırsan haritadan alır" min="0">
+            <span class="input-unit">km</span>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="field">
+            <label>Yolcu Sayısı</label>
+            <div class="input-wrap">
+              <input type="number" id="passengers" value="1" min="1" max="9">
+              <span class="input-unit">kişi</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Ortalama Hız</label>
+            <div class="input-wrap">
+              <input type="number" id="avgSpeed" value="90" min="30" max="200">
+              <span class="input-unit">km/h</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Gidiş-Dönüş</label>
+          <select id="returnTrip">
+            <option value="0">Sadece Gidiş</option>
+            <option value="1">Gidiş + Dönüş</option>
+          </select>
+        </div>
+      </div>
+
       <button class="calc-btn" onclick="calculate()">HESAPLA →</button>
+
     </div>
+
+    <!-- RIGHT PANEL -->
     <div class="right-panel">
-      <div class="map-container"><div id="mainMap"></div></div>
+      <!-- MAP -->
+      <div class="map-container">
+        <div id="mainMap"></div>
+        <div class="map-overlay-badge" id="mapBadge">
+          <div class="mob-city" id="mapBadgeRoute">—</div>
+          <div class="mob-dist" id="mapBadgeDist">— km</div>
+          <div style="font-size:0.7rem;color:var(--text3);margin-top:1px" id="mapBadgeTime">— süre</div>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
       <div class="results-area" id="resultsArea">
-        <div class="stats-grid">
-            <div class="stat-card c1"><span class="sc-icon">📏</span><div class="sc-val" id="r_dist">—</div><div style="font-size:0.7rem;color:var(--text3)">Mesafe (km)</div></div>
-            <div class="stat-card c2"><span class="sc-icon">🧪</span><div class="sc-val" id="r_liters">—</div><div style="font-size:0.7rem;color:var(--text3)">Tüketim (L)</div></div>
-            <div class="stat-card c3"><span class="sc-icon">💰</span><div class="sc-val" id="r_cost">—</div><div style="font-size:0.7rem;color:var(--text3)">Maliyet (₺)</div></div>
-            <div class="stat-card c4"><span class="sc-icon">⏱️</span><div class="sc-val" id="r_time">—</div><div style="font-size:0.7rem;color:var(--text3)">Süre</div></div>
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">🛣️</div>
+          <div class="empty-text">Soldan şehirleri seç,<br>araç bilgilerini gir ve<br><b>Hesapla</b> butonuna bas.</div>
+        </div>
+
+        <div id="resultsContent" style="display:none">
+          <div class="stats-grid">
+            <div class="stat-card c1">
+              <span class="sc-icon">📏</span>
+              <div class="sc-val" id="r_dist">—</div>
+              <div class="sc-lbl">Mesafe (km)</div>
+            </div>
+            <div class="stat-card c2">
+              <span class="sc-icon" id="r_fuelIcon">🧪</span>
+              <div class="sc-val" id="r_liters">—</div>
+              <div class="sc-lbl" id="r_litersLbl">Tüketim (L)</div>
+            </div>
+            <div class="stat-card c3">
+              <span class="sc-icon">💰</span>
+              <div class="sc-val" id="r_cost">—</div>
+              <div class="sc-lbl">Yakıt Maliyeti (₺)</div>
+            </div>
+            <div class="stat-card c4">
+              <span class="sc-icon">⏱️</span>
+              <div class="sc-val" id="r_time">—</div>
+              <div class="sc-lbl">Tahmini Süre</div>
+            </div>
+            <div class="stat-card c5" id="sc_toll" style="display:none">
+              <span class="sc-icon">🅿️</span>
+              <div class="sc-val" id="r_toll">—</div>
+              <div class="sc-lbl">Geçiş Ücretleri (₺)</div>
+            </div>
+            <div class="stat-card c1" id="sc_perPerson" style="display:none">
+              <span class="sc-icon">👤</span>
+              <div class="sc-val" id="r_perPerson">—</div>
+              <div class="sc-lbl">Kişi Başı (₺)</div>
+            </div>
+          </div>
+
+          <div class="bottom-grid">
+            <div>
+              <div class="section-hdr">📋 Detaylı Döküm</div>
+              <div class="detail-table">
+                <div class="dt-row"><span class="dt-key">Güzergah</span><span class="dt-val" id="d_route">—</span></div>
+                <div class="dt-row"><span class="dt-key">Mesafe</span><span class="dt-val" id="d_dist">—</span></div>
+                <div class="dt-row"><span class="dt-key">Tahmini Süre</span><span class="dt-val" id="d_time">—</span></div>
+                <div class="dt-row"><span class="dt-key">Yakıt Tipi</span><span class="dt-val" id="d_fuel">—</span></div>
+                <div class="dt-row"><span class="dt-key">100km Tüketimi</span><span class="dt-val" id="d_consum">—</span></div>
+                <div class="dt-row"><span class="dt-key">Toplam Tüketim</span><span class="dt-val" id="d_total_consum">—</span></div>
+                <div class="dt-row"><span class="dt-key">Yakıt Fiyatı</span><span class="dt-val" id="d_price">—</span></div>
+                <div class="dt-row"><span class="dt-key">Yakıt Maliyeti</span><span class="dt-val" id="d_fuel_cost">—</span></div>
+                <div class="dt-row" id="d_toll_row" style="display:none"><span class="dt-key">Geçiş Ücretleri</span><span class="dt-val" id="d_toll">—</span></div>
+                <div class="dt-row" id="d_pass_row" style="display:none"><span class="dt-key">Yolcu Sayısı</span><span class="dt-val" id="d_pass">—</span></div>
+                <div class="dt-row total"><span class="dt-key" style="color:var(--text);font-weight:600">TOPLAM MALİYET</span><span class="dt-val" id="d_total">—</span></div>
+                <div class="dt-row return" id="d_return_row" style="display:none"><span class="dt-key">Gidiş-Dönüş</span><span class="dt-val" id="d_return">—</span></div>
+                <div class="dt-row" id="d_pp_row" style="display:none"><span class="dt-key">Kişi Başı Toplam</span><span class="dt-val" id="d_pp">—</span></div>
+              </div>
+
+              <div class="print-bar">
+                <button class="print-btn" onclick="window.print()">🖨️ Yazdır / PDF</button>
+              </div>
+            </div>
+
+            <div>
+              <div class="section-hdr">📊 Maliyet Dağılımı</div>
+              <div class="chart-card">
+                <div class="chart-wrap">
+                  <canvas id="costChart"></canvas>
+                </div>
+                <div id="chartLegend" style="font-size:0.73rem;display:flex;flex-direction:column;gap:0.35rem;"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ TAB 2: KARŞILAŞTIR ============ -->
+<div class="tab-panel" id="tab-compare">
+  <div class="compare-layout">
+    <div class="compare-grid">
+      <!-- Car A -->
+      <div class="compare-card">
+        <div class="compare-header">
+          <div class="compare-badge badge-a">A</div>
+          <span class="compare-name">1. Araç</span>
+        </div>
+        <div class="field">
+          <label>Araç Adı (isteğe bağlı)</label>
+          <input type="text" id="c_nameA" placeholder="örn: Honda Civic">
+        </div>
+        <div class="field">
+          <label>Yakıt Tipi</label>
+          <select id="c_fuelA" onchange="updateCmpPrice('A')">
+            <option value="benzin">Benzin 95</option>
+            <option value="benzin97">Benzin 97</option>
+            <option value="dizel">Dizel</option>
+            <option value="lpg">LPG</option>
+            <option value="elektrik">Elektrik</option>
+            <option value="hibrit">Hibrit</option>
+          </select>
+        </div>
+        <div class="two-col">
+          <div class="field">
+            <label id="c_consumLblA">100km Tüketim</label>
+            <div class="input-wrap">
+              <input type="number" id="c_consumA" value="8" min="0.5" step="0.1">
+              <span class="input-unit" id="c_consumUnitA">L</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Fiyat (₺)</label>
+            <div class="input-wrap">
+              <input type="number" id="c_priceA" value="42" min="0.1" step="0.01">
+              <span class="input-unit" id="c_priceUnitA">₺/L</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Car B -->
+      <div class="compare-card" style="border-color:rgba(99,102,241,0.3)">
+        <div class="compare-header">
+          <div class="compare-badge badge-b">B</div>
+          <span class="compare-name">2. Araç</span>
+        </div>
+        <div class="field">
+          <label>Araç Adı (isteğe bağlı)</label>
+          <input type="text" id="c_nameB" placeholder="örn: Toyota Corolla Hybrid">
+        </div>
+        <div class="field">
+          <label>Yakıt Tipi</label>
+          <select id="c_fuelB" onchange="updateCmpPrice('B')">
+            <option value="benzin">Benzin 95</option>
+            <option value="benzin97">Benzin 97</option>
+            <option value="dizel">Dizel</option>
+            <option value="lpg">LPG</option>
+            <option value="elektrik">Elektrik</option>
+            <option value="hibrit" selected>Hibrit</option>
+          </select>
+        </div>
+        <div class="two-col">
+          <div class="field">
+            <label id="c_consumLblB">100km Tüketim</label>
+            <div class="input-wrap">
+              <input type="number" id="c_consumB" value="5" min="0.5" step="0.1">
+              <span class="input-unit" id="c_consumUnitB">L</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Fiyat (₺)</label>
+            <div class="input-wrap">
+              <input type="number" id="c_priceB" value="42" min="0.1" step="0.01">
+              <span class="input-unit" id="c_priceUnitB">₺/L</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="field" style="max-width:320px;margin-bottom:1rem;">
+      <label>Karşılaştırma Mesafesi (km)</label>
+      <div class="input-wrap">
+        <input type="number" id="c_dist" value="500" min="1">
+        <span class="input-unit">km</span>
+      </div>
+    </div>
+
+    <button class="compare-btn" onclick="compare()" style="max-width:320px;display:block">KARŞILAŞTIR →</button>
+
+    <div class="compare-results" id="compareResults" style="display:none;margin-top:1.5rem;">
+      <div class="cr-header">📊 Karşılaştırma Sonuçları</div>
+      <div class="cr-row cr-head">
+        <div class="cr-cell label">Kriter</div>
+        <div class="cr-cell" id="cr_headA" style="color:var(--accent)">Araç A</div>
+        <div class="cr-cell" id="cr_headB" style="color:var(--accent4)">Araç B</div>
+      </div>
+      <div class="cr-row"><div class="cr-cell label">Yakıt Tipi</div><div class="cr-cell val-a" id="cr_fuelA">—</div><div class="cr-cell val-b" id="cr_fuelB">—</div></div>
+      <div class="cr-row"><div class="cr-cell label">100km Tüketim</div><div class="cr-cell val-a" id="cr_consumA">—</div><div class="cr-cell val-b" id="cr_consumB">—</div></div>
+      <div class="cr-row"><div class="cr-cell label">Toplam Tüketim</div><div class="cr-cell val-a" id="cr_totA">—</div><div class="cr-cell val-b" id="cr_totB">—</div></div>
+      <div class="cr-row"><div class="cr-cell label">Yakıt Maliyeti</div><div class="cr-cell val-a" id="cr_costA">—</div><div class="cr-cell val-b" id="cr_costB">—</div></div>
+      <div class="cr-row"><div class="cr-cell label">100km Maliyeti</div><div class="cr-cell val-a" id="cr_per100A">—</div><div class="cr-cell val-b" id="cr_per100B">—</div></div>
+      <div class="cr-row" style="background:rgba(16,185,129,0.05)"><div class="cr-cell label" style="font-weight:600;color:var(--text)">💚 Tasarruf</div><div class="cr-cell" colspan="2" id="cr_saving" style="grid-column:2/4;color:var(--accent3);font-weight:600">—</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TAB 3: MENZİL ============ -->
+<div class="tab-panel" id="tab-range">
+  <div class="range-layout">
+    <div class="card">
+      <div class="card-title">🔋 Menzil Hesaplayıcı</div>
+
+      <div class="field">
+        <label>Yakıt Tipi</label>
+        <div class="fuel-grid">
+          <div class="fuel-btn active" onclick="setRangeFuel('benzin',this)">⛽ Benzin</div>
+          <div class="fuel-btn" onclick="setRangeFuel('dizel',this)">🛢️ Dizel</div>
+          <div class="fuel-btn" onclick="setRangeFuel('lpg',this)">💨 LPG</div>
+          <div class="fuel-btn" onclick="setRangeFuel('elektrik',this)">⚡ Elektrik</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="field">
+          <label id="rangeTankLbl">Depo Kapasitesi</label>
+          <div class="input-wrap">
+            <input type="number" id="r_tank" value="60" min="1" max="200">
+            <span class="input-unit" id="rangeTankUnit">L</span>
+          </div>
+        </div>
+        <div class="field">
+          <label id="rangeRemLbl">Depo Doluluk %</label>
+          <input type="range" id="r_remaining" value="75" min="0" max="100" oninput="updateRangeLabel()">
+          <div style="font-size:0.75rem;color:var(--accent);margin-top:0.3rem;text-align:right" id="r_remainingLbl">75% dolu</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="field">
+          <label id="rangeConsumLbl">100km Tüketim</label>
+          <div class="input-wrap">
+            <input type="number" id="r_consum" value="7" min="0.5" step="0.1">
+            <span class="input-unit" id="rangeConsumUnit">L</span>
+          </div>
+        </div>
+        <div class="field">
+          <label id="rangePriceLbl">Yakıt Fiyatı</label>
+          <div class="input-wrap">
+            <input type="number" id="r_price" value="42" min="0.1" step="0.01">
+            <span class="input-unit" id="rangePriceUnit">₺/L</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="calc-btn" onclick="calcRange()">MENZİL HESAPLA →</button>
+    </div>
+
+    <div class="range-result" id="rangeResult" style="display:none">
+      <div class="range-hero">
+        <div class="range-km" id="rr_km">—</div>
+        <div class="range-sub">Mevcut yakıt ile gidebileceğin mesafe</div>
+      </div>
+      <div class="range-bar-wrap">
+        <div class="range-bar-label">
+          <span id="rr_remFuel">— birim</span>
+          <span id="rr_capacity">— birim</span>
+        </div>
+        <div class="range-bar-bg">
+          <div class="range-bar-fill" id="rr_bar" style="width:75%"></div>
+        </div>
+      </div>
+      <div class="range-details">
+        <div class="detail-table">
+          <div class="dt-row"><span class="dt-key">Depodaki Yakıt</span><span class="dt-val" id="rr_inTank">—</span></div>
+          <div class="dt-row"><span class="dt-key">Doldurmak İçin</span><span class="dt-val" id="rr_toFill">—</span></div>
+          <div class="dt-row"><span class="dt-key">Doldurma Maliyeti</span><span class="dt-val" id="rr_fillCost">—</span></div>
+          <div class="dt-row total"><span class="dt-key" style="color:var(--text);font-weight:600">Max Menzil (tam depo)</span><span class="dt-val" id="rr_maxRange">—</span></div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<div class="tab-panel" id="tab-range">
-  <div style="padding:2rem;max-width:600px;margin:0 auto">
-    <div class="card">
-      <div class="card-title">🔋 Menzil Hesapla</div>
-      <div class="field"><label>Depo (L)</label><input type="number" id="r_tank" value="60"></div>
-      <div class="field"><label>Doluluk %</label><input type="range" id="r_remaining" value="75" oninput="document.getElementById('r_rem_val').innerText=this.value+'%'"> <span id="r_rem_val" style="color:var(--accent)">75%</span></div>
-      <div class="field"><label>Tüketim (L/100km)</label><input type="number" id="r_consum" value="7"></div>
-      <button class="calc-btn" onclick="calcRange()">HESAPLA</button>
-      <div id="rangeResult" style="margin-top:20px;display:none;text-align:center">
-        <div style="font-size:3rem;color:var(--accent);font-family:'Bebas Neue'" id="rr_km">0</div>
-        <div style="color:var(--text2)">Tahmini Menzil (km)</div>
-      </div>
-    </div>
-  </div>
-</div>
+</div> <!-- /app -->
 
-</div>
-
+<!-- CITY MODAL -->
 <div class="modal" id="cityModal">
   <div class="modal-box">
-    <div style="padding:1rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between">
-      <span id="modalTitle" style="color:var(--accent);font-weight:bold">ŞEHİR SEÇ</span><button onclick="closeModal()" style="background:none;border:none;color:var(--text);cursor:pointer">✕</button>
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">ŞEHİR SEÇ</div>
+      <button class="icon-btn" onclick="closeModal()">✕</button>
     </div>
-    <div style="padding:0.5rem"><input type="text" id="modalSearch" placeholder="Ara..." oninput="filterChips()" style="width:100%;padding:0.5rem"></div>
+    <div class="modal-search">
+      <input type="text" id="modalSearch" placeholder="🔍 Şehir ara..." oninput="filterChips()">
+    </div>
     <div class="city-chips" id="cityChips"></div>
-    <div id="modalMap" style="flex:1;min-height:250px"></div>
+    <div id="modalMap" style="flex:1;min-height:280px;"></div>
   </div>
 </div>
 
 <script>
-const FUEL_PRICES={benzin:{price:57.08,unit:'L'},dizel:{price:57.83,unit:'L'},lpg:{price:30.00,unit:'L'},elektrik:{price:9.90,unit:'kWh'}};
-const CITIES=[{n:"Adana",lat:37.00,lon:35.32},{n:"Ankara",lat:39.92,lon:32.85},{n:"Antalya",lat:36.89,lon:30.70},{n:"Bursa",lat:40.18,lon:29.06},{n:"Diyarbakır",lat:37.91,lon:40.23},{n:"Erzurum",lat:39.90,lon:41.27},{n:"Eskişehir",lat:39.78,lon:30.52},{n:"Gaziantep",lat:37.06,lon:37.38},{n:"İstanbul",lat:41.01,lon:28.95},{n:"İzmir",lat:38.42,lon:27.14},{n:"Kayseri",lat:38.73,lon:35.49},{n:"Konya",lat:37.87,lon:32.49},{n:"Mersin",lat:36.80,lon:34.63},{n:"Samsun",lat:41.29,lon:36.33},{n:"Trabzon",lat:41.00,lon:39.73},{n:"Van",lat:38.49,lon:43.38}];
-let fromCity=null,toCity=null,mainMap=null,modalMap=null,modalTarget='from',currentFuel='benzin';
+// ===== DATA =====
+// Güncel fiyatlar: 18 Şubat 2026
+const FUEL_PRICES = {
+  benzin:   { price: 57.08, label: 'Benzin 95',  unit: 'L',   emoji: '⛽' },
+  benzin97: { price: 58.50, label: 'Benzin 97',  unit: 'L',   emoji: '⛽' },
+  dizel:    { price: 57.83, label: 'Motorin',    unit: 'L',   emoji: '🛢️' },
+  lpg:      { price: 30.00, label: 'LPG',        unit: 'L',   emoji: '💨' },
+  elektrik: { price: 9.90,  label: 'Elektrik',   unit: 'kWh', emoji: '⚡' },
+  hibrit:   { price: 57.08, label: 'Hibrit',     unit: 'L',   emoji: '🔋' },
+};
 
-document.addEventListener('DOMContentLoaded',()=>{
-  renderTicker(); renderChips(); initMainMap();
+const DEFAULT_CONSUM = { benzin:7, benzin97:7.5, dizel:6, lpg:10, elektrik:20, hibrit:4.5 };
+
+// Turkish city data
+const CITIES = [
+  {n:"Adana",lat:37.00,lon:35.32},{n:"Adıyaman",lat:37.76,lon:38.28},{n:"Afyonkarahisar",lat:38.75,lon:30.54},{n:"Ağrı",lat:39.72,lon:43.05},
+  {n:"Aksaray",lat:38.37,lon:34.03},{n:"Amasya",lat:40.65,lon:35.83},{n:"Ankara",lat:39.92,lon:32.85},{n:"Antalya",lat:36.89,lon:30.70},
+  {n:"Artvin",lat:41.18,lon:41.82},{n:"Aydın",lat:37.85,lon:27.84},{n:"Balıkesir",lat:39.64,lon:27.89},{n:"Bilecik",lat:40.14,lon:29.98},
+  {n:"Bingöl",lat:38.88,lon:40.49},{n:"Bitlis",lat:38.40,lon:42.12},{n:"Bolu",lat:40.73,lon:31.61},{n:"Burdur",lat:37.72,lon:30.29},
+  {n:"Bursa",lat:40.18,lon:29.06},{n:"Çanakkale",lat:40.14,lon:26.41},{n:"Çankırı",lat:40.60,lon:33.61},{n:"Çorum",lat:40.55,lon:34.96},
+  {n:"Denizli",lat:37.78,lon:29.08},{n:"Diyarbakır",lat:37.91,lon:40.23},{n:"Düzce",lat:40.84,lon:31.16},{n:"Edirne",lat:41.68,lon:26.55},
+  {n:"Elazığ",lat:38.67,lon:39.22},{n:"Erzincan",lat:39.75,lon:39.50},{n:"Erzurum",lat:39.90,lon:41.27},{n:"Eskişehir",lat:39.78,lon:30.52},
+  {n:"Gaziantep",lat:37.06,lon:37.38},{n:"Giresun",lat:40.91,lon:38.39},{n:"Gümüşhane",lat:40.46,lon:39.48},{n:"Hakkari",lat:37.58,lon:43.74},
+  {n:"Hatay",lat:36.20,lon:36.16},{n:"Iğdır",lat:39.92,lon:44.05},{n:"Isparta",lat:37.76,lon:30.55},{n:"İstanbul",lat:41.01,lon:28.95},
+  {n:"İzmir",lat:38.42,lon:27.14},{n:"Kahramanmaraş",lat:37.57,lon:36.92},{n:"Karabük",lat:41.20,lon:32.62},{n:"Karaman",lat:37.18,lon:33.22},
+  {n:"Kars",lat:40.60,lon:43.10},{n:"Kastamonu",lat:41.38,lon:33.78},{n:"Kayseri",lat:38.73,lon:35.49},{n:"Kırıkkale",lat:39.85,lon:33.51},
+  {n:"Kırklareli",lat:41.73,lon:27.22},{n:"Kırşehir",lat:39.14,lon:34.16},{n:"Kocaeli",lat:40.85,lon:29.88},{n:"Konya",lat:37.87,lon:32.49},
+  {n:"Kütahya",lat:39.42,lon:29.98},{n:"Malatya",lat:38.35,lon:38.32},{n:"Manisa",lat:38.61,lon:27.43},{n:"Mardin",lat:37.31,lon:40.73},
+  {n:"Mersin",lat:36.80,lon:34.63},{n:"Muğla",lat:37.21,lon:28.36},{n:"Muş",lat:38.74,lon:41.49},{n:"Nevşehir",lat:38.62,lon:34.71},
+  {n:"Niğde",lat:37.97,lon:34.68},{n:"Ordu",lat:40.98,lon:37.88},{n:"Osmaniye",lat:37.07,lon:36.25},{n:"Rize",lat:41.02,lon:40.52},
+  {n:"Sakarya",lat:40.77,lon:30.39},{n:"Samsun",lat:41.29,lon:36.33},{n:"Siirt",lat:37.93,lon:41.94},{n:"Sinop",lat:42.02,lon:35.15},
+  {n:"Sivas",lat:39.75,lon:37.02},{n:"Şanlıurfa",lat:37.16,lon:38.80},{n:"Şırnak",lat:37.52,lon:42.46},{n:"Tekirdağ",lat:40.98,lon:27.51},
+  {n:"Tokat",lat:40.31,lon:36.56},{n:"Trabzon",lat:41.00,lon:39.73},{n:"Tunceli",lat:39.10,lon:39.54},{n:"Uşak",lat:38.68,lon:29.41},
+  {n:"Van",lat:38.49,lon:43.38},{n:"Yalova",lat:40.65,lon:29.27},{n:"Yozgat",lat:39.82,lon:34.81},{n:"Zonguldak",lat:41.45,lon:31.79}
+];
+
+// Major Turkish tolls - approximate 2025 prices (OGS)
+const TOLL_DB = {
+  // Format: "city1|city2": toll amount
+  "istanbul|kocaeli": 60, "istanbul|sakarya": 80, "istanbul|bolu": 100,
+  "istanbul|bursa": 318, "istanbul|balıkesir": 318, "istanbul|çanakkale": 318,
+  "istanbul|yalova": 50, "istanbul|kırklareli": 40, "istanbul|edirne": 40,
+  "istanbul|tekirdağ": 30, "kocaeli|bolu": 50, "bursa|balıkesir": 40,
+  "istanbul|ankara": 180, "ankara|istanbul": 180, "istanbul|izmir": 400,
+  "osmangazi": 318,
+};
+
+// Toll estimation based on cities
+function estimateToll(from, to) {
+  if (!from || !to) return 0;
+  const f = from.n.toLowerCase(), t = to.n.toLowerCase();
+  const key1 = `${f}|${t}`, key2 = `${t}|${f}`;
+  if (TOLL_DB[key1]) return TOLL_DB[key1];
+  if (TOLL_DB[key2]) return TOLL_DB[key2];
+
+  let toll = 0;
+  // Check İstanbul routes
+  const istanbulCities = ['bursa','yalova','balıkesir','çanakkale','tekirdağ','edirne','kırklareli'];
+  const isIstanbul = f === 'istanbul' || t === 'istanbul';
+  if (isIstanbul && (istanbulCities.includes(f) || istanbulCities.includes(t))) toll += 318;
+  else if (isIstanbul) toll += 60;
+
+  // Kocaeli/Sakarya bridge
+  if ((f.includes('kocaeli') || t.includes('kocaeli')) && !isIstanbul) toll += 40;
+
+  return Math.round(toll);
+}
+
+// ===== STATE =====
+let fromCity = null, toCity = null;
+let mainMap = null, modalMap = null;
+let routeLayer = null;
+let fromMarker = null, toMarker = null;
+let modalTarget = 'from';
+let currentFuel = 'benzin';
+let rangeFuel = 'benzin';
+let costChart = null;
+let filteredCities = [...CITIES];
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  renderTicker();
+  renderChips();
+  initMainMap();
+  updateCmpPrice('A');
+  updateCmpPrice('B');
 });
 
-function renderTicker(){
-  document.getElementById('tickerItems').innerHTML=Object.entries(FUEL_PRICES).map(([k,v])=>`<div class="ticker-item"><span style="color:var(--accent)">${v.price}</span> ₺</div>`).join('');
+// ===== TICKER =====
+function renderTicker() {
+  const el = document.getElementById('tickerItems');
+  el.innerHTML = Object.entries(FUEL_PRICES).map(([k,v]) =>
+    `<div class="ticker-item">
+      <span>${v.emoji}</span>
+      <span class="ti-name">${v.label}</span>
+      <span class="ti-price">${v.price.toFixed(2)}</span>
+      <span class="ti-unit">₺/${v.unit}</span>
+    </div>`
+  ).join('');
 }
-function toggleTheme(){
-  const h=document.documentElement; h.setAttribute('data-theme',h.getAttribute('data-theme')==='light'?'dark':'light');
+
+// ===== THEME =====
+function toggleTheme() {
+  const html = document.documentElement;
+  const isLight = html.getAttribute('data-theme') === 'light';
+  html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+  document.getElementById('themeBtn').textContent = isLight ? '🌙' : '☀️';
 }
-function switchTab(id,btn){
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active'); btn.classList.add('active');
-  if(id==='calc'&&mainMap)setTimeout(()=>mainMap.invalidateSize(),100);
+
+// ===== TABS =====
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'calc' && mainMap) setTimeout(() => mainMap.invalidateSize(), 100);
 }
-function setFuel(t,b){
-  currentFuel=t; document.querySelectorAll('.fuel-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active');
-  document.getElementById('fuelPrice').value=FUEL_PRICES[t].price;
+
+// ===== FUEL =====
+function setFuel(type, btn) {
+  currentFuel = type;
+  document.querySelectorAll('#tab-calc .fuel-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const f = FUEL_PRICES[type];
+  document.getElementById('consumption').value = DEFAULT_CONSUM[type];
+  document.getElementById('fuelPrice').value = f.price.toFixed(2);
+  const isEle = type === 'elektrik';
+  document.getElementById('consumLbl').textContent = `100km Tüketim (${f.unit})`;
+  document.getElementById('consumUnit').textContent = f.unit;
+  document.getElementById('priceLbl').textContent = `${f.label} Fiyatı`;
+  document.getElementById('priceUnit').textContent = `₺/${f.unit}`;
 }
-function initMainMap(){
-  mainMap=L.map('mainMap',{zoomControl:false}).setView([39,35],6);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(mainMap);
+
+function setRangeFuel(type, btn) {
+  rangeFuel = type;
+  document.querySelectorAll('#tab-range .fuel-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const f = FUEL_PRICES[type];
+  document.getElementById('r_consum').value = DEFAULT_CONSUM[type];
+  document.getElementById('r_price').value = f.price.toFixed(2);
+  document.getElementById('rangeTankLbl').textContent = type === 'elektrik' ? 'Batarya (kWh)' : 'Depo (L)';
+  document.getElementById('rangeTankUnit').textContent = f.unit;
+  document.getElementById('rangeConsumLbl').textContent = `100km Tüketim (${f.unit})`;
+  document.getElementById('rangeConsumUnit').textContent = f.unit;
+  document.getElementById('rangePriceLbl').textContent = `Fiyat (₺/${f.unit})`;
+  document.getElementById('rangePriceUnit').textContent = `₺/${f.unit}`;
+  if (type === 'elektrik') document.getElementById('r_tank').value = 75;
+  else document.getElementById('r_tank').value = 60;
 }
-function openModal(t){
-  modalTarget=t; document.getElementById('modalTitle').innerText=t==='from'?'NEREDEN':'NEREYE';
+
+// ===== DISTANCE =====
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371, dLat = (lat2-lat1)*Math.PI/180, dLon = (lon2-lon1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 1.35);
+}
+
+function formatTime(minutes) {
+  const h = Math.floor(minutes / 60), m = Math.round(minutes % 60);
+  if (h === 0) return `${m} dk`;
+  if (m === 0) return `${h} sa`;
+  return `${h} sa ${m} dk`;
+}
+
+// ===== MAIN MAP =====
+function initMainMap(attempt) {
+  attempt = attempt || 0;
+  if (typeof L === 'undefined') {
+    if (attempt > 20) { // 4 saniye bekledik, yüklenemedi
+      document.getElementById('mainMap').innerHTML =
+        '<div style="height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0.75rem;color:#6b6480;background:#f5f4f8">' +
+        '<span style="font-size:2.5rem">🗺️</span><span style="font-size:0.85rem">Harita yüklenemedi</span>' +
+        '<span style="font-size:0.75rem;color:#9994a8">Manuel mesafe girişini kullanabilirsiniz</span></div>';
+      return;
+    }
+    setTimeout(() => initMainMap(attempt + 1), 200); // 200ms sonra tekrar dene
+    return;
+  }
+  mainMap = L.map('mainMap', { zoomControl: true, attributionControl: false }).setView([39.0, 35.0], 5.5);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd', maxZoom: 19
+  }).addTo(mainMap);
+
+  CITIES.forEach(c => {
+    L.circleMarker([c.lat, c.lon], {
+      radius: 4.5, fillColor: '#f59e0b', color: '#d97706', weight: 1.5, fillOpacity: 0.8, interactive: true
+    }).addTo(mainMap).bindTooltip(c.n, {permanent:false, direction:'top', className:''});
+  });
+}
+
+function drawRoute() {
+  if (!fromCity || !toCity || !mainMap) return;
+
+  if (routeLayer) { mainMap.removeLayer(routeLayer); routeLayer = null; }
+  if (fromMarker) { mainMap.removeLayer(fromMarker); fromMarker = null; }
+  if (toMarker) { mainMap.removeLayer(toMarker); toMarker = null; }
+
+  const f = fromCity, t = toCity;
+
+  const iconFrom = L.divIcon({
+    html:`<div style="width:14px;height:14px;background:#f59e0b;border:2px solid #fff;border-radius:50%;box-shadow:0 0 10px rgba(245,158,11,0.9);"></div>`,
+    iconSize:[14,14],iconAnchor:[7,7],className:''
+  });
+  const iconTo = L.divIcon({
+    html:`<div style="width:14px;height:14px;background:#ef4444;border:2px solid #fff;border-radius:50%;box-shadow:0 0 10px rgba(239,68,68,0.9);"></div>`,
+    iconSize:[14,14],iconAnchor:[7,7],className:''
+  });
+  fromMarker = L.marker([f.lat,f.lon],{icon:iconFrom}).addTo(mainMap);
+  toMarker   = L.marker([t.lat,t.lon],{icon:iconTo  }).addTo(mainMap);
+
+  const drawFallback = () => {
+    routeLayer = L.polyline([[f.lat,f.lon],[t.lat,t.lon]], {
+      color:'#f59e0b', weight:3, dashArray:'10,7', opacity:0.75
+    }).addTo(mainMap);
+    mainMap.fitBounds([[f.lat,f.lon],[t.lat,t.lon]], {padding:[60,60]});
+  };
+
+  try {
+    const url = `https://router.project-osrm.org/route/v1/driving/${f.lon},${f.lat};${t.lon},${t.lat}?overview=full&geometries=geojson`;
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 5000);
+    fetch(url, {signal: ctrl.signal})
+      .then(r => r.json())
+      .then(data => {
+        clearTimeout(timer);
+        if (data.routes && data.routes[0]) {
+          const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+          routeLayer = L.polyline(coords, {color:'#f59e0b', weight:4, opacity:0.85}).addTo(mainMap);
+          mainMap.fitBounds(routeLayer.getBounds(), {padding:[40,40]});
+        } else { drawFallback(); }
+      })
+      .catch(() => { clearTimeout(timer); drawFallback(); });
+  } catch(e) { drawFallback(); }
+}
+
+// ===== MODAL =====
+function openModal(target) {
+  modalTarget = target;
+  document.getElementById('modalTitle').textContent = target === 'from' ? 'NEREDEN — Şehir Seç' : 'NEREYE — Şehir Seç';
+  document.getElementById('modalSearch').value = '';
+  filterChips();
   document.getElementById('cityModal').classList.add('open');
-  if(!modalMap){
-    setTimeout(()=>{
-      modalMap=L.map('modalMap',{zoomControl:false}).setView([39,35],5);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(modalMap);
-      renderChips();
-    },100);
+
+  if (!modalMap) {
+    setTimeout(() => {
+      if (typeof L === 'undefined') return;
+      modalMap = L.map('modalMap', {zoomControl:true, attributionControl:false}).setView([39.0, 35.0], 5.5);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        subdomains:'abcd', maxZoom:19
+      }).addTo(modalMap);
+
+      CITIES.forEach(c => {
+        L.circleMarker([c.lat, c.lon], {
+          radius:6, fillColor:'#f59e0b', color:'#e8441a', weight:1.5, fillOpacity:0.85, interactive:true
+        }).addTo(modalMap).bindTooltip(c.n, {permanent:false, direction:'top', className:''})
+         .on('click', () => selectCity(c));
+      });
+    }, 150);
+  } else {
+    setTimeout(() => modalMap.invalidateSize(), 150);
   }
 }
-function closeModal(){document.getElementById('cityModal').classList.remove('open');}
-function filterChips(){renderChips(document.getElementById('modalSearch').value);}
-function renderChips(q=''){
-  const el=document.getElementById('cityChips');
-  el.innerHTML=CITIES.filter(c=>c.n.toLowerCase().includes(q.toLowerCase())).map(c=>`<div class="chip" onclick='selCity(${JSON.stringify(c)})'>${c.n}</div>`).join('');
+
+function closeModal() {
+  document.getElementById('cityModal').classList.remove('open');
 }
-function selCity(c){
-  if(modalTarget==='from'){fromCity=c;document.getElementById('fromBtn').innerText=c.n;}
-  else{toCity=c;document.getElementById('toBtn').innerText=c.n;}
+
+document.getElementById('cityModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('cityModal')) closeModal();
+});
+
+function filterChips() {
+  const q = document.getElementById('modalSearch').value.toLowerCase();
+  filteredCities = CITIES.filter(c => c.n.toLowerCase().includes(q));
+  renderChips();
+}
+
+function renderChips() {
+  const el = document.getElementById('cityChips');
+  el.innerHTML = filteredCities.map(c =>
+    `<div class="chip" onclick='selectCityFromChip(${JSON.stringify(c)})'>${c.n}</div>`
+  ).join('');
+}
+
+function selectCityFromChip(c) { selectCity(c); }
+
+function selectCity(c) {
+  if (modalTarget === 'from') {
+    fromCity = c;
+    document.getElementById('fromBtn').innerHTML = `<span class="city-pick-dot dot-from"></span>${c.n}`;
+  } else {
+    toCity = c;
+    document.getElementById('toBtn').innerHTML = `<span class="city-pick-dot dot-to"></span>${c.n}`;
+  }
+  updateDistBadge();
   closeModal();
 }
-function haversine(lat1,lon1,lat2,lon2){
-  const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLon=(lon2-lon1)*Math.PI/180;
-  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-  return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))*1.35);
+
+function swapCities() {
+  [fromCity, toCity] = [toCity, fromCity];
+  document.getElementById('fromBtn').innerHTML = fromCity
+    ? `<span class="city-pick-dot dot-from"></span>${fromCity.n}`
+    : `<span class="ph">📍 Nereden seç...</span>`;
+  document.getElementById('toBtn').innerHTML = toCity
+    ? `<span class="city-pick-dot dot-to"></span>${toCity.n}`
+    : `<span class="ph">📍 Nereye seç...</span>`;
+  updateDistBadge();
 }
-function calculate(){
-  if(!fromCity||!toCity){alert('Şehir seçin');return;}
-  const dist=haversine(fromCity.lat,fromCity.lon,toCity.lat,toCity.lon);
-  const cons=parseFloat(document.getElementById('consumption').value);
-  const price=parseFloat(document.getElementById('fuelPrice').value);
-  const totalL=(dist*cons)/100;
-  const cost=totalL*price;
-  
-  document.getElementById('r_dist').innerText=dist;
-  document.getElementById('r_liters').innerText=totalL.toFixed(1);
-  document.getElementById('r_cost').innerText=Math.round(cost);
-  document.getElementById('r_time').innerText=Math.floor(dist/90)+'s';
-  
-  // Harita çizgi
-  if(window.line) mainMap.removeLayer(window.line);
-  window.line=L.polyline([[fromCity.lat,fromCity.lon],[toCity.lat,toCity.lon]],{color:'orange'}).addTo(mainMap);
-  mainMap.fitBounds(window.line.getBounds(),{padding:[50,50]});
+
+function updateDistBadge() {
+  const badge = document.getElementById('distBadge');
+  const tollBadge = document.getElementById('tollBadge');
+  if (fromCity && toCity) {
+    const d = haversine(fromCity.lat, fromCity.lon, toCity.lat, toCity.lon);
+    badge.style.display = 'flex';
+    document.getElementById('distBadgeVal').textContent = d + ' km';
+    const toll = estimateToll(fromCity, toCity);
+    if (toll > 0) {
+      tollBadge.style.display = 'flex';
+      document.getElementById('tollBadgeVal').textContent = toll + ' ₺';
+    } else {
+      tollBadge.style.display = 'none';
+    }
+    drawRoute();
+  } else {
+    badge.style.display = 'none';
+    tollBadge.style.display = 'none';
+  }
 }
-function calcRange(){
-  const t=parseFloat(document.getElementById('r_tank').value);
-  const p=parseFloat(document.getElementById('r_remaining').value)/100;
-  const c=parseFloat(document.getElementById('r_consum').value);
-  const r=Math.round((t*p/c)*100);
-  document.getElementById('rr_km').innerText=r;
-  document.getElementById('rangeResult').style.display='block';
+
+// ===== CALCULATE =====
+function calculate() {
+  const manualKm = parseFloat(document.getElementById('manualDist').value);
+  let distance;
+
+  if (fromCity && toCity) {
+    distance = haversine(fromCity.lat, fromCity.lon, toCity.lat, toCity.lon);
+  } else if (!isNaN(manualKm) && manualKm > 0) {
+    distance = manualKm;
+  } else {
+    alert('Lütfen haritadan şehir seçin veya mesafeyi elle girin.');
+    return;
+  }
+
+  const consumption = parseFloat(document.getElementById('consumption').value) || DEFAULT_CONSUM[currentFuel];
+  const price = parseFloat(document.getElementById('fuelPrice').value) || FUEL_PRICES[currentFuel].price;
+  const passengers = parseInt(document.getElementById('passengers').value) || 1;
+  const avgSpeed = parseInt(document.getElementById('avgSpeed').value) || 90;
+  const isReturn = document.getElementById('returnTrip').value === '1';
+
+  const totalConsum = (consumption * distance) / 100;
+  const fuelCost = totalConsum * price;
+  const toll = (fromCity && toCity) ? estimateToll(fromCity, toCity) : 0;
+  const totalCost = fuelCost + toll;
+  const returnCost = totalCost * 2 + (isReturn ? toll : 0);
+  const perPerson = totalCost / passengers;
+  const timeMin = (distance / avgSpeed) * 60;
+  const per100Cost = consumption * price;
+
+  const f = FUEL_PRICES[currentFuel];
+  const fromName = fromCity ? fromCity.n : 'Başlangıç';
+  const toName = toCity ? toCity.n : 'Varış';
+
+  // Stats
+  document.getElementById('r_dist').textContent = distance;
+  document.getElementById('r_fuelIcon').textContent = f.emoji;
+  document.getElementById('r_liters').textContent = totalConsum.toFixed(1);
+  document.getElementById('r_litersLbl').textContent = `Tüketim (${f.unit})`;
+  document.getElementById('r_cost').textContent = Math.round(fuelCost);
+  document.getElementById('r_time').textContent = formatTime(timeMin);
+
+  if (toll > 0) {
+    document.getElementById('sc_toll').style.display = 'block';
+    document.getElementById('r_toll').textContent = toll;
+  } else {
+    document.getElementById('sc_toll').style.display = 'none';
+  }
+
+  if (passengers > 1) {
+    document.getElementById('sc_perPerson').style.display = 'block';
+    document.getElementById('r_perPerson').textContent = Math.round(perPerson);
+  } else {
+    document.getElementById('sc_perPerson').style.display = 'none';
+  }
+
+  // Detail table
+  document.getElementById('d_route').textContent = `${fromName} → ${toName}`;
+  document.getElementById('d_dist').textContent = `${distance} km`;
+  document.getElementById('d_time').textContent = formatTime(timeMin);
+  document.getElementById('d_fuel').textContent = f.label;
+  document.getElementById('d_consum').textContent = `${consumption} ${f.unit}/100km`;
+  document.getElementById('d_total_consum').textContent = `${totalConsum.toFixed(2)} ${f.unit}`;
+  document.getElementById('d_price').textContent = `${price.toFixed(2)} ₺/${f.unit}`;
+  document.getElementById('d_fuel_cost').textContent = `${fuelCost.toFixed(2)} ₺`;
+
+  if (toll > 0) {
+    document.getElementById('d_toll_row').style.display = 'flex';
+    document.getElementById('d_toll').textContent = `${toll} ₺`;
+  } else {
+    document.getElementById('d_toll_row').style.display = 'none';
+  }
+
+  if (passengers > 1) {
+    document.getElementById('d_pass_row').style.display = 'flex';
+    document.getElementById('d_pass').textContent = `${passengers} kişi`;
+    document.getElementById('d_pp_row').style.display = 'flex';
+    document.getElementById('d_pp').textContent = `${perPerson.toFixed(2)} ₺`;
+  } else {
+    document.getElementById('d_pass_row').style.display = 'none';
+    document.getElementById('d_pp_row').style.display = 'none';
+  }
+
+  document.getElementById('d_total').textContent = `${totalCost.toFixed(2)} ₺`;
+
+  if (isReturn) {
+    document.getElementById('d_return_row').style.display = 'flex';
+    document.getElementById('d_return').textContent = `${(totalCost * 2).toFixed(2)} ₺`;
+  } else {
+    document.getElementById('d_return_row').style.display = 'none';
+  }
+
+  // Chart
+  drawCostChart(fuelCost, toll, passengers);
+
+  // Map badge
+  const badge = document.getElementById('mapBadge');
+  badge.style.display = 'flex';
+  document.getElementById('mapBadgeRoute').textContent = `${fromName} → ${toName}`;
+  document.getElementById('mapBadgeDist').textContent = `${distance} km`;
+  document.getElementById('mapBadgeTime').textContent = formatTime(timeMin);
+
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('resultsContent').style.display = 'block';
+}
+
+// ===== CHART =====
+function drawCostChart(fuelCost, toll, passengers) {
+  if (costChart) costChart.destroy();
+
+  const ctx = document.getElementById('costChart').getContext('2d');
+  const labels = ['Yakıt'], data = [fuelCost], colors = ['#f59e0b'];
+
+  if (toll > 0) { labels.push('Geçiş Ücreti'); data.push(toll); colors.push('#6366f1'); }
+
+  const total = data.reduce((a,b)=>a+b,0);
+
+  costChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: 'var(--card)', borderWidth: 3, hoverBorderWidth: 3 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '68%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.label}: ${ctx.parsed.toFixed(0)} ₺ (%${((ctx.parsed/total)*100).toFixed(0)})`
+          }
+        }
+      }
+    }
+  });
+
+  // Legend
+  const leg = document.getElementById('chartLegend');
+  leg.innerHTML = labels.map((l,i) =>
+    `<div style="display:flex;align-items:center;gap:0.5rem;">
+      <div style="width:10px;height:10px;border-radius:3px;background:${colors[i]};flex-shrink:0;"></div>
+      <span style="color:var(--text2)">${l}</span>
+      <span style="margin-left:auto;font-weight:600;color:var(--text)">${data[i].toFixed(0)} ₺</span>
+    </div>`
+  ).join('');
+}
+
+// ===== COMPARE =====
+const FUEL_LABELS = {benzin:'Benzin 95',benzin97:'Benzin 97',dizel:'Dizel',lpg:'LPG',elektrik:'Elektrik',hibrit:'Hibrit'};
+
+function updateCmpPrice(car) {
+  const select = document.getElementById(`c_fuel${car}`);
+  const type = select.value;
+  const f = FUEL_PRICES[type];
+  document.getElementById(`c_price${car}`).value = f.price.toFixed(2);
+  document.getElementById(`c_consum${car}`).value = DEFAULT_CONSUM[type];
+  document.getElementById(`c_consumUnit${car}`).textContent = f.unit;
+  document.getElementById(`c_priceUnit${car}`).textContent = `₺/${f.unit}`;
+  document.getElementById(`c_consumLbl${car}`).textContent = `100km Tüketim (${f.unit})`;
+}
+
+function compare() {
+  const dist = parseFloat(document.getElementById('c_dist').value) || 500;
+  const nA = document.getElementById('c_nameA').value || 'Araç A';
+  const nB = document.getElementById('c_nameB').value || 'Araç B';
+  const fA = document.getElementById('c_fuelA').value;
+  const fB = document.getElementById('c_fuelB').value;
+  const cA = parseFloat(document.getElementById('c_consumA').value) || 7;
+  const cB = parseFloat(document.getElementById('c_consumB').value) || 5;
+  const pA = parseFloat(document.getElementById('c_priceA').value) || 42;
+  const pB = parseFloat(document.getElementById('c_priceB').value) || 42;
+
+  const totA = (cA * dist) / 100;
+  const totB = (cB * dist) / 100;
+  const costA = totA * pA;
+  const costB = totB * pB;
+  const per100A = cA * pA;
+  const per100B = cB * pB;
+  const saving = Math.abs(costA - costB);
+  const cheaperIs = costA < costB ? nA : nB;
+
+  const uA = FUEL_PRICES[fA].unit;
+  const uB = FUEL_PRICES[fB].unit;
+
+  document.getElementById('cr_headA').textContent = nA;
+  document.getElementById('cr_headB').textContent = nB;
+  document.getElementById('cr_fuelA').textContent = FUEL_LABELS[fA];
+  document.getElementById('cr_fuelB').textContent = FUEL_LABELS[fB];
+  document.getElementById('cr_consumA').textContent = `${cA} ${uA}/100km`;
+  document.getElementById('cr_consumB').textContent = `${cB} ${uB}/100km`;
+  document.getElementById('cr_totA').textContent = `${totA.toFixed(2)} ${uA}`;
+  document.getElementById('cr_totB').textContent = `${totB.toFixed(2)} ${uB}`;
+  document.getElementById('cr_costA').textContent = `${costA.toFixed(2)} ₺`;
+  document.getElementById('cr_costB').textContent = `${costB.toFixed(2)} ₺`;
+  document.getElementById('cr_per100A').textContent = `${per100A.toFixed(2)} ₺`;
+  document.getElementById('cr_per100B').textContent = `${per100B.toFixed(2)} ₺`;
+
+  // Add winner class
+  ['cr_totA','cr_costA','cr_per100A'].forEach(id => document.getElementById(id).className = 'cr-cell val-a');
+  ['cr_totB','cr_costB','cr_per100B'].forEach(id => document.getElementById(id).className = 'cr-cell val-b');
+
+  const winnerA = costA <= costB;
+  document.getElementById(winnerA ? 'cr_costA' : 'cr_costB').className += ' winner';
+
+  document.getElementById('cr_saving').textContent = `${cheaperIs} ile ${saving.toFixed(2)} ₺ tasarruf (${dist} km için)`;
+
+  document.getElementById('compareResults').style.display = 'block';
+}
+
+// ===== RANGE =====
+function updateRangeLabel() {
+  const v = document.getElementById('r_remaining').value;
+  document.getElementById('r_remainingLbl').textContent = `${v}% dolu`;
+}
+
+function calcRange() {
+  const tank = parseFloat(document.getElementById('r_tank').value) || 60;
+  const pct = parseFloat(document.getElementById('r_remaining').value) / 100;
+  const consum = parseFloat(document.getElementById('r_consum').value) || 7;
+  const price = parseFloat(document.getElementById('r_price').value) || 42;
+  const f = FUEL_PRICES[rangeFuel];
+
+  const inTank = tank * pct;
+  const toFill = tank - inTank;
+  const range = Math.round((inTank / consum) * 100);
+  const maxRange = Math.round((tank / consum) * 100);
+  const fillCost = toFill * price;
+
+  document.getElementById('rr_km').textContent = range;
+  document.getElementById('rr_remFuel').textContent = `${inTank.toFixed(1)} ${f.unit}`;
+  document.getElementById('rr_capacity').textContent = `${tank} ${f.unit}`;
+  document.getElementById('rr_bar').style.width = `${pct * 100}%`;
+  document.getElementById('rr_inTank').textContent = `${inTank.toFixed(1)} ${f.unit}`;
+  document.getElementById('rr_toFill').textContent = `${toFill.toFixed(1)} ${f.unit}`;
+  document.getElementById('rr_fillCost').textContent = `${fillCost.toFixed(2)} ₺`;
+  document.getElementById('rr_maxRange').textContent = `${maxRange} km`;
+  document.getElementById('rangeResult').style.display = 'block';
 }
 </script>
 </body>
