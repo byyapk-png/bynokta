@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dijital Kadı (Test) - ByNoKTa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        ottoman: {
+                            bg: '#0f0805', 
+                            card: '#1c0c07',
+                            border: '#8b2a1a', 
+                            bordergold: '#c29b27',
+                            gold: '#e2c564', 
+                            text: '#fdf7e3', 
+                            muted: '#d3ba9b' 
+                        }
+                    },
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        playfair: ['Lora', 'serif'] 
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* GERİ DÖN BUTONU */
+        .back-btn { position: fixed; top: 12px; left: 12px; z-index: 999; text-decoration: none; background: rgba(43, 15, 11, 0.8); color: #e2c564; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; border: 1px solid rgba(194, 155, 39, 0.5); backdrop-filter: blur(5px); font-family: sans-serif;}
+        .back-btn:hover { background: rgba(107, 32, 20, 0.8); color: #fff;}
+
+        .step-hidden {
+            display: none;
+        }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            body {
+                background: white !important;
+                color: black !important;
+            }
+
+            .print-only {
+                display: block !important;
+            }
+        }
+
+        body {
+            background-image: radial-gradient(circle at center, #1c110a 0%, #0d0704 100%);
+        }
+
+        input,
+        select,
+        textarea {
+            background-color: #140c08 !important;
+            border-color: #a67c00 !important;
+            color: #f3e5ab !important;
+            font-family: 'Playfair Display', serif;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #8c734b !important;
+        }
+
+        .ottoman-card {
+            background-color: #2b0f0b;
+            /* Deep maroon/brown */
+            border: 1px solid #6b2014;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .ottoman-label {
+            color: #a67c00;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+
+<body class="bg-ottoman-bg text-ottoman-text font-playfair min-h-screen">
+
+    <a href="index.html" class="back-btn no-print">← PORTAL</a>
+
+    <header class="pt-10 pb-6 relative z-10 w-full flex flex-col items-center justify-center">
+        <div class="absolute top-4 right-4 flex items-center gap-4">
+            <button id="settingsToggle" class="text-xl text-ottoman-gold hover:text-white transition-colors"
+                title="API Ayarları">⚙️</button>
+            <button id="themeToggle" class="hidden text-2xl" title="Tema Değiştir">🌙</button>
+            <div class="text-sm flex items-center gap-2 no-print">
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="saveSessionToggle" class="sr-only peer">
+                    <div
+                        class="w-9 h-5 bg-ottoman-card border border-ottoman-bordergold peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-ottoman-gold after:border-ottoman-gold after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-ottoman-bordergold">
+                    </div>
+                    <span class="ml-2 text-xs font-medium text-ottoman-muted">Kaydet</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <div
+                class="flex items-center justify-center gap-4 mb-3 text-ottoman-muted text-xs md:text-sm tracking-[0.3em] font-cinzel">
+                <span class="text-ottoman-gold">✦</span>
+                BİSMİLLAHİRRAHMANİRRAHİM
+                <span class="text-ottoman-gold">✦</span>
+            </div>
+
+            <div class="flex justify-center mb-1">
+                <div class="w-2 h-2 rotate-45 bg-ottoman-gold shadow-[0_0_8px_rgba(212,175,55,0.8)]"></div>
+            </div>
+
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-black font-cinzel tracking-wider text-ottoman-gold drop-shadow-lg mb-2"
+                style="text-shadow: 0 4px 6px rgba(0,0,0,0.5), 0 0 20px rgba(212,175,55,0.2);">
+                DİJİTAL KADI
+            </h1>
+
+            <div
+                class="flex items-center justify-center gap-3 text-ottoman-muted italic font-playfair tracking-widest text-sm md:text-base">
+                <span>Adaletin Dijital Kapısı</span>
+                <span class="text-ottoman-gold text-xs">●</span>
+                <span>Hüküm Divanı</span>
+            </div>
+
+            <div
+                class="mt-8 mx-auto w-16 h-16 rounded-full border border-ottoman-bordergold flex items-center justify-center shadow-[0_0_15px_rgba(166,124,0,0.2)] bg-ottoman-card/50">
+                <span class="text-2xl text-ottoman-gold drop-shadow-md">⚖️</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto p-4 md:p-6 pb-24">
+
+        <div id="consentModal"
+            class="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+            <div
+                class="ottoman-card rounded-sm max-w-md w-full p-8 shadow-[0_0_30px_rgba(212,175,55,0.15)] border border-ottoman-bordergold">
+                <div class="text-center mb-6 text-5xl opacity-80">⚖️</div>
+                <h2
+                    class="text-2xl font-bold mb-6 text-center text-ottoman-gold font-cinzel tracking-widest border-b border-ottoman-border pb-4">
+                    AÇIK RIZA VE ONAY BEYANI</h2>
+                <ul
+                    class="text-sm space-y-4 mb-8 bg-ottoman-bg/50 border border-ottoman-border p-5 rounded-sm text-ottoman-text">
+                    <li class="flex gap-3 items-start"><span class="text-ottoman-gold mt-0.5">⚠️</span> <span>Bu ferman
+                            <strong>yalnız iki tarafın rızasıyla</strong> tanzim edilebilir.</span></li>
+                    <li class="flex gap-3 items-start"><span class="text-ottoman-gold mt-0.5">🔒</span> <span>Sırlarınız
+                            mahremdir; kayıtlar cihaz dışına <strong>gönderilmez.</strong></span></li>
+                    <li class="flex gap-3 items-start"><span class="text-ottoman-gold mt-0.5"></span> <span>Çıkan sonuç
+                            amir bir <strong>hukuki karar değildir</strong>, sulh için bir nasihattir.</span></li>
+                </ul>
+                <div class="mb-8 flex space-x-3 items-start p-2">
+                    <input type="checkbox" id="consentCheck" class="mt-1 w-5 h-5 accent-ottoman-gold cursor-pointer">
+                    <label for="consentCheck" class="text-sm text-ottoman-text cursor-pointer select-none">Yukarıdaki
+                        şartları okudum ve iki taraf olarak rıza gösteriyoruz.</label>
+                </div>
+                <button id="btnStart"
+                    class="w-full bg-[#3a1a14] text-ottoman-gold py-4 font-cinzel tracking-widest transition-all border border-ottoman-gold hover:bg-[#4a2218] hover:shadow-[0_0_15px_rgba(212,175,55,0.3)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#3a1a14] disabled:hover:shadow-none font-bold text-lg"
+                    disabled>FERMANI BAŞLAT</button>
+            </div>
+        </div> <div id="settingsModal"
+            class="hidden fixed inset-0 bg-black/90 items-center justify-center p-4 z-50 backdrop-blur-sm">
+            <div
+                class="ottoman-card rounded-sm max-w-md w-full p-8 shadow-[0_0_30px_rgba(212,175,55,0.15)] border border-ottoman-bordergold">
+                <div class="flex justify-between items-center mb-6 border-b border-ottoman-border pb-4">
+                    <h2
+                        class="text-xl md:text-2xl font-bold font-cinzel text-ottoman-gold tracking-widest flex items-center gap-2">
+                        <span class="opacity-70">⚙️</span> AYARLAR (YAPAY ZEKA)
+                    </h2>
+                    <button id="closeSettings"
+                        class="text-ottoman-muted hover:text-ottoman-gold text-3xl font-bold leading-none transition-colors">&times;</button>
+                </div>
+                <div
+                    class="mb-6 text-sm text-ottoman-text leading-relaxed bg-ottoman-bg/50 border border-ottoman-border p-4 rounded-sm">
+                    Önerilerin daha hikmetli, "Google Gemini AI" tarafından üretilmesi için ücretsiz <a
+                        href="https://aistudio.google.com/app/apikey" target="_blank"
+                        class="text-ottoman-gold underline font-bold hover:text-white transition-colors">Gemini API</a>
+                    anahtarınızı buraya raptedebilirsiniz. Sırrınız kendi cihazınızda kalır. Boş bırakırsanız temel
+                    sözcük analizine devam eder.
+                </div>
+                <div class="mb-8">
+                    <label
+                        class="block text-sm font-medium mb-3 text-ottoman-text uppercase tracking-widest font-cinzel">Google
+                        Gemini API Mührü:</label>
+                    <input type="password" id="apiKeyInput" placeholder="AIzaSy..."
+                        class="w-full p-4 rounded-sm border border-ottoman-border bg-ottoman-bg text-ottoman-text focus:ring-1 focus:ring-ottoman-gold outline-none tracking-widest font-mono">
+                </div>
+                <button id="saveSettingsBtn"
+                    class="w-full bg-[#3a1a14] text-ottoman-gold py-4 font-cinzel tracking-widest transition-all border border-ottoman-gold hover:bg-[#4a2218] hover:shadow-[0_0_15px_rgba(212,175,55,0.3)] font-bold text-lg">MÜHRÜ
+                    KAYDET</button>
+            </div>
+        </div>
+
+        <div id="stepperNav" class="hidden"></div> <div id="wizardContainer" class="hidden">
+
+            <div id="step1" class="step-content ottoman-card p-6 md:p-8 rounded-sm relative">
+
+                <h2
+                    class="text-xl md:text-2xl font-bold mb-8 text-ottoman-gold font-cinzel text-center tracking-widest border-b border-ottoman-bordergold pb-4">
+                    <span class="mr-2 opacity-70">📜</span> DAVA BEYANI
+                </h2>
+
+                <div class="mb-8">
+                    <label class="ottoman-label mb-3"><span class="text-lg opacity-80">⚖️</span> DAVANIN KONUSU</label>
+                    <input type="text" id="category" placeholder="Örn: Ev İşleri, Harcamalar..."
+                        class="w-full p-4 rounded-sm border border-ottoman-border bg-ottoman-bg text-ottoman-text focus:ring-1 focus:ring-ottoman-gold outline-none text-lg">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                        <label class="ottoman-label mb-3"><span class="text-lg opacity-80">👤</span> BİRİNCİ
+                            TARAF</label>
+                        <input type="text" id="partyA" placeholder="Örn: Ahmet"
+                            class="w-full p-4 rounded-sm border border-ottoman-border bg-ottoman-bg text-ottoman-text focus:ring-1 focus:ring-ottoman-gold outline-none text-lg">
+                    </div>
+                    <div>
+                        <label class="ottoman-label mb-3"><span class="text-lg opacity-80">👤</span> İKİNCİ
+                            TARAF</label>
+                        <input type="text" id="partyB" placeholder="Örn: Ayşe"
+                            class="w-full p-4 rounded-sm border border-ottoman-border bg-ottoman-bg text-ottoman-text focus:ring-1 focus:ring-ottoman-gold outline-none text-lg">
+                    </div>
+                </div>
+
+                <div id="dictationZone" class="hidden mb-6 bg-[#3a0b0b] border border-[#6b2014] p-4 rounded-sm">
+                    <p class="text-sm font-bold text-red-500 mb-2 animate-pulse">🔴 Dinleniyor...</p>
+                    <div id="dictationText"
+                        class="min-h-[60px] p-3 bg-ottoman-bg rounded-sm border border-ottoman-border text-sm mb-3 text-ottoman-text">
+                    </div>
+                    <div class="flex gap-2 flex-wrap">
+                        <button id="btnStopDictate"
+                            class="bg-gray-800 text-ottoman-text border border-gray-600 px-3 py-1 rounded-sm text-sm">Durdur</button>
+                        <button
+                            class="btn-transfer bg-ottoman-card text-ottoman-gold border border-ottoman-bordergold px-3 py-1 rounded-sm text-sm hover:bg-ottoman-bg hover:text-white"
+                            data-target="narrativeA"><span class="partyA_name">A</span>'ya Aktar</button>
+                        <button
+                            class="btn-transfer bg-ottoman-card text-ottoman-gold border border-ottoman-bordergold px-3 py-1 rounded-sm text-sm hover:bg-ottoman-bg hover:text-white"
+                            data-target="narrativeB"><span class="partyB_name">B</span>'ye Aktar</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-4">
+                    <div>
+                        <label class="ottoman-label mb-3 flex items-center justify-between">
+                            <span><span class="text-lg opacity-80 mr-2">✍️</span> <span class="partyA_name">A</span>'NIN
+                                BEYANI</span>
+                        </label>
+                        <textarea id="narrativeA" rows="5"
+                            class="w-full p-4 rounded-sm border border-ottoman-border bg-ottoman-bg text-ottoman-text focus:ring-1 focus:ring-ottoman-gold outline-none text-lg"
+                            placeholder="Birinci taraf argümanı..."></textarea>
+                    </div>
+                    <div>
+                        <label class="ottoman-label mb-3 flex items-center justify-between">
+                            <span><span class="text-lg opacity-80 mr-2">✍️</span> <span class="partyB_name">B</span>'NİN
+                                BEYANI</span>
+                        </label>
+                        <textarea id="narrativeB" rows="5"
+                            class="w-full p-4 rounded-sm border border-ottoman-border bg-ottoman-bg text-ottoman-text focus:ring-1 focus:ring-ottoman-gold outline-none text-lg"
+                            placeholder="İkinci taraf argümanı..."></textarea>
+                    </div>
+                </div>
+
+                <div class="text-center mb-8">
+                    <button id="btnDictate"
+                        class="text-ottoman-muted hover:text-ottoman-gold text-sm font-playfair italic underline transition-colors">🎤
+                        Sesli Asistan İle Yazdır</button>
+                </div>
+
+                <input type="hidden" id="narrativeNeutral" value="">
+                <input type="hidden" id="evidenceNotes" value="">
+
+                <div class="text-center mt-10">
+                    <button id="btnSubmitAll"
+                        class="bg-[#3a1a14] hover:bg-[#4a2218] text-ottoman-gold border border-ottoman-gold px-4 md:px-10 py-4 font-cinzel tracking-widest transition-all shadow-[0_0_10px_rgba(212,175,55,0.2)] text-lg md:text-xl w-full hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]">
+                        ⚖️ KADI HAZRETLERİNE ARZ EYLEYİNİZ ⚖️
+                    </button>
+                    <p class="text-red-500 font-playfair italic text-sm mt-4 hidden" id="errMerged">Lütfen tüm alanları
+                        (Konu, İsimler ve Beyanlar) eksiksiz doldurunuz.</p>
+                </div>
+            </div>
+
+            <div id="step2" class="step-hidden"></div>
+            <div id="step3" class="step-hidden"></div>
+
+            <div id="step4"
+                class="step-hidden ottoman-card p-6 md:p-10 rounded-sm text-ottoman-text relative overflow-hidden">
+                <div
+                    class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none hidden print-only text-9xl font-cinzel text-ottoman-gold">
+                    ⚖️KADI
+                </div>
+
+                <div class="text-center mb-8 border-b border-ottoman-bordergold pb-6">
+                    <div class="text-4xl md:text-
