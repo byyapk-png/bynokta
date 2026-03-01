@@ -4,15 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dijital Kadı (Test)</title>
-    <!-- Google Fonts -->
+    <title>Dijital Kadı - ByNoKTa</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap"
         rel="stylesheet">
 
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -21,24 +19,28 @@
                 extend: {
                     colors: {
                         ottoman: {
-                            bg: '#0f0805', // even darker for high contrast
+                            bg: '#0f0805',
                             card: '#1c0c07',
-                            border: '#8b2a1a', // slightly more vibrant red border
+                            border: '#8b2a1a',
                             bordergold: '#c29b27',
-                            gold: '#e2c564', // brighter gold for headings
-                            text: '#fdf7e3', // much brighter, off-white text for readability
-                            muted: '#d3ba9b' // lighter muted text
+                            gold: '#e2c564',
+                            text: '#fdf7e3',
+                            muted: '#d3ba9b'
                         }
                     },
                     fontFamily: {
                         cinzel: ['Cinzel', 'serif'],
-                        playfair: ['Lora', 'serif'] // Replaced Playfair with highly readable Lora, kept variable name 'playfair' in tailwind config for less code change
+                        playfair: ['Lora', 'serif']
                     }
                 }
             }
         }
     </script>
     <style>
+        /* GERİ DÖN BUTONU */
+        .back-btn { position: fixed; top: 12px; left: 12px; z-index: 999; text-decoration: none; background: rgba(43, 15, 11, 0.8); color: #e2c564; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; border: 1px solid rgba(194, 155, 39, 0.5); backdrop-filter: blur(5px); font-family: sans-serif;}
+        .back-btn:hover { background: rgba(107, 32, 20, 0.8); color: #fff;}
+
         .step-hidden {
             display: none;
         }
@@ -78,7 +80,6 @@
 
         .ottoman-card {
             background-color: #2b0f0b;
-            /* Deep maroon/brown */
             border: 1px solid #6b2014;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
@@ -98,11 +99,10 @@
 
 <body class="bg-ottoman-bg text-ottoman-text font-playfair min-h-screen">
 
-    <!-- Header -->
+    <a href="index.html" class="back-btn no-print">← PORTAL</a>
+
     <header class="pt-10 pb-6 relative z-10 w-full flex flex-col items-center justify-center">
         <div class="absolute top-4 right-4 flex items-center gap-4">
-            <button id="settingsToggle" class="text-xl text-ottoman-gold hover:text-white transition-colors"
-                title="API Ayarları">⚙️</button>
             <button id="themeToggle" class="hidden text-2xl" title="Tema Değiştir">🌙</button>
             <div class="text-sm flex items-center gap-2 no-print">
                 <label class="relative inline-flex items-center cursor-pointer">
@@ -148,7 +148,6 @@
 
     <main class="max-w-3xl mx-auto p-4 md:p-6 pb-24">
 
-        <!-- STEP 1: Consent Modal (Overlay) -->
         <div id="consentModal"
             class="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
             <div
@@ -163,7 +162,7 @@
                             <strong>yalnız iki tarafın rızasıyla</strong> tanzim edilebilir.</span></li>
                     <li class="flex gap-3 items-start"><span class="text-ottoman-gold mt-0.5">🔒</span> <span>Sırlarınız
                             mahremdir; kayıtlar cihaz dışına <strong>gönderilmez.</strong></span></li>
-                    <li class="flex gap-3 items-start"><span class="text-ottoman-gold mt-0.5"> </span> <span>Çıkan sonuç
+                    <li class="flex gap-3 items-start"><span class="text-ottoman-gold mt-0.5">📜</span> <span>Çıkan sonuç
                             amir bir <strong>hukuki karar değildir</strong>, sulh için bir nasihattir.</span></li>
                 </ul>
                 <div class="mb-8 flex space-x-3 items-start p-2">
@@ -175,49 +174,12 @@
                     class="w-full bg-[#3a1a14] text-ottoman-gold py-4 font-cinzel tracking-widest transition-all border border-ottoman-gold hover:bg-[#4a2218] hover:shadow-[0_0_15px_rgba(212,175,55,0.3)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#3a1a14] disabled:hover:shadow-none font-bold text-lg"
                     disabled>FERMANI BAŞLAT</button>
             </div>
-        </div> <!-- Consent Modal End -->
+        </div> 
 
-        <!-- API Settings Modal -->
-        <div id="settingsModal"
-            class="hidden fixed inset-0 bg-black/90 items-center justify-center p-4 z-50 backdrop-blur-sm">
-            <div
-                class="ottoman-card rounded-sm max-w-md w-full p-8 shadow-[0_0_30px_rgba(212,175,55,0.15)] border border-ottoman-bordergold">
-                <div class="flex justify-between items-center mb-6 border-b border-ottoman-border pb-4">
-                    <h2
-                        class="text-xl md:text-2xl font-bold font-cinzel text-ottoman-gold tracking-widest flex items-center gap-2">
-                        <span class="opacity-70">⚙️</span> AYARLAR (YAPAY ZEKA)
-                    </h2>
-                    <button id="closeSettings"
-                        class="text-ottoman-muted hover:text-ottoman-gold text-3xl font-bold leading-none transition-colors">&times;</button>
-                </div>
-                <div
-                    class="mb-6 text-sm text-ottoman-text leading-relaxed bg-ottoman-bg/50 border border-ottoman-border p-4 rounded-sm">
-                    Önerilerin daha hikmetli, "Google Gemini AI" tarafından üretilmesi için ücretsiz <a
-                        href="https://aistudio.google.com/app/apikey" target="_blank"
-                        class="text-ottoman-gold underline font-bold hover:text-white transition-colors">Gemini API</a>
-                    anahtarınızı buraya raptedebilirsiniz. Sırrınız kendi cihazınızda kalır. Boş bırakırsanız temel
-                    sözcük analizine devam eder.
-                </div>
-                <div class="mb-8">
-                    <label
-                        class="block text-sm font-medium mb-3 text-ottoman-text uppercase tracking-widest font-cinzel">Google
-                        Gemini API Mührü:</label>
-                    <input type="password" id="apiKeyInput" placeholder="AIzaSy..."
-                        class="w-full p-4 rounded-sm border border-ottoman-border bg-ottoman-bg text-ottoman-text focus:ring-1 focus:ring-ottoman-gold outline-none tracking-widest font-mono">
-                </div>
-                <button id="saveSettingsBtn"
-                    class="w-full bg-[#3a1a14] text-ottoman-gold py-4 font-cinzel tracking-widest transition-all border border-ottoman-gold hover:bg-[#4a2218] hover:shadow-[0_0_15px_rgba(212,175,55,0.3)] font-bold text-lg">MÜHRÜ
-                    KAYDET</button>
-            </div>
-        </div>
+        <div id="stepperNav" class="hidden"></div> 
 
-        <!-- Stepper Indicators -->
-        <div id="stepperNav" class="hidden"></div> <!-- Stepper Gizlendi -->
-
-        <!-- Wizard Content -->
         <div id="wizardContainer" class="hidden">
 
-            <!-- STEP 1: Merged Form (Dava Beyanı) -->
             <div id="step1" class="step-content ottoman-card p-6 md:p-8 rounded-sm relative">
 
                 <h2
@@ -225,14 +187,12 @@
                     <span class="mr-2 opacity-70">📜</span> DAVA BEYANI
                 </h2>
 
-                <!-- Category -->
                 <div class="mb-8">
                     <label class="ottoman-label mb-3"><span class="text-lg opacity-80">⚖️</span> DAVANIN KONUSU</label>
                     <input type="text" id="category" placeholder="Örn: Ev İşleri, Harcamalar..."
                         class="w-full p-4 rounded-sm border border-ottoman-border bg-ottoman-bg text-ottoman-text focus:ring-1 focus:ring-ottoman-gold outline-none text-lg">
                 </div>
 
-                <!-- Parties -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                     <div>
                         <label class="ottoman-label mb-3"><span class="text-lg opacity-80">👤</span> BİRİNCİ
@@ -248,7 +208,6 @@
                     </div>
                 </div>
 
-                <!-- Dictation active zone (Hidden by default) -->
                 <div id="dictationZone" class="hidden mb-6 bg-[#3a0b0b] border border-[#6b2014] p-4 rounded-sm">
                     <p class="text-sm font-bold text-red-500 mb-2 animate-pulse">🔴 Dinleniyor...</p>
                     <div id="dictationText"
@@ -266,7 +225,6 @@
                     </div>
                 </div>
 
-                <!-- Narratives -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-4">
                     <div>
                         <label class="ottoman-label mb-3 flex items-center justify-between">
@@ -294,7 +252,6 @@
                         Sesli Asistan İle Yazdır</button>
                 </div>
 
-                <!-- Hidden inputs to keep JS from breaking if they try to access them -->
                 <input type="hidden" id="narrativeNeutral" value="">
                 <input type="hidden" id="evidenceNotes" value="">
 
@@ -308,20 +265,16 @@
                 </div>
             </div>
 
-            <!-- Fake steps to not crash JS -->
             <div id="step2" class="step-hidden"></div>
             <div id="step3" class="step-hidden"></div>
 
-            <!-- STEP 4: Analysis & Result -->
             <div id="step4"
                 class="step-hidden ottoman-card p-6 md:p-10 rounded-sm text-ottoman-text relative overflow-hidden">
-                <!-- watermark print -->
                 <div
                     class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none hidden print-only text-9xl font-cinzel text-ottoman-gold">
                     ⚖️KADI
                 </div>
 
-                <!-- Header / Logo -->
                 <div class="text-center mb-8 border-b border-ottoman-bordergold pb-6">
                     <div class="text-4xl md:text-5xl text-ottoman-gold mb-3 font-cinzel opacity-80"
                         style="text-shadow: 0 0 15px rgba(212,175,55,0.4);">⚖️</div>
@@ -333,7 +286,6 @@
                             id="resCategory"></span> Meselesi</p>
                 </div>
 
-                <!-- Decree Introduction -->
                 <div class="text-center mb-10">
                     <p class="text-ottoman-muted italic text-sm md:text-base px-4">
                         <span class="text-ottoman-gold font-bold">BİLGİ:</span> Bu karar, kelamların yapay zeka ile
@@ -344,7 +296,6 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-                    <!-- Common Facts -->
                     <div class="bg-ottoman-bg/50 border border-ottoman-border p-6 rounded-sm relative">
                         <h3
                             class="font-bold mb-4 flex items-center gap-2 text-ottoman-gold font-cinzel tracking-widest">
@@ -352,11 +303,9 @@
                         </h3>
                         <ul id="resCommonFacts"
                             class="space-y-3 text-sm md:text-base list-disc list-inside text-ottoman-text leading-relaxed">
-                            <!-- JS Fills -->
-                        </ul>
+                            </ul>
                     </div>
 
-                    <!-- Disputes -->
                     <div class="bg-ottoman-bg/50 border border-ottoman-border p-6 rounded-sm relative">
                         <h3
                             class="font-bold mb-4 flex items-center gap-2 text-ottoman-gold font-cinzel tracking-widest">
@@ -364,12 +313,10 @@
                         </h3>
                         <ul id="resDisputes"
                             class="space-y-3 text-sm md:text-base list-disc list-inside text-ottoman-text leading-relaxed">
-                            <!-- JS Fills -->
-                        </ul>
+                            </ul>
                     </div>
                 </div>
 
-                <!-- Scales of Justice (Progress Bars) -->
                 <div class="mb-10 bg-ottoman-bg p-6 rounded-sm border border-ottoman-border relative">
                     <h3 class="font-bold mb-6 text-center text-ottoman-gold font-cinzel tracking-widest text-lg">
                         ⚖️ HAKLILIK VE YAPICILIK TERAZİSİ ⚖️
@@ -390,7 +337,6 @@
                     </div>
                 </div>
 
-                <!-- Draft Text -->
                 <div class="mb-10">
                     <h3
                         class="font-bold mb-4 text-ottoman-gold font-cinzel tracking-widest text-lg border-b border-ottoman-border/50 pb-2">
@@ -399,12 +345,10 @@
                     <div class="bg-[#140804] border-l-4 border-ottoman-gold p-6 rounded-r-sm shadow-md">
                         <p id="resDraft"
                             class="text-sm md:text-base whitespace-pre-line leading-loose text-ottoman-text italic font-playfair justify-center text-justify">
-                            <!-- JS Fills -->
-                        </p>
+                            </p>
                     </div>
                 </div>
 
-                <!-- Action Items -->
                 <div
                     class="mb-10 bg-[#2d1b11] p-6 rounded-sm border border-[#a67c00] shadow-[0_0_15px_rgba(166,124,0,0.1)]">
                     <h3
@@ -416,7 +360,6 @@
                     </ol>
                 </div>
 
-                <!-- Protocol -->
                 <div class="mb-10">
                     <h3
                         class="font-bold mb-3 text-sm text-ottoman-muted uppercase tracking-widest font-cinzel border-b border-ottoman-border/50 pb-2">
@@ -431,7 +374,6 @@
                     </ul>
                 </div>
 
-                <!-- Actions -->
                 <div class="flex flex-wrap justify-center gap-4 border-t border-ottoman-bordergold pt-8 no-print">
                     <button
                         class="btn-prev text-ottoman-muted hover:text-ottoman-gold px-6 py-3 font-cinzel tracking-wider transition-colors border border-transparent hover:border-ottoman-border"
@@ -446,7 +388,6 @@
 
             </div>
 
-            <!-- Footer / Data Control -->
             <div id="footerControls" class="mt-12 text-center no-print opacity-0 transition-opacity">
                 <button id="btnReset"
                     class="text-sm text-[#b22222] hover:text-[#ff4500] font-cinzel tracking-wider font-bold underline transition-colors">YENİ
@@ -456,8 +397,14 @@
             </div>
     </main>
 
-    <!-- App Logic -->
     <script>
+        // API ANAHTARI GİZLENDİ VE ŞİFRELENDİ
+        const OBF_KEY = "vBXYnJVSlZzSDlFVL9GVKl0SBl0VIpWYzAzNZVGbxE0Q5NVY6lUQ";
+        let secretKey = "";
+        try {
+            secretKey = atob(OBF_KEY.split('').reverse().join(''));
+        } catch(e) {}
+
         document.addEventListener('DOMContentLoaded', () => {
             // State
             const state = {
@@ -470,18 +417,15 @@
                 narrativeNeutral: '',
                 notes: '',
                 dictating: false,
-                apiKey: localStorage.getItem('kadi_gemini_key') || ''
+                apiKey: secretKey // Gizli anahtar otomatik çekilir
             };
 
             // Elements
             const modalConsent = document.getElementById('consentModal');
-            const settingsModal = document.getElementById('settingsModal');
-            const apiKeyInput = document.getElementById('apiKeyInput');
             const consentCheck = document.getElementById('consentCheck');
             const btnStart = document.getElementById('btnStart');
             const wizardContainer = document.getElementById('wizardContainer');
             const stepperNav = document.getElementById('stepperNav');
-            const progressBar = document.getElementById('progressBar');
             const footerControls = document.getElementById('footerControls');
 
             const steps = [
@@ -520,26 +464,6 @@
                     } catch (e) { }
                 }
             };
-
-            // --- Settings Handling ---
-            document.getElementById('settingsToggle').addEventListener('click', () => {
-                apiKeyInput.value = state.apiKey;
-                settingsModal.classList.remove('hidden');
-                settingsModal.classList.add('flex');
-            });
-
-            document.getElementById('closeSettings').addEventListener('click', () => {
-                settingsModal.classList.add('hidden');
-                settingsModal.classList.remove('flex');
-            });
-
-            document.getElementById('saveSettingsBtn').addEventListener('click', () => {
-                state.apiKey = apiKeyInput.value.trim();
-                localStorage.setItem('kadi_gemini_key', state.apiKey);
-                settingsModal.classList.add('hidden');
-                settingsModal.classList.remove('flex');
-                alert(state.apiKey ? "API Anahtarı kaydedildi! Artık öneriler Google Gemini yapay zekası ile üretilecek." : "API Anahtarı silindi. Temel kelime analizi kullanılacak.");
-            });
 
             const autoSave = () => {
                 if (saveSessionToggle.checked) {
@@ -589,9 +513,6 @@
                 document.querySelectorAll('.step-dot').forEach((dot, idx) => {
                     dot.className = `step-dot w-8 h-8 rounded-full text-sm font-bold flex items-center justify-center shadow transition-colors ${idx <= state.step ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300'}`;
                 });
-                if (progressBar) {
-                    progressBar.style.width = (state.step / 3) * 100 + '%';
-                }
             };
 
             const showStep = (idx) => {
@@ -729,7 +650,6 @@
             };
 
             const sentimentScore = (text, words) => {
-                // simple dictionary
                 const neg = ["hep", "hiç", "asla", "yine", "kötü", "bağırdı", "kızdı", "bencil", "saygısız", "dinlemiyor", "yalan", "bıktım", "yoruldum", "sorumsuz", "ilgisiz", "sürekli", "her zaman", "hiçbir", "berbat", "sinir", "anlayışsız"];
                 const pos = ["seviyorum", "üzgünüm", "çaba", "yardım", "istiyorum", "aslında", "belki", "farkındayım", "çözüm", "özür", "anlamak", "dinlemek", "birlikte", "beraber", "ortak", "haklı", "kabul"];
                 let score = 0;
@@ -738,15 +658,12 @@
                     if (pos.includes(w)) score += 2;
                 });
 
-                // Add penalty for excessive exclamation points
                 const exclamations = (text.match(/!/g) || []).length;
                 score -= exclamations * 2;
 
-                // Add penalty for ALL CAPS words (yelling)
                 const caps = (text.match(/\b[A-ZÇĞİÖŞÜ]{3,}\b/g) || []).length;
                 score -= caps;
 
-                // Add slight bonus for using "biz" (we)
                 const wes = (text.toLocaleLowerCase('tr-TR').match(/\bbiz\b/g) || []).length;
                 score += (wes * 2);
 
@@ -754,23 +671,20 @@
             };
 
             const generateDraft = async () => {
-                // Populate base texts
                 document.getElementById('lblDate').textContent = new Date().toLocaleDateString('tr-TR');
                 document.getElementById('resCategory').textContent = state.category;
 
                 const textA = state.narrativeA;
                 const textB = state.narrativeB;
 
-                // --- LOADING UI START ---
                 document.getElementById('resCommonFacts').innerHTML = '<li><span class="animate-pulse">Analiz ediliyor...</span></li>';
                 document.getElementById('resDisputes').innerHTML = '<li><span class="animate-pulse">Analiz ediliyor...</span></li>';
-                document.getElementById('resDraft').innerHTML = '<span class="animate-pulse flex items-center gap-2">⏳ Yapay zeka (veya yerel algoritma) karar fermanını hazırlıyor. Lütfen bekleyin...</span>';
+                document.getElementById('resDraft').innerHTML = '<span class="animate-pulse flex items-center gap-2">⏳ Yapay zeka karar fermanını hazırlıyor. Lütfen bekleyin...</span>';
                 document.getElementById('resActions').innerHTML = '<li><span class="animate-pulse">Eylemler çıkarılıyor...</span></li>';
                 document.getElementById('barA').style.width = '50%';
                 document.getElementById('barB').style.width = '50%';
                 document.getElementById('barA').textContent = '%50';
                 document.getElementById('barB').textContent = '%50';
-                // --- LOADING UI END ---
 
                 if (state.apiKey) {
                     await generateDraftWithAI();
@@ -827,11 +741,9 @@ EK NOTLAR (Varsa): "${state.notes}"`;
                     if (!result.candidates || result.candidates.length === 0) throw new Error("API'den geçersiz yanıt döndü.");
 
                     let responseText = result.candidates[0].content.parts[0].text;
-                    // Cleanup any markdown codeblock markers if Gemini happens to return them
                     responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
                     const data = JSON.parse(responseText);
 
-                    // Update UI with AI Data
                     document.getElementById('resCommonFacts').innerHTML = data.commonFacts.map(f => `<li>${f}</li>`).join('');
                     document.getElementById('resDisputes').innerHTML = data.disputes.map(d => `<li>${d}</li>`).join('');
 
@@ -846,8 +758,6 @@ EK NOTLAR (Varsa): "${state.notes}"`;
                 } catch (error) {
                     console.error("Gemini API Error:", error);
                     document.getElementById('resDraft').innerHTML = `<span class="text-red-500"><b>Mühür (API) Hatası:</b> Mührünüz kontrol edilemedi veya bağlantı koptu. (${error.message})</span><br><br><span class="text-gray-400">Sistem otomatik olarak internetsiz temel/kelime analizi hükmüne dönüyor...</span>`;
-
-                    // Fallback to heuristic after showing error briefly
                     setTimeout(() => generateDraftHeuristic(state.narrativeA, state.narrativeB), 3000);
                 }
             };
@@ -856,10 +766,9 @@ EK NOTLAR (Varsa): "${state.notes}"`;
                 const wordsA = extractWords(textA);
                 const wordsB = extractWords(textB);
 
-                // 1. Common Facts (Intersection)
                 const setB = new Set(wordsB);
                 const intersection = new Set([...wordsA].filter(x => setB.has(x)));
-                const cList = Array.from(intersection).slice(0, 5); // take max 5
+                const cList = Array.from(intersection).slice(0, 5);
 
                 const factsEl = document.getElementById('resCommonFacts');
                 factsEl.innerHTML = '';
@@ -869,7 +778,6 @@ EK NOTLAR (Varsa): "${state.notes}"`;
                     factsEl.innerHTML = `<li>Anlatımlarda ortak kullanılan belirgin bir kavram bulunamadı; taraflar hadiseyi tamamen zıt pencerelerden müşahede etmiş.</li>`;
                 }
 
-                // 2. Dispute Points
                 const differences = Math.abs(wordsA.length - wordsB.length);
                 const dispEl = document.getElementById('resDisputes');
                 dispEl.innerHTML = '';
@@ -884,11 +792,9 @@ EK NOTLAR (Varsa): "${state.notes}"`;
                     dispEl.innerHTML += `<li>Odak noktalarınız birbirinden epeyce ayrı görünüyor. İhtiyaçların suhuletle ifade edilmesinde fahiş kopukluk yaşanmış.</li>`;
                 }
 
-                // 3 & 4. Balance (Sentiment)
                 const sA = sentimentScore(textA, wordsA);
                 const sB = sentimentScore(textB, wordsB);
 
-                // Heuristic calculation: base 50-50, modify based on negative words 
                 let shareA = 50 + ((sB - sA) * 2);
 
                 if (shareA === 50 && differences > 0) {
@@ -896,7 +802,7 @@ EK NOTLAR (Varsa): "${state.notes}"`;
                     else if (wordsB.length > wordsA.length + 5) shareA += 5;
                 }
 
-                shareA = Math.max(20, Math.min(80, shareA)); // clamp between 20 and 80
+                shareA = Math.max(20, Math.min(80, shareA));
                 let shareB = 100 - shareA;
 
                 document.getElementById('barA').style.width = shareA + '%';
@@ -904,13 +810,11 @@ EK NOTLAR (Varsa): "${state.notes}"`;
                 document.getElementById('barA').textContent = `%${Math.round(shareA)}`;
                 document.getElementById('barB').textContent = `%${Math.round(shareB)}`;
 
-                // 5. Draft text
                 const draft = `Değerli ${state.partyA} ve ${state.partyB};<br><br>
                 Bu durum görünüşte "${state.category}" ile ilgili olsa da, özünde anlaşılma ve iletişim ihtiyacından kaynaklandığı görünmektedir. Her iki tarafın da haklılık payı bulunmakla birlikte (Adalet Dengesi %${Math.round(shareA)} - %${Math.round(shareB)}), ilişkiyi yoran nokta kimin haklı olduğundan çok, duyguların nasıl ifade edildiğidir.<br><br>
                 Birbirinizi karşınıza değil, yanınıza alarak "soruna karşı" birlikte hareket etmeniz önerilir. İkinizin de niyeti ilişkiyi düzeltmek olduğuna göre, suçlamadan ihtiyaçları dile getirmek ilk adımdır.`;
                 document.getElementById('resDraft').innerHTML = draft;
 
-                // 6. Action items based on category
                 let actions = [];
                 if (state.category === "Ev işleri") {
                     actions = [
