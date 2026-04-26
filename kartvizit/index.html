@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dijital Kartvizit</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="profile-container">
+        <!-- Header / Banner -->
+        <div class="banner"></div>
+
+        <!-- Yükleniyor Göstergesi -->
+        <div id="loading" style="text-align:center; padding: 50px;">
+            Yükleniyor...
+        </div>
+
+        <div id="app-content" style="display: none;">
+            <!-- Profile Info -->
+            <div class="profile-header">
+                <div class="avatar-container">
+                    <img id="profileAvatar" src="" alt="Profil Fotoğrafı" class="avatar">
+                </div>
+                <h1 class="name" id="profileName">--</h1>
+                <p class="title" id="profileTitle">--</p>
+                <p class="bio" id="profileBio">--</p>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="action-buttons">
+                <a id="btnPhone" href="#" class="action-btn">
+                    <div class="icon-wrapper"><i class="fas fa-phone"></i></div>
+                    <span>Ara</span>
+                </a>
+                <a id="btnEmail" href="#" class="action-btn">
+                    <div class="icon-wrapper"><i class="fas fa-envelope"></i></div>
+                    <span>E-posta</span>
+                </a>
+                <a id="btnWhatsapp" href="#" class="action-btn" target="_blank">
+                    <div class="icon-wrapper"><i class="fab fa-whatsapp"></i></div>
+                    <span>WhatsApp</span>
+                </a>
+                <a id="btnMap" href="#" class="action-btn" target="_blank">
+                    <div class="icon-wrapper"><i class="fas fa-map-marker-alt"></i></div>
+                    <span>Konum</span>
+                </a>
+            </div>
+
+            <!-- Contact Links -->
+            <div class="links-container" id="socialLinksContainer">
+                <!-- Javascript ile Doldurulacak -->
+            </div>
+
+            <!-- Save Contact Button -->
+            <button class="save-btn" id="saveContactBtn">
+                <i class="fas fa-user-plus"></i> Rehbere Kaydet
+            </button>
+        </div>
+
+        <footer>
+            <p>NFC Dijital Kartvizit</p>
+        </footer>
+    </div>
+
+    <!-- ÖNCE Veri dosyası yüklenir, SONRA onu çalıştıran script yüklenir -->
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
