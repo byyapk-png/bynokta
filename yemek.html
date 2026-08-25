@@ -1,0 +1,1240 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0b1020">
+<title>Haftalık Yemek Çarkı</title>
+<style>.category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.category-btn{border:1px solid #33415a;background:#101827;color:#e5e7eb;border-radius:12px;padding:12px;text-align:left;font-weight:800}.category-btn.active{border-color:#8b5cf6;background:#24134d}.calorie-note{margin:10px 0;padding:11px 13px;border:1px solid #33415a;border-radius:12px;background:#101827;color:#cbd5e1;font-size:12px;line-height:1.45}
+:root{
+  --bg:#080b14; --panel:#111827; --panel2:#0d1422; --line:#263247;
+  --text:#f4f7fb; --muted:#9aa7bb; --accent:#8b5cf6; --accent2:#06b6d4;
+  --green:#22c55e; --danger:#ef4444; --gold:#fbbf24;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; min-height:100vh; color:var(--text);
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:
+    radial-gradient(circle at 20% 0%,rgba(139,92,246,.22),transparent 35%),
+    radial-gradient(circle at 90% 20%,rgba(6,182,212,.12),transparent 30%),
+    var(--bg);
+}
+button,input,textarea{font:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.app{width:min(760px,100%);margin:auto;padding:16px 13px 34px}
+.header{text-align:center;padding:10px 4px 18px}
+.logo{font-size:42px;filter:drop-shadow(0 0 18px rgba(139,92,246,.45))}
+h1{font-size:26px;margin:4px 0 3px}
+.subtitle{color:var(--muted);font-size:13px}
+.panel{
+  background:linear-gradient(180deg,rgba(20,28,45,.96),rgba(12,17,29,.96));
+  border:1px solid var(--line); border-radius:20px; padding:15px;
+  box-shadow:0 18px 50px rgba(0,0,0,.28); margin-bottom:13px;
+}
+.panel-title{font-weight:800;font-size:15px;margin-bottom:10px}
+.category-select{width:100%;background:#090e19;color:#fff;border:1px solid #33415a;border-radius:12px;padding:13px;font-weight:850;outline:none}
+.category-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,92,246,.12)}
+.addrow{display:flex;gap:8px}
+input,textarea{
+  width:100%; color:var(--text); background:#090e19; border:1px solid #33415a;
+  border-radius:12px; outline:none; padding:12px 13px;
+}
+input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,92,246,.12)}
+textarea{min-height:82px;resize:vertical}
+.btn{
+  border:0;border-radius:12px;padding:11px 15px;font-weight:800;color:#fff;
+  background:linear-gradient(135deg,#7c3aed,#4f46e5);
+}
+.btn.secondary{background:#202b3e}
+.btn.green{background:linear-gradient(135deg,#16a34a,#22c55e)}
+.btn.red{background:linear-gradient(135deg,#dc2626,#ef4444)}
+.btn.gold{background:linear-gradient(135deg,#d97706,#f59e0b);color:#160d00}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.hint{font-size:12px;color:var(--muted);margin-top:9px}
+.count{color:#c4b5fd;font-weight:800}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.chip{
+  display:flex;align-items:center;gap:7px;background:#182236;border:1px solid #2c3a52;
+  padding:7px 9px;border-radius:999px;font-size:12px
+}
+.chip button{border:0;background:transparent;color:#f87171;font-weight:900;padding:0 2px}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:12px}
+.day{
+  text-align:center;padding:8px 2px;border-radius:11px;border:1px solid #29364d;
+  background:#0a101c;color:var(--muted);font-size:11px;font-weight:800
+}
+.day.active{color:#fff;border-color:#8b5cf6;background:rgba(139,92,246,.18)}
+.day.done{color:#86efac;border-color:#1f7a45;background:rgba(34,197,94,.10)}
+.wheelbox{position:relative;width:min(88vw,430px);aspect-ratio:1;margin:4px auto 10px}
+canvas{width:100%;height:100%;display:block;filter:drop-shadow(0 18px 25px rgba(0,0,0,.45))}
+.pointer{
+  position:absolute;z-index:4;top:-2px;left:50%;transform:translateX(-50%);
+  width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;
+  border-top:28px solid #f8fafc;filter:drop-shadow(0 3px 4px #000)
+}
+.hub{
+  position:absolute;z-index:5;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:82px;height:82px;border-radius:50%;border:5px solid #dbeafe;
+  background:radial-gradient(circle,#4c1d95,#161025 68%,#070a11);
+  color:#fff;font-weight:1000;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 5px rgba(0,0,0,.45),0 5px 25px rgba(0,0,0,.6);
+  text-align:center;line-height:1.05
+}
+.status{text-align:center;min-height:25px;color:#c4b5fd;font-weight:800;font-size:14px}
+.result{
+  border:1px solid #2d3b54;background:#0a111e;border-radius:16px;padding:13px;
+  margin-top:10px;text-align:center
+}
+.result .small{font-size:11px;color:var(--muted)}
+.result .food{font-size:22px;font-weight:950;margin-top:3px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.actions .btn{flex:1;min-width:120px}
+.week{display:flex;flex-direction:column;gap:7px}
+.row{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:11px 12px;border-radius:13px;background:#0a111e;border:1px solid #253249
+}
+.row .d{width:84px;font-weight:900}.row .f{flex:1;color:#e2e8f0}
+.row.empty .f{color:#64748b}
+.row .num{font-size:11px;color:#64748b}
+.toast{
+  position:fixed;left:50%;bottom:18px;transform:translate(-50%,20px);
+  background:#f8fafc;color:#0b1020;padding:11px 15px;border-radius:999px;
+  font-size:13px;font-weight:800;opacity:0;pointer-events:none;transition:.25s;z-index:50;
+  box-shadow:0 8px 30px rgba(0,0,0,.35)
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+.winner-overlay{
+  position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
+  padding:20px;background:rgba(3,6,15,.78);backdrop-filter:blur(7px);
+  opacity:0;pointer-events:none;transition:opacity .22s;
+}
+.winner-overlay.show{opacity:1;pointer-events:auto}
+.winner-card{
+  width:min(92vw,430px);padding:30px 22px 24px;text-align:center;border-radius:26px;
+  background:linear-gradient(180deg,#1b1730,#0d1422);border:1px solid #4b3b75;
+  box-shadow:0 25px 80px rgba(0,0,0,.6),0 0 45px rgba(139,92,246,.22);
+  transform:scale(.82) translateY(20px);transition:transform .28s cubic-bezier(.2,.9,.2,1);
+}
+.winner-overlay.show .winner-card{transform:scale(1) translateY(0)}
+.winner-burst{font-size:52px;line-height:1;margin-bottom:8px;animation:winnerPop .65s ease both}
+.winner-label{font-size:12px;letter-spacing:2px;color:#a5b4fc;font-weight:900}
+.winner-food{font-size:31px;line-height:1.15;font-weight:1000;margin:10px 0 7px;color:#fff}
+.winner-day{font-size:15px;color:#9aa7bb;margin-bottom:18px}
+.winner-image{
+  display:block;width:min(76vw,290px);height:180px;object-fit:cover;margin:12px auto 15px;
+  border-radius:18px;border:1px solid #3b4760;box-shadow:0 12px 30px rgba(0,0,0,.35)
+}
+ .repeat-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.repeat-select{background:#090e19;color:#fff;border:1px solid #33415a;border-radius:11px;padding:10px 12px;font-weight:800;outline:none}
+.waiting-tab-panel{padding:0;overflow:hidden}
+.waiting-tab-panel .photo-tab{border-top:1px solid #202c40}
+.waiting-tab-panel .count{margin-left:auto;margin-right:3px}
+.photo-tab-panel{padding:0;overflow:hidden}.photo-tab{width:100%;display:flex;align-items:center;gap:10px;padding:14px 15px;border:0;background:transparent;color:#fff;font-weight:900;text-align:left}.photo-tab span:nth-child(2){flex:1}.photo-tab-content{display:none;padding:0 15px 14px}.photo-tab-panel.open .photo-tab-content{display:block}
+.photo-row{
+  display:flex;align-items:center;gap:9px;padding:8px 0;border-top:1px solid #202c40
+}
+.photo-row:first-child{border-top:0}
+.photo-name{flex:1;font-size:12px;font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.photo-thumb{width:46px;height:38px;border-radius:8px;object-fit:cover;border:1px solid #33415a}
+.photo-row input[type=file]{display:none}
+.photo-btn{padding:7px 9px;border-radius:9px;border:1px solid #33415a;background:#182236;color:#fff;font-size:11px;font-weight:800}
+.shopping-list,.history-list{display:flex;flex-direction:column;gap:7px}
+.shop-row,.history-row{
+  display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:12px;
+  background:#0a111e;border:1px solid #253249
+}
+.shop-icon{font-size:20px}
+.shop-food{flex:1;font-weight:800}
+.shop-state{font-size:11px;color:#22c55e}
+.history-row{font-size:12px}
+.history-day{font-weight:900;width:78px;color:#a78bfa}
+.history-food{flex:1;font-weight:800}
+
+@keyframes winnerPop{0%{transform:scale(.2) rotate(-12deg);opacity:0}70%{transform:scale(1.12) rotate(3deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+@media(max-width:430px){
+  .app{padding:11px 10px 28px}.panel{padding:12px;border-radius:17px}
+  h1{font-size:23px}.logo{font-size:36px}.hub{width:72px;height:72px}
+  .row .d{width:72px}.days{gap:3px}.day{font-size:10px;padding:7px 1px}
+}
+
+.category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.category-btn{border:1px solid #33415a;background:#101827;color:#e5e7eb;border-radius:12px;padding:12px;text-align:left;font-weight:800}
+.category-btn.active{border-color:#8b5cf6;background:#24134d}
+@media(max-width:600px){.category-grid{grid-template-columns:1fr 1fr}.category-btn{padding:11px 10px;font-size:14px}}
+
+.after-wheel-space{height:10px}
+/* V11 reference-style desktop layout */
+body{background:
+  radial-gradient(circle at 18% 8%,rgba(124,58,237,.18),transparent 28%),
+  radial-gradient(circle at 92% 70%,rgba(37,99,235,.14),transparent 30%),
+  linear-gradient(135deg,#070b16 0%,#0b1020 52%,#11142b 100%);
+}
+.app{width:min(1120px,100%);padding:18px 16px 42px}
+.header{display:none}
+.category-panel{padding:0 4px 14px;background:transparent;border:0;box-shadow:none;margin-bottom:6px}
+.category-title{text-align:center;font-size:20px;font-weight:950;margin:0 0 14px}
+.category-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.category-btn{
+  min-height:48px;border:1px solid #2f3d55;background:linear-gradient(180deg,#111a2b,#0c1422);
+  color:#f3f4f6;border-radius:12px;padding:10px 12px;text-align:center;font-weight:900;
+  transition:.18s;box-shadow:inset 0 1px rgba(255,255,255,.03)
+}
+.category-btn:hover{border-color:#5b4a91;transform:translateY(-1px)}
+.category-btn.active{border-color:#8b5cf6;background:linear-gradient(135deg,#30156e,#17143b);box-shadow:0 0 0 1px rgba(139,92,246,.22),0 8px 25px rgba(139,92,246,.12)}
+.category-subhint{text-align:center;color:#b9c3d4;font-size:12px;margin:12px 0 0}
+.category-panel .hint{text-align:center;margin-top:5px}
+.wheel-panel{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(320px,.8fr);gap:10px 20px;align-items:center;padding:12px 16px 18px}
+.wheel-panel .days{grid-column:1/-1;margin-bottom:0}
+.wheel-panel .wheelbox{grid-column:1;grid-row:2 / span 3;width:min(100%,560px);margin:0 auto}
+.wheel-panel .status{grid-column:2;grid-row:2;font-size:13px}
+.wheel-panel .result{grid-column:2;grid-row:3;margin:0}
+.wheel-panel>.actions{grid-column:2;grid-row:4;margin-top:0!important}
+.wheelbox{width:min(100%,560px)}
+.recommendation-card{border:1px solid #2e3d55;background:linear-gradient(180deg,#121d2d,#0b1422);border-radius:18px;padding:16px;text-align:left;box-shadow:0 16px 45px rgba(0,0,0,.25)}
+.recommend-title{font-size:17px;font-weight:950;margin-bottom:10px}
+.recommendation-card .food{background:#080f1b;border:1px solid #26364d;border-radius:11px;padding:15px;font-size:17px;text-align:center;min-height:52px;display:flex;align-items:center;justify-content:center}
+.nutrition-row{display:flex;justify-content:space-between;gap:10px;padding:11px 4px;border-bottom:1px solid #233148;color:#cbd5e1;font-size:13px}
+.nutrition-row strong{color:#f8fafc}
+.recommendation-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.recommendation-actions .btn:last-child{grid-column:1/-1}
+.recommendation-actions .btn{min-width:0}
+.wheel-panel .pointer{top:-3px}
+.days .day{padding:10px 2px;font-size:12px;background:#11192a}
+.days .day.active{background:linear-gradient(180deg,#2c225d,#181936);border-color:#8b5cf6}
+.after-wheel-space{height:4px}
+.addrow{display:grid;grid-template-columns:1fr auto}
+.addrow .btn{min-width:95px}
+.waiting-tab-panel{margin-top:0}
+.photo-tab-panel{margin-top:0}
+.calorie-note{background:#0c1524;border-color:#27364d}
+@media(max-width:850px){
+  .category-grid{grid-template-columns:repeat(3,1fr)}
+  .wheel-panel{grid-template-columns:1fr}
+  .wheel-panel .days,.wheel-panel .wheelbox,.wheel-panel .status,.wheel-panel .result,.wheel-panel>.actions{grid-column:1;grid-row:auto}
+  .wheel-panel .wheelbox{width:min(88vw,500px)}
+  .wheel-panel .status{order:3}.wheel-panel .result{order:4}.wheel-panel>.actions{order:5}
+}
+@media(max-width:560px){
+  .app{padding:10px 9px 30px}
+  .category-title{font-size:17px}
+  .category-grid{grid-template-columns:1fr 1fr;gap:7px}
+  .category-btn{min-height:45px;padding:9px 7px;font-size:12px}
+  .wheel-panel{padding:9px}
+  .recommendation-card{padding:12px}
+  .recommendation-actions{grid-template-columns:1fr 1fr}
+}
+
+
+.mode-panel{margin:8px 0 10px;padding:10px 12px;border:1px solid #293951;border-radius:15px;background:#0c1422}
+.mode-title{text-align:center;font-weight:950;font-size:14px;margin-bottom:8px}
+.mode-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mode-btn{border:1px solid #2f3d55;background:#111a2b;color:#e5e7eb;border-radius:11px;padding:11px;font-weight:900;cursor:pointer}
+.mode-btn.active{border-color:#8b5cf6;background:linear-gradient(135deg,#30156e,#17143b);box-shadow:0 0 0 1px rgba(139,92,246,.18)}
+.mode-help{text-align:center;color:#9aa8bc;font-size:11px;margin-top:7px}
+.days .day.selected-day{box-shadow:0 0 0 2px #f59e0b,0 4px 16px rgba(245,158,11,.18)}
+@media(max-width:560px){.mode-buttons{grid-template-columns:1fr}.mode-btn{padding:10px;font-size:12px}}
+
+.profile-panel{margin:8px 0 10px;padding:14px;border:1px solid #293951;border-radius:16px;background:linear-gradient(180deg,#101a2a,#0b1421)}
+.profile-title{text-align:center;font-size:16px;font-weight:950;margin-bottom:12px}
+.profile-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.profile-grid label{display:flex;flex-direction:column;gap:5px;color:#b8c4d5;font-size:11px;font-weight:800}
+.profile-grid input,.profile-grid select{width:100%;box-sizing:border-box;border:1px solid #33445f;background:#080f1b;color:#f3f4f6;border-radius:10px;padding:10px;font-weight:800;outline:none}
+.profile-calc{width:100%;margin-top:10px;border:0;border-radius:10px;padding:11px;background:#7c3aed;color:#fff;font-weight:950;cursor:pointer}
+.target-result{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.target-result>div{display:flex;flex-direction:column;gap:5px;border:1px solid #26364e;background:#0a1320;border-radius:10px;padding:9px;text-align:center}
+.target-result span{font-size:10px;color:#9eabc0}.target-result strong{font-size:14px}
+.profile-note{margin-top:9px;color:#8e9db3;font-size:10px;line-height:1.45;text-align:center}
+@media(max-width:700px){.profile-grid{grid-template-columns:1fr 1fr}.target-result{grid-template-columns:1fr 1fr}.target-result>div:last-child{grid-column:1/-1}}
+@media(max-width:430px){.profile-grid{grid-template-columns:1fr}.target-result{grid-template-columns:1fr}.target-result>div:last-child{grid-column:auto}.profile-panel{padding:11px}.profile-title{font-size:14px}}
+
+.target-result .bmi-box{grid-column:1/-1}
+.target-method{text-align:center;margin-top:9px;padding:8px;border:1px solid #26364e;border-radius:99px;background:#0a1320;color:#aebbd0;font-size:10px;line-height:1.4}
+
+.goal-box{grid-column:1/-1}
+
+.back-home-btn {
+  display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px;
+  background: rgba(139, 92, 246, 0.15); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3);
+  padding: 8px 16px; border-radius: 999px; text-decoration: none; font-size: 13px; font-weight: 800;
+  transition: .2s;
+}
+.back-home-btn:hover { background: rgba(139, 92, 246, 0.3); color: #fff; transform: translateY(-1px); }
+</style>
+</head>
+<body>
+<div class="app">
+<a href="index.html" class="back-home-btn">← ByNoKTa Portala Dön</a>
+<section class="panel category-panel">
+  <div class="category-title">🎯 Bu Hafta Nasıl Beslenmek İstiyorsun?</div>
+  <div class="category-grid" id="categoryGrid">
+    <button class="category-btn" data-key="protein">💪 Protein Ağırlıklı</button>
+    <button class="category-btn" data-key="dengeli">⚖️ Dengeli</button>
+    <button class="category-btn" data-key="yesillik">🥗 Yeşillik / Sebze Ağırlıklı</button>
+    <button class="category-btn" data-key="yagkaybi">🔥 Yağ Kaybı Odaklı</button>
+    <button class="category-btn" data-key="et">🥩 Et Ağırlıklı</button>
+    <button class="category-btn" data-key="tavuk">🍗 Tavuk Ağırlıklı</button>
+    <button class="category-btn" data-key="balik">🐟 Balık Ağırlıklı</button>
+    <button class="category-btn" data-key="ciger">🫀 Protein + Ciğer</button>
+    <button class="category-btn" data-key="karisik">🎲 Karışık / Sürpriz</button>
+  </div>
+  <div class="category-subhint">💡 Pazartesiden pazara kadar çevir, şansına çıkan yemeği seç!</div>
+  <div class="hint" id="categoryHint">Bir tarz seçtiğinde o kategoriye ait 30 yemek otomatik olarak çarka yüklenir.</div>
+</section>
+
+  
+
+  <section class="profile-panel">
+    <div class="profile-title">🎯 Günlük Hedefini Hesapla</div>
+    <div class="profile-grid">
+      <label>Cinsiyet
+        <select id="pSex"><option value="male">Erkek</option><option value="female">Kadın</option></select>
+      </label>
+      <label>Yaş
+        <input id="pAge" type="number" min="18" max="100" placeholder="Örn. 35">
+      </label>
+      <label>Kilo (kg)
+        <input id="pWeight" type="number" min="40" max="300" step="0.1" placeholder="Örn. 90">
+      </label>
+      <label>Boy (cm)
+        <input id="pHeight" type="number" min="130" max="230" step="1" placeholder="Örn. 180">
+      </label>
+      <label>Aktivite
+        <select id="pActivity">
+          <option value="1.2">Hareketsiz</option>
+          <option value="1.375">Hafif aktif</option>
+          <option value="1.55" selected>Orta aktif</option>
+          <option value="1.725">Çok aktif</option>
+          <option value="1.9">Çok yoğun aktif</option>
+        </select>
+      </label>
+      <label>Hedef
+        <select id="pGoal">
+          <option value="loss" selected>🔥 Yağ kaybı</option>
+          <option value="gain">💪 Kas kazanımı</option>
+          <option value="recomp">🔥💪 Yağ kaybı + kas kazanımı</option>
+          <option value="maintain">⚖️ Kilo koruma</option>
+        </select>
+      </label>
+    </div>
+    <button class="profile-calc" id="calculateTargets">Hedefleri Hesapla</button>
+    <div class="target-result" id="targetResult">
+      <div><span>🔥 Günlük kalori</span><strong id="targetCalories">---</strong></div>
+      <div><span>💪 Günlük protein</span><strong id="targetProtein">---</strong></div>
+      <div><span>🍽️ Çark öğün hedefi</span><strong id="mealTarget">---</strong></div>
+      <div class="bmi-box"><span>📊 VKİ / Durum</span><strong id="bmiResult">---</strong></div>
+    </div>
+    <div class="target-method" id="targetMethod">🎯 Hedefine göre çark kalori + protein değerlerini önceliklendirir. 🔥 Yağ kaybı ve 💪 kas kazanımı modları özellikle hedeflenir.</div>
+  <div class="profile-note">
+      Hesaplama yaklaşık bir başlangıç tahminidir. Çarkta görünen kcal/protein değerleri <b>tek ana öğün porsiyonu</b> içindir.
+      Gerçek ihtiyaç; sağlık durumu, vücut kompozisyonu, egzersiz ve porsiyonlara göre değişebilir.
+    </div>
+  </section>
+
+  <section class="mode-panel">
+    <div class="mode-title">📅 Çark Modu</div>
+    <div class="mode-buttons">
+      <button class="mode-btn active" data-mode="week">📋 Haftalık Menü</button>
+      <button class="mode-btn" data-mode="day">🍽️ Sadece Bugün</button>
+    </div>
+    <div class="mode-help" id="modeHelp">Haftalık mod: Pazartesiden pazara 7 yemek seçilir.</div>
+  </section>
+
+  <section class="panel wheel-panel">
+    <div class="days" id="days"></div>
+    <div class="wheelbox">
+      <div class="pointer"></div>
+
+
+      <canvas id="wheel" width="700" height="700"></canvas>
+      <button class="hub" id="spinBtn">ÇEVİR!</button>
+    </div>
+    <div class="status" id="status">En az 7 yemek ekle, sonra çarkı çevir.</div>
+    <div class="result recommendation-card">
+  <div class="recommend-title">🎯 Bugünkü Öneri</div>
+  <div class="food" id="lastFood">—</div>
+  <div class="nutrition-row"><span>🔥 Kalori</span><strong id="lastCalories">--- kcal</strong></div>
+  <div class="nutrition-row"><span>💪 Protein</span><strong id="lastProtein">--- g</strong></div>
+  <div class="nutrition-row"><span>🌿 Kategori</span><strong id="lastCategory">---</strong></div>
+  <div class="actions recommendation-actions">
+    <button class="btn" id="repeatSpinBtn">⟳ Tekrar Çevir</button>
+    <button class="btn secondary" id="copyResultBtn">📋 Kopyala</button>
+    <button class="btn green" id="shareResultBtn">↗ Paylaş</button>
+  </div>
+</div>
+    <div class="actions" style="margin-top:10px">
+      <button class="btn secondary" id="undoBtn" disabled>↩ Geri Al</button>
+      <button class="btn gold" id="shareBtn">↗ Haftayı Paylaş</button>
+      <button class="btn green" id="resetWeek">↻ Haftayı Sıfırla</button>
+    </div>
+  </section>
+
+<div class="after-wheel-space"></div>
+<section class="panel">
+    <div class="panel-title">🍲 Yemekleri Ekle</div>
+    <div class="addrow">
+      <input id="foodInput" placeholder="Örn: Tavuk Pilav" maxlength="50">
+      <button class="btn" id="addBtn">＋ Ekle</button>
+    </div>
+    <div class="hint">İstersen aşağıdaki alana her satıra bir yemek gelecek şekilde topluca da ekleyebilirsin.</div>
+    <textarea id="bulkInput" placeholder="Kuru fasulye pilav&#10;Tavuk sote&#10;Mantı&#10;Köfte patates"></textarea>
+    <div class="actions" style="margin-top:8px">
+      <button class="btn secondary" id="bulkBtn">Toplu Ekle</button>
+      <button class="btn red" id="clearFoods">Yemekleri Temizle</button>
+    </div>
+    <div class="hint">💡 Menü havuzu artık yukarıdaki beslenme tarzına göre otomatik yüklenir.</div>
+    <div class="hint"><span class="count" id="foodCount">0</span> yemek çarkta bekliyor.</div><div class="hint">🥩 Menü: tavuk • balık • dana • ciğer ve benzeri protein kaynakları. Hindi kullanılmıyor.</div>
+  </section>
+
+
+  <section class="panel waiting-tab-panel">
+    <button class="photo-tab" id="waitingFoodsTabBtn" type="button">
+      <span>🍽️</span><span>Çarkta Bekleyen Yemekler</span>
+      <span class="count" id="waitingFoodsCount">0</span>
+      <span id="waitingFoodsArrow">＋</span>
+    </button>
+    <div class="photo-tab-content" id="waitingFoodsTabContent">
+      <div class="hint">Çarkta kullanılmayı bekleyen yemekler burada görünür.</div>
+      <div class="chips" id="chips"></div>
+    </div>
+  </section>
+
+  <section class="panel photo-tab-panel">
+    <button class="photo-tab" id="photoTabBtn" type="button"><span>📸</span><span>Yemek Fotoğrafları</span><span id="photoTabArrow">＋</span></button>
+    <div class="photo-tab-content" id="photoTabContent"><div class="hint">Yemeğin fotoğrafını ekle; seçildiğinde kazanan ekranında gösterilir.</div><div id="photoManager"></div></div>
+  </section>
+
+  
+<div class="calorie-note">ℹ️ <b>Kalori Bilgisi:</b> Kcal ve protein değerleri standart <b>tek ana öğün porsiyonu</b> için yaklaşık hesaplanmıştır. Yağ, sos, ürün markası, pişirme yöntemi ve porsiyon değişiklikleri gerçek değeri değiştirebilir. Paketli ürünlerde etiket değeri esas alınmalıdır.</div>
+<section class="panel repeat-panel">
+    <div class="repeat-row">
+      <div><div class="panel-title" style="margin:0">🔁 Tekrar Engelleme</div>
+      <div class="hint" style="margin-top:3px">Son seçilen haftalardaki yemekler tekrar çarka alınmaz.</div></div>
+      <select id="repeatWeeks" class="repeat-select">
+        <option value="1">1 hafta</option><option value="2">2 hafta</option>
+        <option value="3">3 hafta</option><option value="4">4 hafta</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-title">📅 Haftalık Menü</div>
+    <div class="week" id="week"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-title">🕘 Geçmiş Haftalar / Son Seçimler</div>
+    <div id="historyList" class="history-list"></div>
+    <div class="actions" style="margin-top:8px">
+      <button class="btn secondary" id="clearHistory">Geçmişi Temizle</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-title">⚙️ İşlemler</div>
+    <div class="actions">
+      <button class="btn secondary" id="saveBtn">💾 Telefona Kaydet</button>
+      <button class="btn red" id="fullReset">🗑 Her Şeyi Sıfırla</button>
+    </div>
+    <div class="hint">Veriler bu tarayıcıda saklanır; sayfayı kapatsan bile menün kaybolmaz.</div>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+<div class="winner-overlay" id="winnerOverlay" aria-hidden="true">
+  <div class="winner-card">
+    <div class="winner-burst">🎉</div>
+    <div class="winner-label">SEÇİLEN YEMEK</div>
+    <img id="winnerImage" class="winner-image" alt="Seçilen yemek" hidden>
+    <div class="winner-food" id="winnerFood">—</div>
+    <div class="winner-day" id="winnerDay">—</div>
+    <button class="btn green" id="closeWinner">Tamam</button>
+  </div>
+</div>
+
+
+<script>
+const days = ["Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi","Pazar"];
+const CATEGORY_MENUS = {"💪 Protein Ağırlıklı": ["Akdeniz Tavuk Protein Bowl — 150 g ızgara tavuk, 100 g pişmiş kinoa, nohut, domates, salatalık, roka ve yoğurtlu sos (470 kcal, 48 g protein)", "Greek Chicken Bowl — limonlu kekikli tavuk, esmer pirinç, salatalık, domates, zeytin, az feta ve tzatziki (490 kcal, 45 g protein)", "Tavuk Shawarma Bowl — baharatlı tavuk, basmati pirinç, közlenmiş biber, salata ve sarımsaklı yoğurt (480 kcal, 47 g protein)", "Chicken Fajita Bowl — tavuk göğsü, esmer pirinç, renkli biber, siyah fasulye, salsa ve yoğurtlu sos (500 kcal, 46 g protein)", "Tavuk Teriyaki Bowl — ızgara tavuk, esmer pirinç, brokoli, havuç ve hafif teriyaki sos (490 kcal, 45 g protein)", "Peri Peri Tavuk Bowl — acılı tavuk göğsü, tatlı patates, brokoli ve yoğurtlu dip sos (460 kcal, 47 g protein)", "Tavuklu Kinoa Power Bowl — tavuk göğsü, kinoa, nohut, roka, domates ve limonlu yoğurt (450 kcal, 49 g protein)", "Tavuk Caesar Protein Bowl — ızgara tavuk, marul, parmesan, tam tahıllı kruton ve hafif yoğurtlu Caesar sos (460 kcal, 50 g protein)", "Tavuklu Akdeniz Orzo Bowl — tavuk, tam buğday orzo, domates, roka, salatalık ve feta (490 kcal, 46 g protein)", "Izgara Tavuk ve Mercimek Bowl — tavuk göğsü, yeşil mercimek, köz sebze ve yoğurtlu sos (450 kcal, 52 g protein)", "Steak & Quinoa Bowl — yağsız dana bonfile, kinoa, brokoli, köz biber ve yoğurtlu sos (500 kcal, 46 g protein)", "Dana Fajita Bowl — yağsız dana eti, esmer pirinç, biber, soğan, salsa ve avokado (510 kcal, 44 g protein)", "Korean Beef Bowl — yağsız dana kıyma, basmati pirinç, brokoli, havuç ve hafif soya-zencefil sosu (500 kcal, 43 g protein)", "Beef & Broccoli Bowl — yağsız dana eti, brokoli, esmer pirinç ve susamlı hafif sos (490 kcal, 45 g protein)", "Dana Köfte Protein Bowl — ızgara köfte, bulgur, közlenmiş sebze, roka ve cacık (480 kcal, 45 g protein)", "Dana Bonfile Sweet Potato Bowl — bonfile, tatlı patates, brokoli ve sarımsaklı yoğurt (490 kcal, 48 g protein)", "Dana Etli Akdeniz Bowl — dana kuşbaşı, kinoa, nohut, domates, salatalık ve yoğurtlu sos (500 kcal, 46 g protein)", "Somon Kinoa Protein Bowl — fırın somon, kinoa, brokoli, salatalık ve limonlu yoğurt (500 kcal, 40 g protein)", "Teriyaki Somon Bowl — somon, esmer pirinç, brokoli, havuç ve hafif teriyaki sos (510 kcal, 39 g protein)", "Somon & Edamame Bowl — somon, kinoa, edamame, salatalık ve susamlı yoğurt sosu (500 kcal, 43 g protein)", "Ton Balığı Protein Bowl — ton balığı, kinoa, nohut, haşlanmış yumurta, domates ve roka (450 kcal, 45 g protein)", "Akdeniz Ton Balığı Bowl — ton balığı, beyaz fasulye, domates, salatalık, zeytin ve yeşillik (430 kcal, 42 g protein)", "Ton Balığı Pirinç Bowl — ton balığı, basmati pirinç, edamame, salatalık ve hafif susam sosu (470 kcal, 44 g protein)", "Tavuk & Yumurta Power Bowl — tavuk göğsü, haşlanmış yumurta, kinoa, brokoli ve yoğurt (470 kcal, 50 g protein)", "Protein Kahvaltı Bowl — yumurta, lor peyniri, tavuk göğsü, avokado ve yeşillik (450 kcal, 48 g protein)", "Tavuklu Nohut Bowl — ızgara tavuk, nohut, bulgur, roka, domates ve cacık (470 kcal, 47 g protein)", "Tavuklu Siyah Fasulye Bowl — tavuk, siyah fasulye, esmer pirinç, mısır, salsa ve yoğurt (490 kcal, 46 g protein)", "Dana & Mercimek Bowl — yağsız dana, yeşil mercimek, köz sebze ve cacık (470 kcal, 50 g protein)", "Izgara Köfte & Kinoa Bowl — dana köfte, kinoa, közlenmiş kabak, biber ve tzatziki (480 kcal, 44 g protein)", "Tavuklu Protein Pita Bowl — tavuk shawarma, tam tahıllı pita parçaları, nohut, salata ve sarımsaklı yoğurt (490 kcal, 48 g protein)"], "⚖️ Dengeli": ["Akdeniz Tavuk Bowl — tavuk, kinoa, nohut, domates, salatalık, roka ve tzatziki (500 kcal, 43 g protein)", "Somon Akdeniz Tabağı — somon, bulgur, roka, domates, salatalık ve yoğurt (520 kcal, 38 g protein)", "Dana Fajita Tabağı — yağsız dana, esmer pirinç, biber, soğan, salsa ve avokado (520 kcal, 42 g protein)", "Tavuk Teriyaki Pirinç Bowl — tavuk, basmati, brokoli, havuç ve hafif teriyaki sos (510 kcal, 44 g protein)", "Levrek Akdeniz Bowl — levrek, kinoa, köz sebze, yeşillik ve limonlu yoğurt (470 kcal, 40 g protein)", "Etli Sebze Bowl — dana kuşbaşı, bulgur, kabak, biber, patlıcan ve yoğurt (500 kcal, 42 g protein)", "Tavuklu Mercimek Bowl — tavuk, yeşil mercimek, bulgur, roka ve yoğurt (490 kcal, 47 g protein)", "Ton Balığı Nohut Bowl — ton balığı, nohut, kinoa, yeşillik ve yumurta (480 kcal, 43 g protein)", "Somon Tatlı Patates Tabağı — somon, tatlı patates, brokoli ve yoğurtlu sos (520 kcal, 38 g protein)", "Köfte Bulgur Bowl — dana köfte, bulgur, köz biber, salata ve cacık (510 kcal, 43 g protein)", "Tavuklu Akdeniz Orzo — tavuk, tam buğday orzo, domates, roka ve feta (510 kcal, 44 g protein)", "Uskumru Bulgur Tabağı — ızgara uskumru, bulgur, roka ve yoğurt (500 kcal, 39 g protein)", "Dana Bonfile Patates Bowl — bonfile, fırın patates, brokoli ve yoğurt (530 kcal, 46 g protein)", "Tavuk Shawarma Pita Bowl — tavuk, tam tahıllı pita, nohut, salata ve yoğurt (510 kcal, 45 g protein)", "Çipura Kinoa Tabağı — çipura, kinoa, sebze ve cacık (480 kcal, 40 g protein)", "Etli Nohut Bowl — yağsız dana, nohut, bulgur, domates ve yoğurt (520 kcal, 44 g protein)", "Tavuk Fajita Bowl — tavuk, esmer pirinç, siyah fasulye, biber ve salsa (510 kcal, 45 g protein)", "Alabalık Karabuğday Tabağı — alabalık, karabuğday, brokoli ve yoğurt (490 kcal, 40 g protein)", "Dana Köfte Sweet Potato Bowl — köfte, tatlı patates, yeşillik ve cacık (520 kcal, 42 g protein)", "Ton Balığı Esmer Pirinç Bowl — ton balığı, pirinç, edamame, salatalık ve yumurta (490 kcal, 43 g protein)", "Tavuklu Siyah Fasulye Bowl — tavuk, siyah fasulye, esmer pirinç, mısır ve yoğurt (520 kcal, 45 g protein)", "Somon Kinoa Bowl — somon, kinoa, brokoli, avokado ve limonlu yoğurt (530 kcal, 39 g protein)", "Dana Stroganoff Bowl — yağsız dana, mantar, esmer pirinç ve yoğurtlu sos (510 kcal, 43 g protein)", "Tavuk Pesto Bowl — tavuk, kinoa, domates, brokoli ve ölçülü pesto (510 kcal, 45 g protein)", "Levrek Fırın Sebze Tabağı — levrek, patates, kabak, biber ve yoğurt (480 kcal, 41 g protein)", "Kıymalı Kabak Bowl — yağsız kıyma, kabak, bulgur, domates ve yoğurt (470 kcal, 39 g protein)", "Tavuklu Nohut Salata Bowl — tavuk, nohut, bulgur, yeşillik ve tahinli yoğurt sosu (500 kcal, 45 g protein)", "Dana Etli Akdeniz Bowl — dana, kinoa, nohut, sebze ve yoğurt (520 kcal, 44 g protein)", "Fırın Somon & Bulgur — somon, bulgur, kuşkonmaz ve yoğurtlu salata (520 kcal, 39 g protein)", "Tavuk & Avokado Grain Bowl — tavuk, esmer pirinç, avokado, brokoli ve yoğurt (510 kcal, 44 g protein)"], "🥗 Yeşillik / Sebze Ağırlıklı": ["Izgara Tavuk Akdeniz Yeşil Bowl — tavuk, roka, salatalık, domates, nohut ve yoğurt (410 kcal, 43 g protein)", "Somon Avokado Yeşil Bowl — somon, roka, avokado, salatalık ve limonlu yoğurt (450 kcal, 36 g protein)", "Ton Balığı Akdeniz Salatası — ton balığı, beyaz fasulye, roka, domates ve yumurta (400 kcal, 42 g protein)", "Dana Steak Garden Bowl — bonfile, karışık yeşillik, mantar, biber ve yoğurtlu sos (430 kcal, 44 g protein)", "Tavuk Caesar Light Bowl — tavuk, marul, parmesan, domates ve yoğurtlu Caesar sos (420 kcal, 46 g protein)", "Levrek Yeşil Akdeniz Tabağı — levrek, roka, salatalık, domates ve brokoli (390 kcal, 40 g protein)", "Fajita Tavuk Salata Bowl — tavuk, biber, soğan, marul, salsa ve avokado (420 kcal, 45 g protein)", "Köfte Çoban Salata Bowl — köfte, domates, salatalık, biber ve cacık (430 kcal, 40 g protein)", "Tavuklu Brokoli Edamame Bowl — tavuk, brokoli, edamame, salatalık ve yoğurt (420 kcal, 47 g protein)", "Ton Balığı Semizotu Bowl — ton balığı, semizotu, yumurta, domates ve yoğurt (380 kcal, 41 g protein)", "Dana Kuşbaşı Sebze Wok — dana, brokoli, kabak, biber, mantar ve hafif soya sosu (430 kcal, 42 g protein)", "Somon Kuşkonmaz Bowl — somon, kuşkonmaz, brokoli, roka ve yoğurt (440 kcal, 37 g protein)", "Tavuklu Köz Sebze Bowl — tavuk, patlıcan, kabak, biber, roka ve yoğurt (410 kcal, 45 g protein)", "Kıymalı Ispanak Bowl — yağsız kıyma, ıspanak, mantar ve yoğurt (390 kcal, 38 g protein)", "Çipura Brokoli Tabağı — çipura, brokoli, kabak ve limonlu yoğurt (390 kcal, 40 g protein)", "Dana Köfte Roka Bowl — köfte, roka, köz biber, domates ve cacık (420 kcal, 40 g protein)", "Tavuklu Akdeniz Salata — tavuk, yeşillik, nohut, domates, salatalık ve feta (430 kcal, 45 g protein)", "Uskumru Yeşil Tabağı — uskumru, roka, maydanoz, salatalık ve domates (420 kcal, 36 g protein)", "Tavuklu Karnabahar Bowl — tavuk, karnabahar, brokoli, havuç ve yoğurt (390 kcal, 45 g protein)", "Ton Balığı Brokoli Bowl — ton balığı, brokoli, edamame, salatalık ve yumurta (400 kcal, 43 g protein)", "Bonfile Mantar Yeşil Bowl — bonfile, mantar, roka, biber ve brokoli (440 kcal, 46 g protein)", "Somon Akdeniz Salatası — somon, roka, domates, salatalık, zeytin ve yoğurt (440 kcal, 36 g protein)", "Tavuklu Lahana Bowl — tavuk, beyaz lahana, havuç, salatalık ve yoğurtlu sos (390 kcal, 44 g protein)", "Etli Patlıcan Sebze Bowl — yağsız dana, patlıcan, biber, domates ve yoğurt (430 kcal, 41 g protein)", "Alabalık Yeşil Bowl — alabalık, roka, brokoli, salatalık ve yoğurt (400 kcal, 39 g protein)", "Ton Balığı Nohut Salata — ton balığı, nohut, roka, domates ve limonlu sos (420 kcal, 42 g protein)", "Tavuklu Kabak Noodle Bowl — tavuk, kabak noodle, mantar, biber ve yoğurt (380 kcal, 45 g protein)", "Köfte Semizotu Bowl — köfte, semizotu, domates, salatalık ve cacık (420 kcal, 40 g protein)", "Levrek Köz Sebze Bowl — levrek, patlıcan, kabak, biber ve yeşillik (410 kcal, 40 g protein)", "Tavuk Avokado Green Bowl — tavuk, avokado, roka, salatalık, brokoli ve yoğurt (430 kcal, 44 g protein)"], "🔥 Yağ Kaybı Odaklı": ["High Protein Tavuk Green Bowl — tavuk, brokoli, salatalık, roka ve yoğurt (360 kcal, 46 g protein)", "Lean Chicken Fajita Salad — tavuk, biber, soğan, marul, salsa ve yoğurt (380 kcal, 45 g protein)", "Somon Brokoli Light Bowl — somon, brokoli, kuşkonmaz ve limonlu yoğurt (420 kcal, 37 g protein)", "Ton Balığı Protein Salatası — ton balığı, yumurta, yeşillik ve salatalık (350 kcal, 42 g protein)", "Lean Steak Garden Bowl — yağsız bonfile, mantar, brokoli ve roka (400 kcal, 44 g protein)", "Light Köfte Salata Bowl — yağsız köfte, çoban salata ve cacık (390 kcal, 39 g protein)", "Tavuklu Mercimek Green Bowl — tavuk, mercimek, roka, salatalık ve yoğurt (400 kcal, 47 g protein)", "Levrek Protein Tabağı — levrek, brokoli, kabak ve yeşil salata (370 kcal, 41 g protein)", "Dana Sebze Wok Light — dana, brokoli, mantar, kabak ve hafif soya sosu (400 kcal, 42 g protein)", "Çipura Akdeniz Light Bowl — çipura, roka, domates, salatalık ve yoğurt (360 kcal, 39 g protein)", "Tavuk Shawarma Salad — tavuk, yeşillik, salatalık, domates ve sarımsaklı yoğurt (380 kcal, 46 g protein)", "Ton Balığı Edamame Bowl Light — ton balığı, edamame, salatalık ve yeşillik (370 kcal, 43 g protein)", "Somon Yeşil Bowl Light — somon, roka, brokoli, salatalık ve limon (400 kcal, 36 g protein)", "Tavuklu Karnabahar Rice Bowl — tavuk, karnabahar pirinci, brokoli ve yoğurt (350 kcal, 45 g protein)", "Dana Köfte Köz Sebze Bowl — köfte, kabak, patlıcan, biber ve cacık (400 kcal, 39 g protein)", "Alabalık Brokoli Tabağı — alabalık, brokoli, kabak ve yoğurt (380 kcal, 40 g protein)", "Tavuk Pesto Green Bowl Light — tavuk, roka, domates, brokoli ve az pesto (390 kcal, 45 g protein)", "Kıymalı Ispanak Light Bowl — yağsız kıyma, ıspanak, mantar ve yoğurt (360 kcal, 37 g protein)", "Uskumru Roka Salatası — uskumru, roka, salatalık, domates ve limon (400 kcal, 35 g protein)", "Tavuklu Lahana Protein Bowl — tavuk, lahana, havuç, salatalık ve yoğurt (360 kcal, 45 g protein)", "Bonfile Mantar Bowl Light — bonfile, mantar, brokoli ve roka (410 kcal, 45 g protein)", "Ton Balığı Semizotu Light — ton balığı, semizotu, yumurta ve yoğurt (350 kcal, 42 g protein)", "Levrek Kuşkonmaz Bowl — levrek, kuşkonmaz, brokoli ve limonlu yoğurt (370 kcal, 40 g protein)", "Tavuklu Kabak Noodle Bowl — tavuk, kabak noodle, mantar ve yoğurt (350 kcal, 44 g protein)", "Dana Patlıcan Bowl Light — yağsız dana, patlıcan, domates ve yoğurt (390 kcal, 40 g protein)", "Somon Salata Bowl Light — somon, yeşillik, salatalık ve limonlu yoğurt (400 kcal, 36 g protein)", "Tavuklu Brokoli Bowl Light — tavuk, brokoli, edamame ve yoğurt (370 kcal, 47 g protein)", "Köfte Yeşil Bowl Light — köfte, roka, salatalık, domates ve cacık (390 kcal, 39 g protein)", "Çipura Sebze Tabağı — çipura, kabak, brokoli ve yeşillik (360 kcal, 39 g protein)", "Protein Ton Balığı Bowl — ton balığı, yumurta, edamame, roka ve salatalık (370 kcal, 44 g protein)"], "🥩 Et Ağırlıklı": ["Steak & Quinoa Bowl — dana bonfile, kinoa, brokoli, köz biber ve yoğurt (500 kcal, 46 g protein)", "Dana Fajita Bowl — dana, esmer pirinç, biber, soğan, salsa ve avokado (510 kcal, 44 g protein)", "Korean Beef Bowl — yağsız dana kıyma, basmati, brokoli, havuç ve hafif sos (500 kcal, 43 g protein)", "Beef & Broccoli Bowl — dana, brokoli, esmer pirinç ve susamlı hafif sos (490 kcal, 45 g protein)", "Dana Köfte Protein Bowl — köfte, bulgur, köz sebze ve cacık (480 kcal, 45 g protein)", "Dana Bonfile Sweet Potato Bowl — bonfile, tatlı patates, brokoli ve yoğurt (490 kcal, 48 g protein)", "Dana Akdeniz Bowl — dana kuşbaşı, kinoa, nohut, sebze ve yoğurt (500 kcal, 46 g protein)", "Steak Mushroom Bowl — bonfile, mantar, esmer pirinç, brokoli ve yoğurt (510 kcal, 47 g protein)", "Dana Shawarma Bowl — baharatlı dana, bulgur, nohut, salata ve sarımsaklı yoğurt (510 kcal, 45 g protein)", "Dana Gyro Bowl — dana şeritleri, basmati, salatalık, domates ve tzatziki (520 kcal, 44 g protein)", "Etli Nohut Protein Bowl — dana, nohut, bulgur, roka ve yoğurt (520 kcal, 44 g protein)", "Dana Taco Bowl — yağsız dana, esmer pirinç, siyah fasulye, mısır ve salsa (520 kcal, 43 g protein)", "Dana Steak Fajita Salad — bonfile, biber, soğan, yeşillik, avokado ve yoğurt (470 kcal, 45 g protein)", "Dana Köfte Mediterranean Bowl — köfte, kinoa, domates, salatalık, roka ve cacık (500 kcal, 43 g protein)", "Yağsız Dana Chili Bowl — dana kıyma, kırmızı fasulye, domates, biber ve esmer pirinç (520 kcal, 44 g protein)", "Dana Stroganoff Bowl — yağsız dana, mantar, esmer pirinç ve yoğurtlu sos (510 kcal, 43 g protein)", "Etli Sebze Wok Bowl — dana, brokoli, biber, mantar ve karabuğday (490 kcal, 45 g protein)", "Dana Bonfile Basmati Bowl — bonfile, basmati, brokoli ve köz biber (500 kcal, 47 g protein)", "Dana Köfte Sweet Potato Bowl — köfte, tatlı patates, roka ve yoğurt (500 kcal, 42 g protein)", "Dana & Mercimek Bowl — dana, yeşil mercimek, köz sebze ve cacık (490 kcal, 49 g protein)", "Dana Ciğer Protein Bowl — dana ciğer, bulgur, soğan salatası ve cacık (470 kcal, 43 g protein)", "Ciğer Shawarma Bowl — baharatlı ciğer, bulgur, salata ve sarımsaklı yoğurt (480 kcal, 44 g protein)", "Dana Bonfile Patates Bowl — bonfile, fırın patates, brokoli ve yoğurt (530 kcal, 46 g protein)", "Dana Köfte Orzo Bowl — köfte, tam buğday orzo, domates, roka ve yoğurt (510 kcal, 43 g protein)", "Dana Fajita Quinoa Bowl — dana, kinoa, biber, siyah fasulye ve salsa (520 kcal, 45 g protein)", "Beef Burrito Bowl — yağsız dana, esmer pirinç, fasulye, mısır, salsa ve yoğurt (530 kcal, 44 g protein)", "Dana Köfte Bulgur Bowl — köfte, bulgur, köz patlıcan, domates ve cacık (500 kcal, 44 g protein)", "Steak Mediterranean Bowl — bonfile, kinoa, nohut, roka ve feta (520 kcal, 47 g protein)", "Dana Sebze Güveç Bowl — dana, patlıcan, kabak, biber, domates ve bulgur (500 kcal, 43 g protein)", "Etli Karabuğday Power Bowl — dana, karabuğday, brokoli, mantar ve yoğurt (500 kcal, 46 g protein)"], "🐟 Balık Ağırlıklı": ["Somon Kinoa Protein Bowl — somon, kinoa, brokoli, salatalık ve limonlu yoğurt (500 kcal, 40 g protein)", "Teriyaki Somon Bowl — somon, esmer pirinç, brokoli, havuç ve hafif teriyaki (510 kcal, 39 g protein)", "Somon Edamame Bowl — somon, kinoa, edamame, salatalık ve yoğurt sosu (500 kcal, 43 g protein)", "Akdeniz Somon Bowl — somon, bulgur, roka, domates, salatalık ve yoğurt (510 kcal, 39 g protein)", "Somon Sweet Potato Bowl — somon, tatlı patates, brokoli ve yoğurt (520 kcal, 38 g protein)", "Somon Pesto Bowl — somon, kinoa, brokoli, domates ve az pesto (520 kcal, 40 g protein)", "Levrek Akdeniz Bowl — levrek, kinoa, köz sebze ve tzatziki (470 kcal, 40 g protein)", "Levrek Fajita Bowl — levrek, esmer pirinç, biber, mısır ve salsa (480 kcal, 39 g protein)", "Levrek Green Bowl — levrek, brokoli, kuşkonmaz, roka ve yoğurt (430 kcal, 40 g protein)", "Çipura Kinoa Bowl — çipura, kinoa, kabak, domates ve cacık (470 kcal, 40 g protein)", "Çipura Mediterranean Bowl — çipura, bulgur, roka, salatalık ve yoğurt (480 kcal, 39 g protein)", "Uskumru Bulgur Bowl — uskumru, bulgur, roka, domates ve yoğurt (490 kcal, 38 g protein)", "Uskumru Mediterranean Salad Bowl — uskumru, nohut, yeşillik, domates ve yoğurt (480 kcal, 39 g protein)", "Alabalık Karabuğday Bowl — alabalık, karabuğday, brokoli ve yoğurt (470 kcal, 40 g protein)", "Alabalık Sweet Potato Bowl — alabalık, tatlı patates, brokoli ve cacık (480 kcal, 39 g protein)", "Sardalya Bulgur Bowl — sardalya, bulgur, roka, domates ve yoğurt (470 kcal, 36 g protein)", "Sardalya Akdeniz Bowl — sardalya, nohut, yeşillik, domates ve limonlu yoğurt (460 kcal, 37 g protein)", "Palamut Bulgur Bowl — palamut, bulgur, roka, soğan salatası ve yoğurt (500 kcal, 40 g protein)", "Palamut Fırın Sebze Bowl — palamut, patates, kabak, biber ve yoğurt (510 kcal, 39 g protein)", "Mezgit Kinoa Bowl — mezgit, kinoa, brokoli, salatalık ve yoğurt (450 kcal, 41 g protein)", "Mezgit Mediterranean Bowl — mezgit, bulgur, roka, domates ve cacık (460 kcal, 40 g protein)", "Ton Balığı Protein Bowl — ton balığı, kinoa, nohut, yumurta ve roka (450 kcal, 45 g protein)", "Ton Balığı Sushi Bowl — ton balığı, basmati, edamame, salatalık, havuç ve hafif susam sosu (480 kcal, 44 g protein)", "Ton Balığı Nohut Bowl — ton balığı, nohut, bulgur, domates ve yeşillik (450 kcal, 43 g protein)", "Ton Balığı Avokado Bowl — ton balığı, esmer pirinç, avokado, salatalık ve yumurta (490 kcal, 43 g protein)", "Somon Poke Style Bowl — somon, esmer pirinç, edamame, salatalık ve hafif sos (520 kcal, 40 g protein)", "Levrek Köz Sebze Tabağı — levrek, patlıcan, kabak, biber ve yoğurt (440 kcal, 41 g protein)", "Çipura Tatlı Patates Bowl — çipura, tatlı patates, brokoli ve yoğurt (480 kcal, 40 g protein)", "Alabalık Green Bowl — alabalık, roka, brokoli, salatalık ve yoğurt (420 kcal, 39 g protein)", "Uskumru Sweet Potato Bowl — uskumru, tatlı patates, brokoli ve cacık (500 kcal, 38 g protein)"], "🍗 Tavuk Ağırlıklı": ["Akdeniz Tavuk Protein Bowl — tavuk, kinoa, nohut, domates, salatalık, roka ve tzatziki (470 kcal, 48 g protein)", "Greek Chicken Bowl — tavuk, esmer pirinç, domates, salatalık, zeytin ve tzatziki (490 kcal, 45 g protein)", "Tavuk Shawarma Bowl — tavuk, basmati, köz biber, nohut, salata ve yoğurt (480 kcal, 47 g protein)", "Chicken Fajita Bowl — tavuk, esmer pirinç, siyah fasulye, biber, salsa ve yoğurt (500 kcal, 46 g protein)", "Tavuk Teriyaki Bowl — tavuk, esmer pirinç, brokoli, havuç ve hafif teriyaki (490 kcal, 45 g protein)", "Peri Peri Tavuk Bowl — acılı tavuk, tatlı patates, brokoli ve yoğurt (460 kcal, 47 g protein)", "Tavuk Caesar Protein Bowl — tavuk, marul, parmesan, kruton ve yoğurtlu sos (460 kcal, 50 g protein)", "Tavuk Pesto Kinoa Bowl — tavuk, kinoa, brokoli, domates ve az pesto (480 kcal, 47 g protein)", "Tavuklu Mercimek Bowl — tavuk, mercimek, bulgur, roka ve yoğurt (450 kcal, 49 g protein)", "Tavuklu Nohut Bowl — tavuk, nohut, bulgur, roka, domates ve cacık (470 kcal, 47 g protein)", "Tavuklu Siyah Fasulye Bowl — tavuk, siyah fasulye, esmer pirinç, mısır ve salsa (490 kcal, 46 g protein)", "Tavuk Burrito Bowl — tavuk, basmati, fasulye, mısır, salsa ve yoğurt (500 kcal, 46 g protein)", "Tavuk Tikka Bowl — baharatlı tavuk, basmati, salatalık, domates ve yoğurtlu sos (500 kcal, 45 g protein)", "Tavuk Tandoori Bowl — tavuk, bulgur, köz sebze ve cacık (470 kcal, 47 g protein)", "Tavuk Souvlaki Bowl — tavuk şiş, kinoa, salata, nohut ve tzatziki (480 kcal, 48 g protein)", "Tavuk Gyro Bowl — tavuk, basmati, salatalık, domates ve sarımsaklı yoğurt (490 kcal, 46 g protein)", "Tavuk Fajita Salad Bowl — tavuk, biber, soğan, marul, avokado ve salsa (430 kcal, 45 g protein)", "Tavuklu Orzo Bowl — tavuk, tam buğday orzo, domates, roka ve feta (490 kcal, 46 g protein)", "Tavuk Sweet Potato Bowl — tavuk, tatlı patates, brokoli ve yoğurt (450 kcal, 48 g protein)", "Tavuk Mushroom Bowl — tavuk, esmer pirinç, mantar, brokoli ve yoğurt (470 kcal, 47 g protein)", "Tavuk Teriyaki Noodle Bowl — tavuk, tam tahıllı noodle, brokoli ve havuç (500 kcal, 45 g protein)", "Tavuklu Edamame Bowl — tavuk, kinoa, edamame, salatalık ve yoğurt (470 kcal, 50 g protein)", "Tavuklu Akdeniz Pita Bowl — tavuk, tam tahıllı pita, nohut, salata ve tzatziki (490 kcal, 48 g protein)", "Tavuklu Protein Omlet Bowl — tavuk, yumurta, lor, avokado ve yeşillik (450 kcal, 52 g protein)", "Tavuklu Kinoa Caesar Bowl — tavuk, kinoa, marul, parmesan ve hafif Caesar sos (480 kcal, 49 g protein)", "Tavuklu Bulgur Power Bowl — tavuk, bulgur, nohut, köz biber ve yoğurt (460 kcal, 48 g protein)", "Tavuklu Karabuğday Bowl — tavuk, karabuğday, brokoli, mantar ve cacık (450 kcal, 48 g protein)", "Tavuklu Mercimek Curry Bowl — tavuk, mercimek, basmati, ıspanak ve yoğurt (500 kcal, 48 g protein)", "Tavuklu Akdeniz Couscous Bowl — tavuk, tam tahıllı kuskus, nohut, sebze ve yoğurt (490 kcal, 46 g protein)", "Tavuk Protein Poke Bowl — tavuk, esmer pirinç, edamame, salatalık, havuç ve hafif sos (490 kcal, 47 g protein)"], "🫀 Protein + Ciğer": ["Izgara Dana Ciğer Protein Bowl — ciğer, bulgur, roka, soğan salatası ve cacık (470 kcal, 43 g protein)", "Dana Ciğer Shawarma Bowl — baharatlı ciğer, basmati, nohut, salata ve sarımsaklı yoğurt (490 kcal, 45 g protein)", "Dana Ciğer Karabuğday Bowl — ciğer, karabuğday, brokoli, mantar ve yoğurt (460 kcal, 44 g protein)", "Dana Ciğer Sweet Potato Bowl — ciğer, tatlı patates, brokoli ve cacık (470 kcal, 43 g protein)", "Dana Ciğer Mediterranean Bowl — ciğer, kinoa, domates, salatalık, roka ve yoğurt (480 kcal, 44 g protein)", "Dana Ciğer Fajita Bowl — ciğer, esmer pirinç, biber, soğan ve salsa (490 kcal, 45 g protein)", "Dana Ciğer & Mercimek Bowl — ciğer, mercimek, bulgur, roka ve yoğurt (470 kcal, 48 g protein)", "Dana Ciğer Mushroom Bowl — ciğer, esmer pirinç, mantar, brokoli ve yoğurt (480 kcal, 44 g protein)", "Dana Ciğer Kinoa Power Bowl — ciğer, kinoa, nohut, yeşillik ve cacık (480 kcal, 47 g protein)", "Dana Ciğer Pita Bowl — ciğer, tam tahıllı pita, nohut, salata ve yoğurt (490 kcal, 45 g protein)", "Tavuk Ciğer Protein Bowl — tavuk ciğer, bulgur, roka ve cacık (450 kcal, 42 g protein)", "Tavuk Ciğer Shawarma Bowl — tavuk ciğer, basmati, salata, nohut ve yoğurt (470 kcal, 43 g protein)", "Tavuk Ciğer Karabuğday Bowl — tavuk ciğer, karabuğday, brokoli ve yoğurt (450 kcal, 43 g protein)", "Tavuk Ciğer Sweet Potato Bowl — tavuk ciğer, tatlı patates, brokoli ve cacık (460 kcal, 42 g protein)", "Tavuk Ciğer Fajita Bowl — tavuk ciğer, esmer pirinç, biber, soğan ve salsa (470 kcal, 43 g protein)", "Tavuk Ciğer & Mercimek Bowl — tavuk ciğer, mercimek, roka, domates ve yoğurt (450 kcal, 46 g protein)", "Ciğer & Köfte Protein Bowl — dana ciğer, mini köfte, bulgur, roka ve cacık (500 kcal, 47 g protein)", "Ciğer & Tavuk Mix Bowl — dana ciğer, tavuk göğsü, kinoa, brokoli ve yoğurt (500 kcal, 55 g protein)", "Ciğer & Yumurta Power Bowl — ciğer, haşlanmış yumurta, bulgur, roka ve yoğurt (480 kcal, 46 g protein)", "Ciğer & Nohut Bowl — dana ciğer, nohut, bulgur, domates ve yoğurt (490 kcal, 45 g protein)", "Ciğer & Mercimek Bowl — dana ciğer, yeşil mercimek, roka ve cacık (470 kcal, 48 g protein)", "Ciğer & Sebze Wok Bowl — dana ciğer, brokoli, biber, mantar ve karabuğday (460 kcal, 43 g protein)", "Ciğer & Kinoa Mediterranean Bowl — ciğer, kinoa, nohut, domates ve yoğurt (480 kcal, 45 g protein)", "Ciğer Köfte Fajita Bowl — ciğer, köfte, biber, esmer pirinç ve salsa (510 kcal, 47 g protein)", "Tavuk Ciğer Orzo Bowl — tavuk ciğer, tam buğday orzo, domates ve yoğurt (480 kcal, 43 g protein)", "Dana Ciğer Bulgur Poke Style Bowl — ciğer, bulgur, edamame, salatalık ve yoğurt (480 kcal, 45 g protein)", "Ciğerli Akdeniz Salata Bowl — ciğer, nohut, roka, domates, salatalık ve yoğurt (450 kcal, 43 g protein)", "Ciğerli Köz Sebze Bowl — ciğer, patlıcan, kabak, biber ve cacık (430 kcal, 42 g protein)", "Ciğer & Tatlı Patates Protein Bowl — ciğer, tatlı patates, brokoli ve yoğurt (460 kcal, 43 g protein)", "Ciğer & Karabuğday Power Bowl — dana ciğer, karabuğday, mantar, brokoli ve cacık (470 kcal, 44 g protein)"], "🎲 Karışık / Sürpriz": ["Chicken Fajita Bowl — tavuk, esmer pirinç, siyah fasulye, biber ve salsa (500 kcal, 46 g protein)", "Somon Kinoa Bowl — somon, kinoa, brokoli ve limonlu yoğurt (500 kcal, 40 g protein)", "Dana Steak Bowl — bonfile, kinoa, brokoli, köz biber ve yoğurt (500 kcal, 46 g protein)", "Ton Balığı Sushi Bowl — ton balığı, basmati, edamame, salatalık ve havuç (480 kcal, 44 g protein)", "Tavuk Shawarma Bowl — tavuk, basmati, nohut, salata ve yoğurt (480 kcal, 47 g protein)", "Dana Fajita Bowl — dana, esmer pirinç, biber, salsa ve avokado (510 kcal, 44 g protein)", "Levrek Mediterranean Bowl — levrek, kinoa, köz sebze ve tzatziki (470 kcal, 40 g protein)", "Ciğer Protein Bowl — dana ciğer, bulgur, roka ve cacık (470 kcal, 43 g protein)", "Tavuk Caesar Bowl — tavuk, marul, parmesan, kruton ve hafif sos (460 kcal, 50 g protein)", "Somon Edamame Bowl — somon, kinoa, edamame ve salatalık (500 kcal, 43 g protein)", "Dana Köfte Sweet Potato Bowl — köfte, tatlı patates, roka ve yoğurt (500 kcal, 42 g protein)", "Tavuk Tikka Bowl — baharatlı tavuk, basmati, salata ve yoğurt (500 kcal, 45 g protein)", "Ton Balığı Nohut Bowl — ton balığı, nohut, kinoa, yumurta ve yeşillik (450 kcal, 45 g protein)", "Uskumru Bulgur Bowl — uskumru, bulgur, roka ve yoğurt (490 kcal, 38 g protein)", "Dana Chili Bowl — yağsız dana, kırmızı fasulye, domates ve esmer pirinç (520 kcal, 44 g protein)", "Tavuk Pesto Bowl — tavuk, kinoa, brokoli, domates ve az pesto (480 kcal, 47 g protein)", "Alabalık Karabuğday Bowl — alabalık, karabuğday, brokoli ve yoğurt (470 kcal, 40 g protein)", "Etli Nohut Bowl — dana, nohut, bulgur, roka ve yoğurt (520 kcal, 44 g protein)", "Tavuklu Mercimek Bowl — tavuk, mercimek, bulgur ve cacık (450 kcal, 49 g protein)", "Çipura Tatlı Patates Bowl — çipura, tatlı patates, brokoli ve yoğurt (480 kcal, 40 g protein)", "Steak Mushroom Bowl — bonfile, mantar, esmer pirinç ve brokoli (510 kcal, 47 g protein)", "Tavuklu Siyah Fasulye Bowl — tavuk, fasulye, esmer pirinç, mısır ve salsa (490 kcal, 46 g protein)", "Somon Akdeniz Salata Bowl — somon, roka, domates, salatalık ve yoğurt (440 kcal, 36 g protein)", "Dana Köfte Mediterranean Bowl — köfte, kinoa, domates, salatalık ve cacık (500 kcal, 43 g protein)", "Tavuk Souvlaki Bowl — tavuk şiş, kinoa, nohut ve tzatziki (480 kcal, 48 g protein)", "Ton Balığı Avokado Bowl — ton balığı, esmer pirinç, avokado ve yumurta (490 kcal, 43 g protein)", "Dana Shawarma Bowl — dana, bulgur, nohut, salata ve yoğurt (510 kcal, 45 g protein)", "Tavuk Sweet Potato Bowl — tavuk, tatlı patates, brokoli ve yoğurt (450 kcal, 48 g protein)", "Ciğer & Mercimek Bowl — ciğer, mercimek, bulgur ve cacık (470 kcal, 48 g protein)", "Protein Sürpriz Bowl — tavuk, ton balığı, yumurta, kinoa, yeşillik ve yoğurt (500 kcal, 55 g protein)"]};
+const colors = ["#6d28d9","#0891b2","#db2777","#16a34a","#ea580c","#2563eb","#ca8a04","#9333ea","#0f766e","#be123c"];
+
+let foods = [];
+let schedule = Array(7).fill(null);
+let history = [];
+let foodPhotos = {};
+let weekArchive = [];
+let repeatWeeks = 1;
+let selectedCategory = "";
+let spinMode = "week";
+let activeDay = 0;
+let calorieProfile = null;
+let spinning = false;
+let autoWeek = false;
+let rotation = 0;
+let animFrame = null;
+let audioCtx = null;
+let tickTimer = null;
+
+const $ = id => document.getElementById(id);
+function loadSelectedCategory(categoryName){
+  const list=CATEGORY_MENUS[categoryName]||[];
+  foods=list.slice();
+  schedule=Array(7).fill(null);
+  history=[];
+  save(); render();
+}
+
+const wheel = $("wheel"), ctx = wheel.getContext("2d");
+
+function save(){
+  localStorage.setItem("haftalikYemekCarki", JSON.stringify({foods,schedule,history,foodPhotos,weekArchive,repeatWeeks,selectedCategory}));
+}
+function load(){
+  try{
+    const s=JSON.parse(localStorage.getItem("haftalikYemekCarki")||"null");
+    if(s){ foods=s.foods||[]; schedule=s.schedule||Array(7).fill(null); history=s.history||[];
+      foodPhotos=s.foodPhotos||{}; weekArchive=s.weekArchive||[]; repeatWeeks=Number(s.repeatWeeks)||1; selectedCategory=s.selectedCategory||"";
+      foods=foods.filter(f=>!String(f).toLocaleLowerCase("tr-TR").includes("hindi"));
+      schedule=schedule.map(f=>f && !String(f).toLocaleLowerCase("tr-TR").includes("hindi")?f:null); }
+  }catch(e){}
+}
+function toast(t){
+  $("toast").textContent=t;$("toast").classList.add("show");
+  setTimeout(()=>$("toast").classList.remove("show"),1800);
+}
+function addFoods(list){
+  let added=0;
+  list.map(x=>x.trim()).filter(Boolean).forEach(name=>{
+    if(!foods.some(f=>f.toLocaleLowerCase("tr-TR")===name.toLocaleLowerCase("tr-TR")) &&
+       !schedule.includes(name)){
+      foods.push(name); added++;
+    }
+  });
+  save(); render();
+  if(added) toast(added+" yemek eklendi");
+}
+const MENU_CATEGORIES={"protein": ["Izgara tavuk göğsü basmati pirinç pilavı yoğurt (450 kcal)", "Izgara tavuk şiş kinoa pilavı cacık (430 kcal)", "Fırında tavuk göğsü tatlı patates brokoli (440 kcal)", "Tavuklu sebze sote karabuğday pilavı (420 kcal)", "Izgara tavuk bonfile bulgur pilavı ayran (450 kcal)", "Fırında tavuk pirzola esmer pirinç pilavı (470 kcal)", "Izgara tavuk köfte kinoa pilavı (440 kcal)", "Tavuk göğsü mantar sote bulgur pilavı (430 kcal)", "Izgara tavuk göğsü mercimek salatası yoğurt (430 kcal)", "Fırında tavuk göğsü kabak ve havuç sote (400 kcal)", "Izgara dana bonfile basmati pirinç pilavı (490 kcal)", "Yağsız dana biftek karabuğday pilavı (460 kcal)", "Dana kuşbaşı mantar sote bulgur pilavı (450 kcal)", "Izgara dana köfte kinoa pilavı yoğurt (460 kcal)", "Dana rosto esmer pirinç pilavı salata (480 kcal)", "Yağsız dana kuşbaşı sebze güveç bulgur pilavı (450 kcal)", "Izgara dana bonfile brokoli ve tatlı patates (470 kcal)", "Dana kıymalı kabak yemeği yoğurt (390 kcal)", "Fırında dana biftek patates püresi salata (480 kcal)", "Yağsız dana köfte bulgur pilavı cacık (450 kcal)", "Fırında somon brokoli kinoa pilavı (470 kcal)", "Izgara levrek bulgur pilavı roka salatası (410 kcal)", "Fırında çipura haşlanmış patates yeşil salata (390 kcal)", "Izgara uskumru esmer pirinç pilavı (460 kcal)", "Ton balıklı kinoa salatası haşlanmış yumurta (400 kcal)", "Izgara dana ciğer bulgur pilavı soğan salatası (450 kcal)", "Dana ciğer sote karabuğday pilavı yoğurt (440 kcal)", "Izgara tavuk ciğer şiş bulgur pilavı (430 kcal)", "Protein omlet tavuk göğsü avokado salatası (410 kcal)", "Ton balıklı mercimek salatası yoğurt (400 kcal)"], "dengeli": ["Izgara tavuk göğsü bulgur pilavı cacık mevsim salata (450 kcal)", "Fırında somon patates brokoli yoğurt (480 kcal)", "Dana kuşbaşı sebze türlü bulgur pilavı (440 kcal)", "Izgara köfte basmati pirinç pilavı cacık (470 kcal)", "Fırında levrek fırın patates yeşil salata (410 kcal)", "Tavuklu sebze sote esmer pirinç pilavı (430 kcal)", "Kıymalı kabak yemeği bulgur pilavı yoğurt (420 kcal)", "Izgara çipura haşlanmış patates salata (400 kcal)", "Dana bonfile karabuğday pilavı brokoli (480 kcal)", "Tavuk şiş bulgur pilavı közlenmiş sebze (450 kcal)", "Ton balıklı kinoa salatası yumurta (410 kcal)", "Kıymalı ıspanak yemeği yoğurt bulgur pilavı (400 kcal)", "Izgara dana köfte kinoa pilavı salata (460 kcal)", "Fırında tavuk pirzola patates ve salata (470 kcal)", "Fırında alabalık bulgur pilavı roka salatası (440 kcal)", "Yağsız dana rosto esmer pirinç pilavı (480 kcal)", "Tavuk göğsü mantar sote kinoa pilavı (430 kcal)", "Izgara uskumru patates salatası yoğurt (450 kcal)", "Kıymalı karnabahar yemeği bulgur pilavı (390 kcal)", "Dana kuşbaşı patlıcan yemeği yoğurt (430 kcal)", "Izgara tavuk köfte karabuğday pilavı (450 kcal)", "Fırında somon tatlı patates roka salatası (480 kcal)", "Izgara dana ciğer bulgur pilavı cacık (450 kcal)", "Tavuklu mercimek salatası yoğurt (420 kcal)", "Fırında levrek esmer pirinç pilavı sebze (420 kcal)", "Izgara köfte tatlı patates püresi salata (470 kcal)", "Dana etli sebze güveç bulgur pilavı (460 kcal)", "Fırında tavuk göğsü kinoa pilavı yoğurt (440 kcal)", "Ton balıklı nohutlu yeşil salata yumurta (420 kcal)", "Izgara dana bonfile bulgur pilavı salata (480 kcal)"], "yesillik": ["Izgara tavuk göğsü büyük yeşil salata yoğurt (380 kcal)", "Ton balıklı roka salatası haşlanmış yumurta (370 kcal)", "Izgara levrek bol yeşillik limonlu salata (360 kcal)", "Izgara dana bonfile közlenmiş sebzeler (430 kcal)", "Tavuklu brokoli mantar ve kabak sote (390 kcal)", "Kıymalı ıspanak yemeği yoğurtlu salata (370 kcal)", "Somonlu roka salatası avokado (450 kcal)", "Izgara köfte közlenmiş patlıcan biber salatası (430 kcal)", "Tavuk göğsü Akdeniz salatası yoğurt (400 kcal)", "Ton balıklı semizotu salatası yumurta (380 kcal)", "Fırında levrek brokoli karnabahar salatası (390 kcal)", "Dana kuşbaşı sebze sote yoğurt (420 kcal)", "Izgara çipura roka domates salatası (370 kcal)", "Tavuklu karnabahar brokoli güveç (400 kcal)", "Kıymalı kabak yemeği cacık salata (380 kcal)", "Izgara uskumru mevsim yeşillikleri (420 kcal)", "Izgara tavuk şiş közlenmiş sebze (400 kcal)", "Dana köfte çoban salata yoğurt (430 kcal)", "Fırında somon kuşkonmaz brokoli (450 kcal)", "Ton balıklı Akdeniz salatası nohut (410 kcal)", "Tavuk göğsü mantar ıspanak sote (390 kcal)", "Izgara dana ciğer soğan maydanoz salatası (410 kcal)", "Fırında alabalık yeşil salata yoğurt (390 kcal)", "Kıymalı karnabahar brokoli yemeği (380 kcal)", "Izgara köfte semizotu yoğurt salatası (420 kcal)", "Fırında tavuk göğsü kabak patlıcan biber (400 kcal)", "Dana biftek roka mantar közlenmiş biber (430 kcal)", "Ton balıklı mercimek yeşillik salatası (400 kcal)", "Fırında çipura brokoli kabak salatası (380 kcal)", "Izgara tavuk göğsü avokadolu yeşil salata (410 kcal)"], "yagkaybi": ["Izgara tavuk göğsü brokoli yoğurt (360 kcal)", "Izgara tavuk şiş büyük yeşil salata (370 kcal)", "Fırında levrek brokoli kabak (360 kcal)", "Ton balıklı yeşil salata yumurta (370 kcal)", "Yağsız dana bonfile közlenmiş sebze (420 kcal)", "Izgara köfte çoban salata yoğurt (410 kcal)", "Fırında somon brokoli kuşkonmaz (440 kcal)", "Tavuk göğsü mantar kabak sote (370 kcal)", "Dana kuşbaşı sebze sote yoğurt (400 kcal)", "Fırında çipura yeşil salata (350 kcal)", "Tavuklu mercimek salatası yoğurt (400 kcal)", "Izgara dana ciğer soğan salatası (390 kcal)", "Fırında tavuk göğsü karnabahar brokoli (370 kcal)", "Ton balıklı semizotu salatası (350 kcal)", "Izgara uskumru roka salatası (410 kcal)", "Dana köfte közlenmiş patlıcan (400 kcal)", "Tavuk göğsü ıspanak mantar sote (360 kcal)", "Fırında alabalık kabak brokoli (380 kcal)", "Kıymalı kabak yemeği yoğurt (380 kcal)", "Izgara levrek kuşkonmaz salatası (360 kcal)", "Fırında somon yeşil salata (430 kcal)", "Izgara tavuk göğsü semizotu yoğurt (370 kcal)", "Dana biftek mantar ve yeşil salata (410 kcal)", "Ton balıklı brokoli yumurta salatası (370 kcal)", "Izgara köfte kabak patlıcan közleme (410 kcal)", "Fırında tavuk göğsü sebze güveç (390 kcal)", "Kıymalı ıspanak yoğurt (360 kcal)", "Izgara çipura roka salatası (360 kcal)", "Dana ciğer közlenmiş sebze (400 kcal)", "Tavuk göğsü karnabahar yoğurt (350 kcal)"], "et": ["Izgara dana bonfile bulgur pilavı salata (480 kcal)", "Yağsız dana kuşbaşı sebze türlü (450 kcal)", "Izgara dana köfte kinoa pilavı (460 kcal)", "Dana rosto esmer pirinç pilavı (480 kcal)", "Yağsız dana biftek karabuğday pilavı (470 kcal)", "Izgara dana ciğer bulgur pilavı (450 kcal)", "Dana ciğer sote esmer pirinç pilavı (450 kcal)", "Dana kuşbaşı mantar sote bulgur pilavı (460 kcal)", "Izgara dana köfte basmati pilavı (470 kcal)", "Dana bonfile tatlı patates brokoli (480 kcal)", "Kıymalı karnabahar yemeği bulgur pilavı (420 kcal)", "Kıymalı kabak yemeği esmer pirinç pilavı (430 kcal)", "Dana etli sebze güveç bulgur pilavı (460 kcal)", "Izgara köfte karabuğday pilavı cacık (460 kcal)", "Dana biftek patates püresi salata (490 kcal)", "Izgara dana bonfile kinoa pilavı (480 kcal)", "Yağsız dana rosto bulgur pilavı (480 kcal)", "Dana kıymalı ıspanak yemeği yoğurt (410 kcal)", "Izgara dana ciğer karabuğday pilavı (450 kcal)", "Dana kuşbaşı patlıcan yemeği bulgur pilavı (440 kcal)", "Izgara dana köfte tatlı patates (470 kcal)", "Dana bonfile mantar sote esmer pirinç (480 kcal)", "Kıymalı taze fasulye bulgur pilavı (430 kcal)", "Izgara ciğer şiş bulgur pilavı (450 kcal)", "Dana biftek közlenmiş sebze yoğurt (440 kcal)", "Dana rosto karabuğday pilavı brokoli (480 kcal)", "Izgara köfte basmati pilavı yoğurt (470 kcal)", "Dana kuşbaşı kabak mantar sote (420 kcal)", "Dana bonfile fırın patates salata (480 kcal)", "Yağsız dana köfte kinoa pilavı (460 kcal)"], "balik": ["Fırında somon patates roka salatası (490 kcal)", "Izgara levrek bulgur pilavı salata (420 kcal)", "Fırında çipura haşlanmış patates (400 kcal)", "Izgara uskumru esmer pirinç pilavı (460 kcal)", "Fırında alabalık karabuğday pilavı (440 kcal)", "Izgara sardalya bulgur pilavı (440 kcal)", "Fırında palamut patates salatası (460 kcal)", "Ton balıklı kinoa salatası yumurta (410 kcal)", "Fırında mezgit fileto patates (400 kcal)", "Izgara somon kinoa salatası (470 kcal)", "Fırında levrek tatlı patates brokoli (420 kcal)", "Izgara çipura bulgur pilavı (430 kcal)", "Fırında uskumru sebzeli patates (450 kcal)", "Izgara alabalık basmati pilavı (450 kcal)", "Fırında sardalya sebze ve yoğurt (420 kcal)", "Ton balıklı mercimek salatası yumurta (400 kcal)", "Fırında somon esmer pirinç kuşkonmaz (480 kcal)", "Izgara palamut bulgur pilavı (460 kcal)", "Fırında çipura brokoli kabak (390 kcal)", "Izgara levrek kinoa pilavı (430 kcal)", "Fırında alabalık tatlı patates (440 kcal)", "Ton balıklı nohutlu yeşil salata (410 kcal)", "Izgara uskumru bulgur pilavı roka (460 kcal)", "Fırında mezgit esmer pirinç pilavı (420 kcal)", "Izgara sardalya patates salatası (430 kcal)", "Fırında palamut bulgur pilavı (460 kcal)", "Somonlu kinoa salatası avokado (480 kcal)", "Ton balıklı esmer pirinç salatası yumurta (420 kcal)", "Izgara çipura karabuğday pilavı (430 kcal)", "Fırında levrek kök sebzeler (410 kcal)"], "tavuk": ["Izgara tavuk göğsü basmati pilavı yoğurt (450 kcal)", "Izgara tavuk şiş kinoa pilavı cacık (430 kcal)", "Fırında tavuk pirzola bulgur pilavı (460 kcal)", "Tavuklu sebze sote esmer pirinç (430 kcal)", "Izgara tavuk bonfile karabuğday pilavı (440 kcal)", "Fırında tavuk göğsü tatlı patates brokoli (440 kcal)", "Tavuk göğsü mantar sote bulgur pilavı (430 kcal)", "Izgara tavuk köfte kinoa pilavı (440 kcal)", "Tavuklu mercimek salatası yoğurt (420 kcal)", "Fırında tavuk göğsü kabak patlıcan (400 kcal)", "Izgara tavuk göğsü bulgur pilavı cacık (440 kcal)", "Tavuk şiş esmer pirinç pilavı (450 kcal)", "Fırında tavuk baget sebzeli bulgur (470 kcal)", "Tavuk göğsü nohutlu salata (430 kcal)", "Izgara tavuk göğsü tatlı patates (430 kcal)", "Tavuklu kinoa sebze salatası yoğurt (410 kcal)", "Fırında tavuk göğsü mantarlı sebze (410 kcal)", "Izgara tavuk bonfile basmati pilavı (450 kcal)", "Tavuk göğsü ıspanak mantar sote (390 kcal)", "Fırında tavuk pirzola patates salata (470 kcal)", "Izgara tavuk şiş bulgur pilavı (440 kcal)", "Tavuklu brokoli kinoa pilavı (430 kcal)", "Fırında tavuk göğsü mercimek salatası (420 kcal)", "Izgara tavuk göğsü arpa şehriye pilavı (450 kcal)", "Tavuk köfte bulgur pilavı ayran (450 kcal)", "Fırında tavuk göğsü sebze güveç (400 kcal)", "Izgara tavuk göğsü avokadolu salata (410 kcal)", "Tavuklu karabuğday sebze sote (420 kcal)", "Fırında tavuk göğsü esmer pirinç brokoli (440 kcal)", "Izgara tavuk şiş tatlı patates salatası (430 kcal)"], "ciger": ["Izgara dana ciğer bulgur pilavı soğan salatası (450 kcal)", "Dana ciğer sote esmer pirinç yoğurt (440 kcal)", "Izgara tavuk ciğer şiş bulgur pilavı (430 kcal)", "Dana ciğer karabuğday pilavı cacık (450 kcal)", "Izgara ciğer şiş basmati pilavı salata (450 kcal)", "Dana ciğer sebze sote bulgur pilavı (440 kcal)", "Tavuk ciğer sote kinoa pilavı yoğurt (430 kcal)", "Izgara dana ciğer tatlı patates brokoli (450 kcal)", "Ciğer şiş bulgur pilavı cacık (440 kcal)", "Dana ciğer mantar sote karabuğday pilavı (450 kcal)", "Tavuk ciğer sebze güveç bulgur pilavı (420 kcal)", "Izgara dana ciğer kinoa pilavı salata (460 kcal)", "Dana ciğer fırın patates yoğurt (450 kcal)", "Tavuk ciğer sote esmer pirinç pilavı (430 kcal)", "Izgara ciğer şiş kinoa pilavı (450 kcal)", "Dana ciğer kabak mantar sote (410 kcal)", "Dana ciğer bulgur pilavı yoğurtlu salata (450 kcal)", "Tavuk ciğer karabuğday pilavı cacık (430 kcal)", "Izgara dana ciğer basmati pilavı (460 kcal)", "Ciğerli sebze sote bulgur pilavı (430 kcal)", "Dana ciğer brokoli tatlı patates (440 kcal)", "Tavuk ciğer nohutlu salata yoğurt (420 kcal)", "Izgara ciğer şiş esmer pirinç pilavı (450 kcal)", "Dana ciğer kinoa salatası yoğurt (430 kcal)", "Ciğer köfte karışık ızgara bulgur pilavı (470 kcal)", "Dana ciğer patlıcan közleme yoğurt (420 kcal)", "Tavuk ciğer mantar sote bulgur pilavı (430 kcal)", "Izgara dana ciğer karabuğday pilavı (450 kcal)", "Ciğerli ıspanak yemeği yoğurt (400 kcal)", "Dana ciğer fırında sebze güveç (430 kcal)"], "karisik": ["Izgara tavuk göğsü basmati pilavı yoğurt (450 kcal)", "Fırında somon tatlı patates brokoli (470 kcal)", "Izgara dana köfte kinoa pilavı cacık (460 kcal)", "Fırında levrek bulgur pilavı salata (410 kcal)", "Dana bonfile karabuğday pilavı (480 kcal)", "Tavuklu sebze sote kinoa (420 kcal)", "Izgara dana ciğer bulgur pilavı (450 kcal)", "Ton balıklı kinoa salatası yumurta (410 kcal)", "Fırında çipura patates salata (400 kcal)", "Tavuk göğsü mantar sote esmer pirinç (420 kcal)", "Dana kuşbaşı sebze güveç bulgur (450 kcal)", "Izgara uskumru bulgur pilavı (460 kcal)", "Fırında tavuk pirzola tatlı patates (470 kcal)", "Kıymalı karnabahar yoğurt (350 kcal)", "Izgara köfte tatlı patates salata (460 kcal)", "Fırında alabalık karabuğday pilavı (440 kcal)", "Tavuk göğsü mercimek salatası (430 kcal)", "Dana rosto esmer pirinç pilavı (480 kcal)", "Izgara levrek kinoa pilavı (430 kcal)", "Tavuk şiş bulgur pilavı cacık (440 kcal)", "Kıymalı kabak yemeği yoğurt (390 kcal)", "Fırında somon esmer pirinç kuşkonmaz (480 kcal)", "Izgara dana bonfile brokoli (450 kcal)", "Ton balıklı mercimek salatası yumurta (400 kcal)", "Fırında tavuk göğsü sebze güveç (400 kcal)", "Izgara sardalya bulgur pilavı (440 kcal)", "Dana köfte basmati pilavı yoğurt (470 kcal)", "Fırında çipura kinoa pilavı (420 kcal)", "Izgara tavuk bonfile karabuğday pilavı (440 kcal)", "Dana ciğer sote esmer pirinç yoğurt (440 kcal)"]};
+
+const CATEGORY_LABELS={
+  protein:"💪 Protein Ağırlıklı", dengeli:"⚖️ Dengeli", yesillik:"🥗 Yeşillik / Sebze Ağırlıklı",
+  yagkaybi:"🔥 Yağ Kaybı Odaklı", et:"🥩 Et Ağırlıklı", balik:"🐟 Balık Ağırlıklı",
+  tavuk:"🍗 Tavuk Ağırlıklı", ciger:"🫀 Protein + Ciğer", karisik:"🎲 Karışık / Sürpriz"
+};
+function categoryLabel(key){ return CATEGORY_LABELS[key]||"---"; }
+function currentCategoryFoods(key){
+  const label=categoryLabel(key);
+  return CATEGORY_MENUS[label] ? CATEGORY_MENUS[label].slice() : [];
+}
+function parseNutrition(food){
+  const text=String(food||"");
+  const kcal=text.match(/(\d+(?:[.,]\d+)?)\s*kcal\b/i);
+  const protein=text.match(/(\d+(?:[.,]\d+)?)\s*g\s*(?:protein|protein\b)/i)
+    || text.match(/protein\s*[:\-]?\s*(\d+(?:[.,]\d+)?)\s*g\b/i);
+  return {
+    kcal:kcal ? kcal[1].replace(",", ".")+" kcal" : "--- kcal",
+    protein:protein ? protein[1].replace(",", ".")+" g" : "--- g"
+  };
+}
+function selectCategory(key,force=false){
+  if(!key || !CATEGORY_LABELS[key]) return;
+  if(!force && schedule.some(Boolean) && !confirm("Mevcut haftalık seçimler silinip yeni beslenme tarzına geçilsin mi?")){
+    render(); return;
+  }
+  selectedCategory=key;
+  foods=currentCategoryFoods(key);
+  schedule=Array(7).fill(null); history=[]; autoWeek=false; rotation=0; activeDay=0;
+  $("spinBtn").textContent="ÇEVİR!";
+  save(); render();
+  toast(categoryLabel(key)+" seçildi • 30 yemek çarkta");
+}
+document.querySelectorAll(".category-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>selectCategory(btn.dataset.key));
+});
+$("calculateTargets").addEventListener("click",calculateTargets);
+
+document.querySelectorAll(".mode-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    spinMode=btn.dataset.mode;
+    document.querySelectorAll(".mode-btn").forEach(x=>x.classList.toggle("active",x===btn));
+    $("modeHelp").textContent=spinMode==="day"
+      ? "Bir gün seç, çarkı çevir; yalnızca o gün için öneri al. Diğer günler değişmez."
+      : "Haftalık mod: Pazartesiden pazara 7 yemek seçilir.";
+    render();
+  });
+});
+
+document.addEventListener("click",e=>{
+  const d=e.target.closest(".day");
+  if(!d)return;
+  const idx=Number(d.dataset.day);
+  if(Number.isInteger(idx)){
+    activeDay=idx;
+    render();
+    if(spinMode==="day") toast(days[idx]+" seçildi — şimdi çarkı çevirebilirsin.");
+  }
+});
+$("repeatSpinBtn").onclick=()=>spin();
+$("copyResultBtn").onclick=async()=>{
+  const food=$("lastFood").textContent;
+  if(!food || food==="—" || food==="Çark dönüyor…"){toast("Önce bir yemek seç");return}
+  try{await navigator.clipboard.writeText(food);toast("Yemek kopyalandı")}catch(e){toast("Kopyalama kullanılamıyor")}
+};
+$("shareResultBtn").onclick=()=>$("shareBtn").click();
+
+
+$("repeatWeeks").value=String(repeatWeeks);
+$("repeatWeeks").onchange=()=>{
+  repeatWeeks=Number($("repeatWeeks").value)||1;save();render();
+  toast("Tekrar engelleme: "+repeatWeeks+" hafta");
+};
+
+$("addBtn").onclick=()=>{ const v=$("foodInput").value.trim(); if(v){addFoods([v]);$("foodInput").value="";} };
+$("foodInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("addBtn").click()});
+$("bulkBtn").onclick=()=>{addFoods($("bulkInput").value.split(/\n|,/));$("bulkInput").value=""};
+
+$("clearFoods").onclick=()=>{
+  if(confirm("Çarktaki tüm bekleyen yemekler silinsin mi?")){foods=[];save();render();toast("Bekleyen yemekler temizlendi")}
+};
+$("fullReset").onclick=()=>{
+  autoWeek=false; $("spinBtn").textContent="ÇEVİR!";
+  if(confirm("Yemekler, haftalık seçimler ve geçmiş tamamen silinsin mi?")){
+    foods=[];schedule=Array(7).fill(null);history=[];foodPhotos={};weekArchive=[];repeatWeeks=1;selectedCategory="";save();render();toast("Her şey sıfırlandı");
+  }
+};
+$("resetWeek").onclick=()=>{
+  autoWeek=false; $("spinBtn").textContent="ÇEVİR!";
+  if(!schedule.some(Boolean)){toast("Hafta zaten boş");return}
+  schedule.filter(Boolean).forEach(x=>{if(!foods.includes(x))foods.push(x)});
+  schedule=Array(7).fill(null);history=[];save();render();toast("Yeni hafta hazır");
+};
+$("undoBtn").onclick=()=>{
+  if(!history.length || spinning)return;
+  autoWeek=false;
+  $("spinBtn").textContent="ÇEVİR!";
+  const h=history.pop();
+  schedule[h.day]=null;
+  if(!foods.includes(h.food))foods.push(h.food);
+  save();render();toast(h.food+" geri çarka eklendi");
+};
+
+function getRecentUsedFoods(){
+  const result=[]; const seen=new Set();
+  weekArchive.filter(w=>!w.category || w.category===selectedCategory).slice(-repeatWeeks).forEach(w=>(w.menu||[]).forEach(f=>{
+    if(f&&!seen.has(f)){seen.add(f);result.push(f)}
+  }));
+  return result;
+}
+function getAvailableFoods(){
+  const blocked=new Set(getRecentUsedFoods());
+  const available=foods.filter(f=>!blocked.has(f));
+  return (available.length>=7 || !blocked.size) ? available : foods.slice();
+}
+
+$("waitingFoodsTabBtn").onclick=()=>{
+  const p=$("waitingFoodsTabBtn").closest(".waiting-tab-panel");
+  p.classList.toggle("open");
+  $("waitingFoodsArrow").textContent=p.classList.contains("open")?"−":"＋";
+};
+
+document.querySelectorAll("[data-category]").forEach(el=>el.addEventListener("click",()=>{
+  document.querySelectorAll("[data-category]").forEach(x=>x.classList.remove("active"));
+  el.classList.add("active");
+  loadSelectedCategory(el.dataset.category);
+}));
+function render(){
+  $("foodCount").textContent=foods.length;
+  if($("waitingFoodsCount")) $("waitingFoodsCount").textContent=foods.length; if($("repeatWeeks")) $("repeatWeeks").value=String(repeatWeeks);
+  document.querySelectorAll(".category-btn").forEach(btn=>{
+    btn.classList.toggle("active",btn.dataset.key===selectedCategory);
+  });
+  if($("categoryHint")) $("categoryHint").textContent=selectedCategory ? categoryLabel(selectedCategory)+" • 30 menüden seçim yapılıyor." : "Bir tarz seçtiğinde o kategoriye ait 30 yemek otomatik olarak çarka yüklenir.";
+  if($("lastCategory")) $("lastCategory").textContent=selectedCategory ? categoryLabel(selectedCategory) : "---";
+  const shownFood=$("lastFood") ? $("lastFood").textContent : "";
+  if(shownFood && shownFood!=="—" && shownFood!=="Çark dönüyor…"){
+    const shownNutrition=parseNutrition(shownFood);
+    if($("lastCalories")) $("lastCalories").textContent=shownNutrition.kcal;
+    if($("lastProtein")) $("lastProtein").textContent=shownNutrition.protein;
+  }
+  $("chips").innerHTML="";
+  foods.forEach((f,i)=>{
+    const c=document.createElement("div");c.className="chip";
+    c.innerHTML=`<span>${escapeHtml(f)}</span><button title="Sil">×</button>`;
+    c.querySelector("button").onclick=()=>{foods.splice(i,1);save();render()};
+    $("chips").appendChild(c);
+  });
+
+  $("days").innerHTML=days.map((d,i)=>`<div class="day ${schedule[i]?"done":"active"} ${i===activeDay?"selected-day":""}" data-day="${i}">${d.slice(0,3).toUpperCase()}<br>${schedule[i]?"✓":"—"}</div>`).join("");
+
+  $("week").innerHTML=days.map((d,i)=>`
+    <div class="row ${schedule[i]?"":"empty"}">
+      <div class="d">${d}</div>
+      <div class="f">${schedule[i]?escapeHtml(schedule[i]):"Henüz seçilmedi"}</div>
+      <div class="num">${schedule[i]?"🍽️":"#"+(i+1)}</div>
+    </div>`).join("");
+
+  renderPhotoManager();
+  renderHistory();
+
+  const next=schedule.findIndex(x=>!x);
+  if(spinMode==="day"){
+    $("status").textContent=`${days[activeDay]} için çark hazır.`;
+    $("spinBtn").disabled=foods.length===0 || spinning || autoWeek;
+  }else{
+    $("status").textContent = next===-1 ? "🎉 Haftanın 7 günü tamamlandı!" :
+      `${days[next]} için çark hazır.`;
+    $("spinBtn").disabled=foods.length<7 || next===-1 || spinning || autoWeek;
+  }
+  $("spinBtn").textContent=autoWeek ? "OTOMATİK ÇEVİRİYOR…" : "ÇEVİR!";
+  $("undoBtn").disabled=history.length===0 || spinning;
+  drawWheel();
+}
+
+$("photoTabBtn").onclick=()=>{const p=$("photoTabBtn").closest(".photo-tab-panel");p.classList.toggle("open");$("photoTabArrow").textContent=p.classList.contains("open")?"−":"＋";};
+function renderPhotoManager(){
+  const box=$("photoManager");
+  if(!box)return;
+  if(!foods.length){
+    box.innerHTML='<div class="hint">Önce yemek ekle.</div>';
+    return;
+  }
+  box.innerHTML=foods.map((food,i)=>{
+    const src=foodPhotos[food];
+    const id="photo_"+i;
+    return `<div class="photo-row">
+      ${src?`<img class="photo-thumb" src="${src}" alt="">`:`<div class="photo-thumb" style="display:flex;align-items:center;justify-content:center">🍽️</div>`}
+      <div class="photo-name">${escapeHtml(food)}</div>
+      <label class="photo-btn" for="${id}">📷 ${src?"Değiştir":"Ekle"}</label>
+      <input id="${id}" type="file" accept="image/*" data-food="${escapeHtml(food)}">
+    </div>`;
+  }).join("");
+  box.querySelectorAll('input[type=file]').forEach(input=>{
+    input.onchange=async e=>{
+      const file=e.target.files[0];
+      if(!file)return;
+      if(file.size>3*1024*1024){toast("Fotoğraf 3 MB'dan küçük olmalı");return}
+      try{
+        const data=await resizePhoto(file,900,700);
+        foodPhotos[input.dataset.food]=data;
+        save();render();toast("Fotoğraf eklendi");
+      }catch(err){toast("Fotoğraf eklenemedi")}
+    };
+  });
+}
+function resizePhoto(file,maxW,maxH){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onerror=reject;
+    reader.onload=()=>{
+      const img=new Image();
+      img.onerror=reject;
+      img.onload=()=>{
+        const ratio=Math.min(1,maxW/img.width,maxH/img.height);
+        const c=document.createElement("canvas");
+        c.width=Math.max(1,Math.round(img.width*ratio));
+        c.height=Math.max(1,Math.round(img.height*ratio));
+        c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+        resolve(c.toDataURL("image/jpeg",.78));
+      };
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function renderHistory(){
+  const box=$("historyList");
+  if(!box)return;
+  if(!weekArchive.length && !history.length){
+    box.innerHTML='<div class="hint">Henüz geçmiş seçim yok.</div>';
+    return;
+  }
+  const current=history.slice().reverse().map(h=>({label:"Bu hafta",day:days[h.day],food:h.food}));
+  const archived=weekArchive.slice().reverse().flatMap(w=>
+    (w.menu||[]).map((food,i)=>({label:w.date,day:days[i],food}))
+  );
+  box.innerHTML=current.concat(archived).slice(0,30).map(h=>`
+    <div class="history-row">
+      <div class="history-day">${escapeHtml(h.label)}</div>
+      <div class="history-food">${escapeHtml(h.day)}: ${escapeHtml(h.food)}</div>
+    </div>`).join("");
+}
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+
+function drawWheel(){
+  const wheelFoods=getAvailableFoods();
+  const n=wheelFoods.length;
+  ctx.clearRect(0,0,700,700);
+  const cx=350,cy=350,r=330;
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(rotation);
+  if(!n){
+    ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fillStyle="#182236";ctx.fill();
+    ctx.restore();return;
+  }
+  const slice=Math.PI*2/n;
+  for(let i=0;i<n;i++){
+    const a=-Math.PI/2+i*slice;
+    ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,r,a,a+slice);ctx.closePath();
+    ctx.fillStyle=colors[i%colors.length];ctx.fill();
+    ctx.lineWidth=3;ctx.strokeStyle="rgba(255,255,255,.20)";ctx.stroke();
+
+    ctx.save();
+    ctx.rotate(a+slice/2);
+    ctx.textAlign="right";ctx.fillStyle="#fff";
+    const max=18;
+    let label=wheelFoods[i];
+    if(label.length>max) label=label.slice(0,max-1)+"…";
+    ctx.font="800 22px system-ui";
+    ctx.shadowColor="rgba(0,0,0,.5)";ctx.shadowBlur=4;
+    ctx.fillText(label,r-18,8);
+    ctx.restore();
+  }
+  ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.lineWidth=10;ctx.strokeStyle="#dbeafe";ctx.stroke();
+  ctx.restore();
+}
+
+
+function startAudio(){
+  try{
+    if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==="suspended") audioCtx.resume();
+  }catch(e){}
+}
+function beep(freq=700, duration=.045, volume=.035){
+  if(!audioCtx) return;
+  try{
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.type="sine"; o.frequency.value=freq;
+    g.gain.setValueAtTime(volume,audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);
+    o.connect(g);g.connect(audioCtx.destination);
+    o.start();o.stop(audioCtx.currentTime+duration);
+  }catch(e){}
+}
+function startWheelSound(duration=5000){
+  startAudio();
+  clearInterval(tickTimer);
+  const started=performance.now();
+  tickTimer=setInterval(()=>{
+    const elapsed=performance.now()-started;
+    if(elapsed>=duration){clearInterval(tickTimer);return}
+    const p=elapsed/duration;
+    const freq=900-650*p;
+    beep(freq,.035,.028);
+  },90);
+}
+function stopWheelSound(){
+  clearInterval(tickTimer);
+  tickTimer=null;
+  beep(1100,.14,.06);
+  setTimeout(()=>beep(1450,.18,.05),90);
+}
+
+
+function showWinner(day,food){
+  const overlay=$("winnerOverlay");
+  $("winnerFood").textContent=food;
+  $("winnerDay").textContent=days[day]+" günü için seçildi";
+  const wi=$("winnerImage");
+  if(foodPhotos[food]){
+    wi.src=foodPhotos[food]; wi.hidden=false;
+  }else{
+    wi.hidden=true; wi.removeAttribute("src");
+  }
+  overlay.classList.add("show");
+  overlay.setAttribute("aria-hidden","false");
+}
+function hideWinner(){
+  const overlay=$("winnerOverlay");
+  overlay.classList.remove("show");
+  overlay.setAttribute("aria-hidden","true");
+}
+$("closeWinner").onclick=hideWinner;
+$("winnerOverlay").addEventListener("click",e=>{
+  if(e.target.id==="winnerOverlay") hideWinner();
+});
+
+
+function nutritionNumbers(food){
+  const n=parseNutrition(food);
+  const kcal=parseFloat(String(n.kcal).replace(/[^\d.]/g,"")) || 0;
+  const protein=parseFloat(String(n.protein).replace(/[^\d.]/g,"")) || 0;
+  return {kcal,protein};
+}
+function mealTarget(){
+  if(!calorieProfile) return null;
+  // One main meal target. Other meals/snacks are assumed to provide the rest.
+  return {
+    kcal: Math.round(calorieProfile.calories*0.30),
+    protein: Math.round(calorieProfile.protein*0.30)
+  };
+}
+function bmiInfo(weight,height){
+  const h=height/100;
+  const bmi=weight/(h*h);
+  let label,cls;
+  if(bmi<18.5){label="Zayıf";cls="low";}
+  else if(bmi<25){label="Normal aralık";cls="normal";}
+  else if(bmi<30){label="Fazla kilolu";cls="over";}
+  else if(bmi<35){label="Obezite I";cls="obese";}
+  else if(bmi<40){label="Obezite II";cls="obese";}
+  else {label="Obezite III";cls="obese";}
+  return {bmi:Math.round(bmi*10)/10,label,cls};
+}
+function categoryFitScore(food){
+  const f=String(food).toLowerCase();
+  const key=selectedCategory||"";
+  const groups={
+    protein:["tavuk","dana","köfte","somon","ton balığı","yumurta","ciğer","levrek","çipura","alabalık","uskumru"],
+    dengeli:["tavuk","dana","somon","levrek","kinoa","bulgur","pirinç"],
+    yesillik:["roka","brokoli","salata","yeşillik","sebze","karnabahar","kabak"],
+    yagkaybi:["light","green","brokoli","salata","yoğurt","tavuk","levrek","ton balığı"],
+    et:["dana","köfte","bonfile","ciğer"],
+    balik:["somon","levrek","çipura","uskumru","alabalık","sardalya","palamut","mezgit","ton balığı"],
+    tavuk:["tavuk"],
+    ciger:["ciğer","tavuk ciğer"],
+    karisik:[]
+  };
+  const words=groups[key]||[];
+  return words.length ? words.reduce((s,w)=>s+(f.includes(w)?1:0),0) : 0;
+}
+function getTargetedFoods(){
+  if(!foods.length) return [];
+  const t=mealTarget();
+  const pool=foods.filter(f=>!schedule.some((x,i)=>i!==activeDay && x===f));
+  const source=pool.length?pool:foods.slice();
+  if(!t) return source.slice();
+  return source.slice().sort((a,b)=>{
+    const A=nutritionNumbers(a), B=nutritionNumbers(b);
+    const kcalWeight=(calorieProfile.goal==="gain")?0.45:0.60;
+    const proteinWeight=(calorieProfile.goal==="gain" || calorieProfile.goal==="recomp")?0.40:0.25;
+    const categoryWeight=1-kcalWeight-proteinWeight;
+    const da=Math.abs(A.kcal-t.kcal)/Math.max(t.kcal,1)*kcalWeight
+           +Math.abs(A.protein-t.protein)/Math.max(t.protein,1)*proteinWeight
+           -categoryFitScore(a)*categoryWeight;
+    const db=Math.abs(B.kcal-t.kcal)/Math.max(t.kcal,1)*kcalWeight
+           +Math.abs(B.protein-t.protein)/Math.max(t.protein,1)*proteinWeight
+           -categoryFitScore(b)*categoryWeight;
+    return da-db;
+  });
+}
+function calculateTargets(){
+  const sex=$("pSex").value;
+  const age=Number($("pAge").value), weight=Number($("pWeight").value), height=Number($("pHeight").value);
+  const activity=Number($("pActivity").value), goal=$("pGoal").value;
+  if(!age||!weight||!height||age<18||weight<40||height<130){
+    toast("Yaş, kilo ve boy bilgilerini doğru gir.");
+    return;
+  }
+  // Mifflin-St Jeor resting metabolic rate estimate.
+  const bmr=10*weight+6.25*height-5*age+(sex==="male"?5:-161);
+  const tdee=bmr*activity;
+  const factor=goal==="loss"?0.85:(goal==="gain"?1.05:(goal==="recomp"?0.90:1));
+  let calories=Math.round(tdee*factor);
+  // Keep the app from presenting an aggressively low automatic target.
+  const floor=sex==="male"?1500:1200;
+  if(goal==="loss" || goal==="recomp") calories=Math.max(calories,floor);
+  const protein=Math.round(weight*(goal==="gain" || goal==="recomp" ? 1.8 : 1.6));
+  const bmi=bmiInfo(weight,height);
+  calorieProfile={sex,age,weight,height,activity,goal,bmr,tdee,calories,protein,bmi:bmi.bmi,bmiLabel:bmi.label};
+  localStorage.setItem("mealWheelProfile",JSON.stringify(calorieProfile));
+  updateTargetUI();
+  toast(`Günlük hedef: ${calories} kcal • ${protein} g protein`);
+  render();
+}
+function updateTargetUI(){
+  if(!calorieProfile)return;
+  const t=mealTarget();
+  $("targetCalories").textContent=calorieProfile.calories+" kcal";
+  $("targetProtein").textContent=calorieProfile.protein+" g";
+  $("mealTarget").textContent=t.kcal+" kcal • "+t.protein+" g protein";
+  const bmi=calorieProfile.bmiInfo ? calorieProfile.bmiInfo : bmiInfo(calorieProfile.weight,calorieProfile.height);
+  $("bmiResult").textContent=bmi.bmi+" • "+bmi.label;
+  const goalLabels={
+    loss:"🔥 Yağ kaybı",
+    gain:"💪 Kas kazanımı",
+    recomp:"🔥💪 Yağ kaybı + kas kazanımı",
+    maintain:"⚖️ Kilo koruma"
+  };
+  if($("goalResult")) $("goalResult").textContent=goalLabels[calorieProfile.goal]||"---";
+}
+function spinWeek(){
+  if(spinning)return;
+  if(!selectedCategory){toast("Önce haftanın beslenme tarzını seç!");return;}
+  const day=schedule.findIndex(x=>!x);
+  if(day<0){autoWeek=false;toast("Hafta tamamlandı");return}
+
+  const ranked=getTargetedFoods();
+  const available=ranked.length?ranked:getAvailableFoods();
+  if(available.length===0){autoWeek=false;toast("Çarkta uygun yemek kalmadı");return}
+  if(day===0 && available.length<7){
+    autoWeek=false;toast("İlk dönüş için en az 7 uygun yemek gerekli");return;
+  }
+  startAudio();
+  spinning=true;
+  $("spinBtn").disabled=true;
+  $("undoBtn").disabled=true;
+  $("status").textContent=days[day]+" seçiliyor… 🎡";
+  $("lastFood").textContent="Çark dönüyor…";
+   if($("lastCalories")) $("lastCalories").textContent="--- kcal";
+   if($("lastProtein")) $("lastProtein").textContent="--- g";
+
+  const n=available.length, slice=2*Math.PI/n;
+  const winner=Math.floor(Math.random()*n);
+  // Seçilen yemeği indeks değil, dönüş başında sabitlenen değer olarak taşı.
+  // Böylece liste sonradan değişse bile okta görünen yemek ile sonuç aynı kalır.
+  const winnerFood=available[winner];
+
+  // Ok, çarkın üstündeki sabit göstergenin (pointer) baktığı noktayı
+  // sektörün tam merkezine kilitliyoruz. Canvas dönüşü nedeniyle merkez
+  // açısı +PI/2 değil -PI/2 referansında hesaplanır.
+  const targetBase = Math.PI/2 - (winner+0.5)*slice;
+  let delta = targetBase - rotation;
+  delta = ((delta%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
+  delta += (6 + Math.floor(Math.random()*3))*2*Math.PI;
+
+  const start=rotation, end=rotation+delta, duration=5000;
+  const t0=performance.now();
+  startWheelSound(duration);
+
+  function ease(t){ return 1-Math.pow(1-t,4); }
+  function frame(now){
+    const p=Math.min(1,(now-t0)/duration);
+    rotation=start+(end-start)*ease(p);
+    drawWheel();
+    if(p<1){animFrame=requestAnimationFrame(frame);return}
+    rotation=end%(2*Math.PI);
+    stopWheelSound();
+    // winner indeksi, pointer'ın tam merkezindeki sektörle aynı olmalı.
+    finishSpin(day,winnerFood);
+  }
+  animFrame=requestAnimationFrame(frame);
+}
+
+
+function spin(){
+  if(spinMode==="day"){ spinDay(); return; }
+  spinWeek();
+}
+
+function spinDay(){
+  if(spinning)return;
+  if(!selectedCategory){toast("Önce beslenme tarzını seç!");return;}
+
+  const ranked=getTargetedFoods();
+  const available=ranked.length?ranked:getAvailableFoods();
+  if(available.length===0){toast("Çarkta uygun yemek kalmadı");return;}
+
+  const day=activeDay;
+  startAudio();
+  spinning=true;
+  $("spinBtn").disabled=true;
+  $("undoBtn").disabled=true;
+  $("status").textContent=days[day]+" için öneri seçiliyor… 🎡";
+  $("lastFood").textContent="Çark dönüyor…";
+  if($("lastCalories")) $("lastCalories").textContent="--- kcal";
+  if($("lastProtein")) $("lastProtein").textContent="--- g";
+
+  const n=available.length, slice=2*Math.PI/n;
+  const winner=Math.floor(Math.random()*n);
+  const winnerFood=available[winner];
+  const targetBase=Math.PI/2-(winner+0.5)*slice;
+  let delta=targetBase-rotation;
+  delta=((delta%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
+  delta+=(6+Math.floor(Math.random()*3))*2*Math.PI;
+
+  const startRot=rotation,endRot=rotation+delta,duration=5000,t0=performance.now();
+  startWheelSound(duration);
+
+  function ease(t){return 1-Math.pow(1-t,4)}
+  function frame(now){
+    const p=Math.min(1,(now-t0)/duration);
+    rotation=startRot+(endRot-startRot)*ease(p);
+    drawWheel();
+    if(p<1){animFrame=requestAnimationFrame(frame);return}
+    rotation=endRot%(2*Math.PI);
+    stopWheelSound();
+    finishSpin(day,winnerFood);
+  }
+  animFrame=requestAnimationFrame(frame);
+}
+function finishSpin(day,food){
+  schedule[day]=food;
+  const removeIndex=foods.indexOf(food);
+  if(removeIndex>=0) foods.splice(removeIndex,1);
+  history.push({day,food});
+  save();
+  render();
+
+  $("lastFood").textContent=food;
+  const nutrition=parseNutrition(food);
+  if($("lastCalories")) $("lastCalories").textContent=nutrition.kcal;
+  if($("lastProtein")) $("lastProtein").textContent=nutrition.protein;
+  if($("lastCategory")) $("lastCategory").textContent=categoryLabel(selectedCategory);
+  $("status").textContent=`🎉 ${days[day]}: ${food}`;
+  spinning=false;
+  $("undoBtn").disabled=false;
+  showWinner(day,food);
+
+  const next=schedule.findIndex(x=>!x);
+
+  if(next===-1){
+    autoWeek=false;
+    $("spinBtn").disabled=true;
+    weekArchive.push({date:new Date().toLocaleDateString("tr-TR"),category:selectedCategory,menu:schedule.slice()});
+    if(weekArchive.length>8) weekArchive=weekArchive.slice(-8);
+    save();
+    render();
+    setTimeout(()=>toast("🎊 Haftalık menü tamamlandı! Geçmişe kaydedildi."),150);
+    return;
+  }
+
+  if(autoWeek){
+    $("spinBtn").textContent="OTOMATİK ÇEVİRİYOR…";
+    $("spinBtn").disabled=true;
+    // A short pause lets the selected meal be seen before the next spin.
+    setTimeout(()=>{
+      hideWinner();
+      if(autoWeek && !spinning) spin();
+    },1600);
+  }else{
+    $("spinBtn").textContent="ÇEVİR!";
+    $("spinBtn").disabled=false;
+  }
+}
+
+$("spinBtn").onclick=()=>{
+  if(spinning)return;
+  if(spinMode==="day"){
+    autoWeek=false;
+    spin();
+    return;
+  }
+  if(schedule.every(Boolean)){toast("Hafta zaten tamamlandı");return}
+  autoWeek=true;
+  spin();
+};
+
+function createMenuImage(){
+  const c=document.createElement("canvas");
+  const scale=2, w=900, h=1080;
+  c.width=w*scale; c.height=h*scale;
+  const x=c.getContext("2d"); x.scale(scale,scale);
+
+  // Arka plan
+  const bg=x.createLinearGradient(0,0,w,h);
+  bg.addColorStop(0,"#080b14"); bg.addColorStop(1,"#17112c");
+  x.fillStyle=bg; x.fillRect(0,0,w,h);
+
+  // Üst ışık
+  const glow=x.createRadialGradient(w*.5,70,20,w*.5,70,430);
+  glow.addColorStop(0,"rgba(139,92,246,.30)");
+  glow.addColorStop(1,"rgba(139,92,246,0)");
+  x.fillStyle=glow; x.fillRect(0,0,w,300);
+
+  x.textAlign="center";
+  x.fillStyle="#ffffff";
+  x.font="900 46px system-ui";
+  x.fillText("🍽️ HAFTALIK YEMEK MENÜSÜ",w/2,78);
+  x.fillStyle="#c4b5fd";
+  x.font="700 22px system-ui";
+  x.fillText("🎡 Haftalık Yemek Çarkı"+(selectedCategory?" • "+$("categorySelect").selectedOptions[0].textContent:""),w/2,116);
+
+  // Menü kartları
+  const left=55, top=155, rowH=111, cardW=w-110;
+  days.forEach((d,i)=>{
+    const y=top+i*rowH;
+    x.fillStyle=schedule[i] ? "rgba(17,24,39,.96)" : "rgba(15,23,42,.72)";
+    roundRect(x,left,y,cardW,88,18); x.fill();
+    x.strokeStyle=schedule[i] ? "#39465e" : "#273247";
+    x.lineWidth=2; x.stroke();
+
+    x.textAlign="left";
+    x.fillStyle="#a78bfa";
+    x.font="900 20px system-ui";
+    x.fillText(d.toUpperCase(),left+24,y+34);
+
+    x.fillStyle=schedule[i] ? "#f8fafc" : "#64748b";
+    x.font=schedule[i] ? "800 27px system-ui" : "700 24px system-ui";
+    x.fillText(schedule[i] || "Henüz seçilmedi",left+24,y+68);
+
+    x.textAlign="right";
+    x.font="700 24px system-ui";
+    x.fillStyle=schedule[i] ? "#22c55e" : "#475569";
+    x.fillText(schedule[i] ? "✓" : "—",left+cardW-25,y+50);
+  });
+
+  x.textAlign="center";
+  x.fillStyle="#64748b";
+  x.font="600 18px system-ui";
+  x.fillText("Haftalık menü otomatik olarak çarktan seçildi.",w/2,h-42);
+
+  return new Promise(resolve=>c.toBlob(resolve,"image/png",1));
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
+}
+
+$("clearHistory").onclick=()=>{
+  if(!weekArchive.length && !history.length){toast("Geçmiş zaten boş");return}
+  if(confirm("Geçmiş seçimler silinsin mi?")){
+    weekArchive=[]; history=[]; save(); render(); toast("Geçmiş temizlendi");
+  }
+};
+
+$("shareBtn").onclick=async()=>{
+  const blob=await createMenuImage();
+  if(!blob){toast("Görsel oluşturulamadı");return}
+
+  const file=new File([blob],"haftalik-yemek-menusu.png",{type:"image/png"});
+
+  // Android/iOS destekliyorsa doğrudan görseli paylaş.
+  if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+    try{
+      await navigator.share({
+        title:"Haftalık Yemek Menüsü",
+        text:"🍽️ Haftalık yemek menümüz",
+        files:[file]
+      });
+      return;
+    }catch(e){
+      if(e && e.name==="AbortError") return;
+    }
+  }
+
+  // Dosya paylaşımı desteklenmiyorsa görseli aç/kaydet.
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download="haftalik-yemek-menusu.png";
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+  toast("Menü görseli oluşturuldu");
+};
+$("saveBtn").onclick=()=>{save();toast("Menü telefona kaydedildi")};
+
+load();
+try{
+  const savedProfile=JSON.parse(localStorage.getItem("mealWheelProfile")||"null");
+  if(savedProfile){
+    calorieProfile=savedProfile;
+    if($("pSex")) $("pSex").value=savedProfile.sex||"male";
+    if($("pAge")) $("pAge").value=savedProfile.age||"";
+    if($("pWeight")) $("pWeight").value=savedProfile.weight||"";
+    if($("pHeight")) $("pHeight").value=savedProfile.height||"";
+    if($("pActivity")) $("pActivity").value=String(savedProfile.activity||1.55);
+    if($("pGoal")) $("pGoal").value=savedProfile.goal||"loss";
+    updateTargetUI();
+  }
+}catch(e){}
+if(foods.length===0 && schedule.every(x=>!x)){
+  const preset=["Izgara tavuk göğsü basmati pirinç pilavı yoğurt (450 kcal)", "Fırında somon balığı patates ve roka salatası (490 kcal)", "Yağsız dana kuşbaşılı sebze türlü bulgur pilavı (440 kcal)", "Fırında levrek fileto fırın patates yeşil salata (400 kcal)", "Izgara köfte kinoa pilavı cacık (470 kcal)", "Fırında sebzeli tavuk pirzola bulgur pilavı (460 kcal)", "Kinoa ton balığı haşlanmış yumurta yoğurt (410 kcal)", "Kıymalı karnabahar yemeği yoğurtlu salata (350 kcal)", "Fırında somon tatlı patates ve brokoli (470 kcal)", "Izgara köfte karabuğday pilavı ayran (450 kcal)", "Izgara tavuk şiş kinoa pilavı cacık (430 kcal)", "Fırında levrek fileto kök sebzeler yoğurt (390 kcal)", "Yağsız dana rosto bulgur pilavı mevsim salata (480 kcal)", "Kıymalı kabak mücver yoğurt ve tam buğday ekmeği (410 kcal)", "Fırında somon fileto tatlı patates püresi brokoli (480 kcal)", "Izgara köfte basmati pirinç pilavı yoğurt (470 kcal)", "Tavuklu sebze sote kinoa pilavı cacık (420 kcal)", "Fırında çipura haşlanmış patates yeşil salata (390 kcal)", "Zeytinyağlı taze fasulye ızgara tavuk göğsü bulgur pilavı (430 kcal)", "Fırında somon karabuğday pilavı roka salatası (470 kcal)", "Izgara köfte fırın patates yoğurtlu salata (460 kcal)", "Fırında sebzeli tavuk pirzola kinoa pilavı (470 kcal)", "Dana bonfile ızgara patates püresi yeşil salata (490 kcal)", "Fırında levrek esmer pirinç pilavı brokoli (410 kcal)", "Kıymalı karnabahar graten yoğurtlu salata (360 kcal)", "Fırında sebzeli köfte basmati pirinç pilavı (470 kcal)", "Izgara tavuk göğsü tatlı patates brokoli yoğurt (440 kcal)", "Yağsız dana biftek karabuğday pilavı közlenmiş sebze (460 kcal)", "Izgara levrek bulgur pilavı roka salatası (410 kcal)", "Tavuk göğsü mantar sote esmer pirinç pilavı (420 kcal)", "Fırında somon brokoli kinoa pilavı (470 kcal)", "Yağsız dana kıymalı kabak yemeği bulgur pilavı (430 kcal)", "Izgara tavuk şiş bulgur pilavı cacık (440 kcal)", "Fırında çipura tatlı patates brokoli (410 kcal)", "Izgara köfte kinoa pilavı közlenmiş sebze (460 kcal)", "Yağsız dana bonfile kinoa pilavı brokoli (480 kcal)", "Ton balıklı kinoa salatası haşlanmış yumurta (400 kcal)", "Izgara tavuk göğsü mercimek salatası yoğurt (430 kcal)", "Fırında somon esmer pirinç pilavı kuşkonmaz (480 kcal)", "Yağsız dana kuşbaşı mantar sote karabuğday pilavı (450 kcal)", "Fırında tavuk göğsü sebzeli kinoa pilavı (430 kcal)", "Izgara köfte tatlı patates püresi yoğurtlu salata (470 kcal)", " Izgara dana ciğer bulgur pilavı soğan salatası (450 kcal)", "Dana ciğer sote esmer pirinç pilavı yoğurt (440 kcal)", " Izgara tavuk ciğer şiş bulgur pilavı cacık (430 kcal)", "Fırında tavuk göğsü patates ve yoğurtlu salata (440 kcal)", " Izgara dana bonfile bulgur pilavı közlenmiş sebze (470 kcal)", "Fırında levrek tatlı patates ve brokoli (410 kcal)", " Izgara uskumru bulgur pilavı roka salatası (460 kcal)", "Fırında sardalya patates ve yeşil salata (450 kcal)"]; foods=preset.slice(); save();
+}
+render();
+</script>
+</body>
+</html>
