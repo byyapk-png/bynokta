@@ -251,9 +251,12 @@ body{background:
 @media(max-width:430px){.profile-grid{grid-template-columns:1fr}.target-result{grid-template-columns:1fr}.target-result>div:last-child{grid-column:auto}.profile-panel{padding:11px}.profile-title{font-size:14px}}
 
 .target-result .bmi-box{grid-column:1/-1}
-.target-method{text-align:center;margin-top:9px;padding:8px;border:1px solid #26364e;border-radius:99px;background:#0a1320;color:#aebbd0;font-size:10px;line-height:1.4}
+.target-method{text-align:center;margin-top:9px;padding:8px;border:1px solid #26364e;border-radius:9px;background:#0a1320;color:#aebbd0;font-size:10px;line-height:1.4}
 
 .goal-box{grid-column:1/-1}
+.recipe-video-btn[hidden]{display:none!important}
+.recipe-video-btn{margin:8px auto 0;display:block;border:1px solid #ef4444;background:#b91c1c;color:#fff;border-radius:10px;padding:10px 14px;font-weight:900;cursor:pointer;width:min(100%,260px)}
+.recipe-video-btn:active{transform:scale(.98)}
 
 .back-home-btn {
   display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px;
@@ -354,7 +357,7 @@ body{background:
     <div class="status" id="status">En az 7 yemek ekle, sonra çarkı çevir.</div>
     <div class="result recommendation-card">
   <div class="recommend-title">🎯 Bugünkü Öneri</div>
-  <div class="food" id="lastFood">—</div>
+  <div class="food" id="lastFood">—</div><button id="recipeVideoBtn" class="recipe-video-btn" type="button" hidden>▶️ Yapılışını İzle</button>
   <div class="nutrition-row"><span>🔥 Kalori</span><strong id="lastCalories">--- kcal</strong></div>
   <div class="nutrition-row"><span>💪 Protein</span><strong id="lastProtein">--- g</strong></div>
   <div class="nutrition-row"><span>🌿 Kategori</span><strong id="lastCategory">---</strong></div>
@@ -456,6 +459,9 @@ body{background:
 
 <script>
 const days = ["Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi","Pazar"];
+const RECIPE_VIDEOS = {
+  "Fırında Somon Tatlı Patates Brokoli":"https://www.youtube.com/watch?v=y9iv6_Xb5V4"
+};
 const CATEGORY_MENUS = {"💪 Protein Ağırlıklı": ["Akdeniz Tavuk Protein Bowl — 150 g ızgara tavuk, 100 g pişmiş kinoa, nohut, domates, salatalık, roka ve yoğurtlu sos (470 kcal, 48 g protein)", "Greek Chicken Bowl — limonlu kekikli tavuk, esmer pirinç, salatalık, domates, zeytin, az feta ve tzatziki (490 kcal, 45 g protein)", "Tavuk Shawarma Bowl — baharatlı tavuk, basmati pirinç, közlenmiş biber, salata ve sarımsaklı yoğurt (480 kcal, 47 g protein)", "Chicken Fajita Bowl — tavuk göğsü, esmer pirinç, renkli biber, siyah fasulye, salsa ve yoğurtlu sos (500 kcal, 46 g protein)", "Tavuk Teriyaki Bowl — ızgara tavuk, esmer pirinç, brokoli, havuç ve hafif teriyaki sos (490 kcal, 45 g protein)", "Peri Peri Tavuk Bowl — acılı tavuk göğsü, tatlı patates, brokoli ve yoğurtlu dip sos (460 kcal, 47 g protein)", "Tavuklu Kinoa Power Bowl — tavuk göğsü, kinoa, nohut, roka, domates ve limonlu yoğurt (450 kcal, 49 g protein)", "Tavuk Caesar Protein Bowl — ızgara tavuk, marul, parmesan, tam tahıllı kruton ve hafif yoğurtlu Caesar sos (460 kcal, 50 g protein)", "Tavuklu Akdeniz Orzo Bowl — tavuk, tam buğday orzo, domates, roka, salatalık ve feta (490 kcal, 46 g protein)", "Izgara Tavuk ve Mercimek Bowl — tavuk göğsü, yeşil mercimek, köz sebze ve yoğurtlu sos (450 kcal, 52 g protein)", "Steak & Quinoa Bowl — yağsız dana bonfile, kinoa, brokoli, köz biber ve yoğurtlu sos (500 kcal, 46 g protein)", "Dana Fajita Bowl — yağsız dana eti, esmer pirinç, biber, soğan, salsa ve avokado (510 kcal, 44 g protein)", "Korean Beef Bowl — yağsız dana kıyma, basmati pirinç, brokoli, havuç ve hafif soya-zencefil sosu (500 kcal, 43 g protein)", "Beef & Broccoli Bowl — yağsız dana eti, brokoli, esmer pirinç ve susamlı hafif sos (490 kcal, 45 g protein)", "Dana Köfte Protein Bowl — ızgara köfte, bulgur, közlenmiş sebze, roka ve cacık (480 kcal, 45 g protein)", "Dana Bonfile Sweet Potato Bowl — bonfile, tatlı patates, brokoli ve sarımsaklı yoğurt (490 kcal, 48 g protein)", "Dana Etli Akdeniz Bowl — dana kuşbaşı, kinoa, nohut, domates, salatalık ve yoğurtlu sos (500 kcal, 46 g protein)", "Somon Kinoa Protein Bowl — fırın somon, kinoa, brokoli, salatalık ve limonlu yoğurt (500 kcal, 40 g protein)", "Teriyaki Somon Bowl — somon, esmer pirinç, brokoli, havuç ve hafif teriyaki sos (510 kcal, 39 g protein)", "Somon & Edamame Bowl — somon, kinoa, edamame, salatalık ve susamlı yoğurt sosu (500 kcal, 43 g protein)", "Ton Balığı Protein Bowl — ton balığı, kinoa, nohut, haşlanmış yumurta, domates ve roka (450 kcal, 45 g protein)", "Akdeniz Ton Balığı Bowl — ton balığı, beyaz fasulye, domates, salatalık, zeytin ve yeşillik (430 kcal, 42 g protein)", "Ton Balığı Pirinç Bowl — ton balığı, basmati pirinç, edamame, salatalık ve hafif susam sosu (470 kcal, 44 g protein)", "Tavuk & Yumurta Power Bowl — tavuk göğsü, haşlanmış yumurta, kinoa, brokoli ve yoğurt (470 kcal, 50 g protein)", "Protein Kahvaltı Bowl — yumurta, lor peyniri, tavuk göğsü, avokado ve yeşillik (450 kcal, 48 g protein)", "Tavuklu Nohut Bowl — ızgara tavuk, nohut, bulgur, roka, domates ve cacık (470 kcal, 47 g protein)", "Tavuklu Siyah Fasulye Bowl — tavuk, siyah fasulye, esmer pirinç, mısır, salsa ve yoğurt (490 kcal, 46 g protein)", "Dana & Mercimek Bowl — yağsız dana, yeşil mercimek, köz sebze ve cacık (470 kcal, 50 g protein)", "Izgara Köfte & Kinoa Bowl — dana köfte, kinoa, közlenmiş kabak, biber ve tzatziki (480 kcal, 44 g protein)", "Tavuklu Protein Pita Bowl — tavuk shawarma, tam tahıllı pita parçaları, nohut, salata ve sarımsaklı yoğurt (490 kcal, 48 g protein)"], "⚖️ Dengeli": ["Akdeniz Tavuk Bowl — tavuk, kinoa, nohut, domates, salatalık, roka ve tzatziki (500 kcal, 43 g protein)", "Somon Akdeniz Tabağı — somon, bulgur, roka, domates, salatalık ve yoğurt (520 kcal, 38 g protein)", "Dana Fajita Tabağı — yağsız dana, esmer pirinç, biber, soğan, salsa ve avokado (520 kcal, 42 g protein)", "Tavuk Teriyaki Pirinç Bowl — tavuk, basmati, brokoli, havuç ve hafif teriyaki sos (510 kcal, 44 g protein)", "Levrek Akdeniz Bowl — levrek, kinoa, köz sebze, yeşillik ve limonlu yoğurt (470 kcal, 40 g protein)", "Etli Sebze Bowl — dana kuşbaşı, bulgur, kabak, biber, patlıcan ve yoğurt (500 kcal, 42 g protein)", "Tavuklu Mercimek Bowl — tavuk, yeşil mercimek, bulgur, roka ve yoğurt (490 kcal, 47 g protein)", "Ton Balığı Nohut Bowl — ton balığı, nohut, kinoa, yeşillik ve yumurta (480 kcal, 43 g protein)", "Somon Tatlı Patates Tabağı — somon, tatlı patates, brokoli ve yoğurtlu sos (520 kcal, 38 g protein)", "Köfte Bulgur Bowl — dana köfte, bulgur, köz biber, salata ve cacık (510 kcal, 43 g protein)", "Tavuklu Akdeniz Orzo — tavuk, tam buğday orzo, domates, roka ve feta (510 kcal, 44 g protein)", "Uskumru Bulgur Tabağı — ızgara uskumru, bulgur, roka ve yoğurt (500 kcal, 39 g protein)", "Dana Bonfile Patates Bowl — bonfile, fırın patates, brokoli ve yoğurt (530 kcal, 46 g protein)", "Tavuk Shawarma Pita Bowl — tavuk, tam tahıllı pita, nohut, salata ve yoğurt (510 kcal, 45 g protein)", "Çipura Kinoa Tabağı — çipura, kinoa, sebze ve cacık (480 kcal, 40 g protein)", "Etli Nohut Bowl — yağsız dana, nohut, bulgur, domates ve yoğurt (520 kcal, 44 g protein)", "Tavuk Fajita Bowl — tavuk, esmer pirinç, siyah fasulye, biber ve salsa (510 kcal, 45 g protein)", "Alabalık Karabuğday Tabağı — alabalık, karabuğday, brokoli ve yoğurt (490 kcal, 40 g protein)", "Dana Köfte Sweet Potato Bowl — köfte, tatlı patates, yeşillik ve cacık (520 kcal, 42 g protein)", "Ton Balığı Esmer Pirinç Bowl — ton balığı, pirinç, edamame, salatalık ve yumurta (490 kcal, 43 g protein)", "Tavuklu Siyah Fasulye Bowl — tavuk, siyah fasulye, esmer pirinç, mısır ve yoğurt (520 kcal, 45 g protein)", "Somon Kinoa Bowl — somon, kinoa, brokoli, avokado ve limonlu yoğurt (530 kcal, 39 g protein)", "Dana Stroganoff Bowl — yağsız dana, mantar, esmer pirinç ve yoğurtlu sos (510 kcal, 43 g protein)", "Tavuk Pesto Bowl — tavuk, kinoa, domates, brokoli ve ölçülü pesto (510 kcal, 45 g protein)", "Levrek Fırın Sebze Tabağı — levrek, patates, kabak, biber ve yoğurt (480 kcal, 41 g protein)", "Kıymalı Kabak Bowl — yağsız kıyma, kabak, bulgur, domates ve yoğurt (470 kcal, 39 g protein)", "Tavuklu Nohut Salata Bowl — tavuk, nohut, bulgur, yeşillik ve tahinli yoğurt sosu (500 kcal, 45 g protein)", "Dana Etli Akdeniz Bowl — dana, kinoa, nohut, sebze ve yoğurt (520 kcal, 44 g protein)", "Fırın Somon & Bulgur — somon, bulgur, kuşkonmaz ve yoğurtlu salata (520 kcal, 39 g protein)", "Tavuk & Avokado Grain Bowl — tavuk, esmer pirinç, avokado, brokoli ve yoğurt (510 kcal, 44 g protein)"], "🥗 Yeşillik / Sebze Ağırlıklı": ["Izgara Tavuk Akdeniz Yeşil Bowl — tavuk, roka, salatalık, domates, nohut ve yoğurt (410 kcal, 43 g protein)", "Somon Avokado Yeşil Bowl — somon, roka, avokado, salatalık ve limonlu yoğurt (450 kcal, 36 g protein)", "Ton Balığı Akdeniz Salatası — ton balığı, beyaz fasulye, roka, domates ve yumurta (400 kcal, 42 g protein)", "Dana Steak Garden Bowl — bonfile, karışık yeşillik, mantar, biber ve yoğurtlu sos (430 kcal, 44 g protein)", "Tavuk Caesar Light Bowl — tavuk, marul, parmesan, domates ve yoğurtlu Caesar sos (420 kcal, 46 g protein)", "Levrek Yeşil Akdeniz Tabağı — levrek, roka, salatalık, domates ve brokoli (390 kcal, 40 g protein)", "Fajita Tavuk Salata Bowl — tavuk, biber, soğan, marul, salsa ve avokado (420 kcal, 45 g protein)", "Köfte Çoban Salata Bowl — köfte, domates, salatalık, biber ve cacık (430 kcal, 40 g protein)", "Tavuklu Brokoli Edamame Bowl — tavuk, brokoli, edamame, salatalık ve yoğurt (420 kcal, 47 g protein)", "Ton Balığı Semizotu Bowl — ton balığı, semizotu, yumurta, domates ve yoğurt (380 kcal, 41 g protein)", "Dana Kuşbaşı Sebze Wok — dana, brokoli, kabak, biber, mantar ve hafif soya sosu (430 kcal, 42 g protein)", "Somon Kuşkonmaz Bowl — somon, kuşkonmaz, brokoli, roka ve yoğurt (440 kcal, 37 g protein)", "Tavuklu Köz Sebze Bowl — tavuk, patlıcan, kabak, biber, roka ve yoğurt (410 kcal, 45 g protein)", "Kıymalı Ispanak Bowl — yağsız kıyma, ıspanak, mantar ve yoğurt (390 kcal, 38 g protein)", "Çipura Brokoli Tabağı — çipura, brokoli, kabak ve limonlu yoğurt (390 kcal, 40 g protein)", "Dana Köfte Roka Bowl — köfte, roka, köz biber, domates ve cacık (420 kcal, 40 g protein)", "Tavuklu Akdeniz Salata — tavuk, yeşillik, nohut, domates, salatalık ve feta (430 kcal, 45 g protein)", "Uskumru Yeşil Tabağı — uskumru, roka, maydanoz, salatalık ve domates (420 kcal, 36 g protein)", "Tavuklu Karnabahar Bowl — tavuk, karnabahar, brokoli, havuç ve yoğurt (390 kcal, 45 g protein)", "Ton Balığı Brokoli Bowl — ton balığı, brokoli, edamame, salatalık ve yumurta (400 kcal, 43 g protein)", "Bonfile Mantar Yeşil Bowl — bonfile, mantar, roka, biber ve brokoli (440 kcal, 46 g protein)", "Somon Akdeniz Salatası — somon, roka, domates, salatalık, zeytin ve yoğurt (440 kcal, 36 g protein)", "Tavuklu Lahana Bowl — tavuk, beyaz lahana, havuç, salatalık ve yoğurtlu sos (390 kcal, 44 g protein)", "Etli Patlıcan Sebze Bowl — yağsız dana, patlıcan, biber, domates ve yoğurt (430 kcal, 41 g protein)", "Alabalık Yeşil Bowl — alabalık, roka, brokoli, salatalık ve yoğurt (400 kcal, 39 g protein)", "Ton Balığı Nohut Salata — ton balığı, nohut, roka, domates ve limonlu sos (420 kcal, 42 g protein)", "Tavuklu Kabak Noodle Bowl — tavuk, kabak noodle, mantar, biber ve yoğurt (380 kcal, 45 g protein)", "Köfte Semizotu Bowl — köfte, semizotu, domates, salatalık ve cacık (420 kcal, 40 g protein)", "Levrek Köz Sebze Bowl — levrek, patlıcan, kabak, biber ve yeşillik (410 kcal, 40 g protein)", "Tavuk Avokado Green Bowl — tavuk, avokado, roka, salatalık, brokoli ve yoğurt (430 kcal, 44 g protein)"], "🔥 Yağ Kaybı Odaklı": ["High Protein Tavuk Green Bowl — tavuk, brokoli, salatalık, roka ve yoğurt (360 kcal, 46 g protein)", "Lean Chicken Fajita Salad — tavuk, biber, soğan, marul, salsa ve yoğurt (380 kcal, 45 g protein)", "Somon Brokoli Light Bowl — somon, brokoli, kuşkonmaz ve limonlu yoğurt (420 kcal, 37 g protein)", "Ton Balığı Protein Salatası — ton balığı, yumurta, yeşillik ve salatalık (350 kcal, 42 g protein)", "Lean Steak Garden Bowl — yağsız bonfile, mantar, brokoli ve roka (400 kcal, 44 g protein)", "Light Köfte Salata Bowl — yağsız köfte, çoban salata ve cacık (390 kcal, 39 g protein)", "Tavuklu Mercimek Green Bowl — tavuk, mercimek, roka, salatalık ve yoğurt (400 kcal, 47 g protein)", "Levrek Protein Tabağı — levrek, brokoli, kabak ve yeşil salata (370 kcal, 41 g protein)", "Dana Sebze Wok Light — dana, brokoli, mantar, kabak ve hafif soya sosu (400 kcal, 42 g protein)", "Çipura Akdeniz Light Bowl — çipura, roka, domates, salatalık ve yoğurt (360 kcal, 39 g protein)", "Tavuk Shawarma Salad — tavuk, yeşillik, salatalık, domates ve sarımsaklı yoğurt (380 kcal, 46 g protein)", "Ton Balığı Edamame Bowl Light — ton balığı, edamame, salatalık ve yeşillik (370 kcal, 43 g protein)", "Somon Yeşil Bowl Light — somon, roka, brokoli, salatalık ve limon (400 kcal, 36 g protein)", "Tavuklu Karnabahar Rice Bowl — tavuk, karnabahar pirinci, brokoli ve yoğurt (350 kcal, 45 g protein)", "Dana Köfte Köz Sebze Bowl — köfte, kabak, patlıcan, biber ve cacık (400 kcal, 39 g protein)", "Alabalık Brokoli Tabağı — alabalık, brokoli, kabak ve yoğurt (380 kcal, 40 g protein)", "Tavuk Pesto Green Bowl Light — tavuk, roka, domates, brokoli ve az pesto (390 kcal, 45 g protein)", "Kıymalı Ispanak Light Bowl — yağsız kıyma, ıspanak, mantar ve yoğurt (360 kcal, 37 g protein)", "Uskumru Roka Salatası — uskumru, roka, salatalık, domates ve limon (400 kcal, 35 g protein)", "Tavuklu Lahana Protein Bowl — tavuk, lahana, havuç, salatalık ve yoğurt (360 kcal, 45 g protein)", "Bonfile Mantar Bowl Light — bonfile, mantar, brokoli ve roka (410 kcal, 45 g protein)", "Ton Balığı Semizotu Light — ton balığı, semizotu, yumurta ve yoğurt (350 kcal, 42 g protein)", "Levrek Kuşkonmaz Bowl — levrek, kuşkonmaz, brokoli ve limonlu yoğurt (370 kcal, 40 g protein)", "Tavuklu Kabak Noodle Bowl — tavuk, kabak noodle, mantar ve yoğurt (350 kcal, 44 g protein)", "Dana Patlıcan Bowl Light — yağsız dana, patlıcan, domates ve yoğurt (390 kcal, 40 g protein)", "Somon Salata Bowl Light — somon, yeşillik, salatalık ve limonlu yoğurt (400 kcal, 36 g protein)", "Tavuklu Brokoli Bowl Light — tavuk, brokoli, edamame ve yoğurt (370 kcal, 47 g protein)", "Köfte Yeşil Bowl Light — köfte, roka, salatalık, domates ve cacık (390 kcal, 39 g protein)", "Çipura Sebze Tabağı — çipura, kabak, brokoli ve yeşillik (360 kcal, 39 g protein)", "Protein Ton Balığı Bowl — ton balığı, yumurta, edamame, roka ve salatalık (370 kcal, 44 g protein)"], "🥩 Et Ağırlıklı": ["Steak & Quinoa Bowl — dana bonfile, kinoa, brokoli, köz biber ve yoğurt (500 kcal, 46 g protein)", "Dana Fajita Bowl — dana, esmer pirinç, biber, soğan, salsa ve avokado (510 kcal, 44 g protein)", "Korean Beef Bowl — yağsız dana kıyma, basmati, brokoli, havuç ve hafif sos (500 kcal, 43 g protein)", "Beef & Broccoli Bowl — dana, brokoli, esmer pirinç ve susamlı hafif sos (490 kcal, 45 g protein)", "Dana Köfte Protein Bowl — köfte, bulgur, köz sebze ve cacık (480 kcal, 45 g protein)", "Dana Bonfile Sweet Potato Bowl — bonfile, tatlı patates, brokoli ve yoğurt (490 kcal, 48 g protein)", "Dana Akdeniz Bowl — dana kuşbaşı, kinoa, nohut, sebze ve yoğurt (500 kcal, 46 g protein)", "Steak Mushroom Bowl — bonfile, mantar, esmer pirinç, brokoli ve yoğurt (510 kcal, 47 g protein)", "Dana Shawarma Bowl — baharatlı dana, bulgur, nohut, salata ve sarımsaklı yoğurt (510 kcal, 45 g protein)", "Dana Gyro Bowl — dana şeritleri, basmati, salatalık, domates ve tzatziki (520 kcal, 44 g protein)", "Etli Nohut Protein Bowl — dana, nohut, bulgur, roka ve yoğurt (520 kcal, 44 g protein)", "Dana Taco Bowl — yağsız dana, esmer pirinç, siyah fasulye, mısır ve salsa (520 kcal, 43 g protein)", "Dana Steak Fajita Salad — bonfile, biber, soğan, yeşillik, avokado ve yoğurt (470 kcal, 45 g protein)", "Dana Köfte Mediterranean Bowl — köfte, kinoa, domates, salatalık, roka ve cacık (500 kcal, 43 g protein)", "Yağsız Dana Chili Bowl — dana kıyma, kırmızı fasulye, domates, biber ve esmer pirinç (520 kcal, 44 g protein)", "Dana Stroganoff Bowl — yağsız dana, mantar, esmer pirinç ve yoğurtlu sos (510 kcal, 43 g protein)", "Etli Sebze Wok Bowl — dana, brokoli, biber, mantar ve karabuğday (490 kcal, 45 g protein)", "Dana Bonfile Basmati Bowl — bonfile, basmati, brokoli ve köz biber (500 kcal, 47 g protein)", "Dana Köfte Sweet Potato Bowl — köfte, tatlı patates, roka ve yoğurt (500 kcal, 42 g protein)", "Dana & Mercimek Bowl — dana, yeşil mercimek, köz sebze ve cacık (490 kcal, 49 g protein)", "Dana Ciğer Protein Bowl — dana ciğer, bulgur, soğan salatası ve cacık (470 kcal, 43 g protein)", "Ciğer Shawarma Bowl — baharatlı ciğer, bulgur, salata ve sarımsaklı yoğurt (480 kcal, 44 g protein)", "Dana Bonfile Patates Bowl — bonfile, fırın patates, brokoli ve yoğurt (530 kcal, 46 g protein)", "Dana Köfte Orzo Bowl — köfte, tam buğday orzo, domates, roka ve yoğurt (510 kcal, 43 g protein)", "Dana Fajita Quinoa Bowl — dana, kinoa, biber, siyah fasulye ve salsa (520 kcal, 45 g protein)", "Beef Burrito Bowl — yağsız dana, esmer pirinç, fasulye, mısır, salsa ve yoğurt (530 kcal, 44 g protein)", "Dana Köfte Bulgur Bowl — köfte, bulgur, köz patlıcan, domates ve cacık (500 kcal, 44 g protein)", "Steak Mediterranean Bowl — bonfile, kinoa, nohut, roka ve feta (520 kcal, 47 g protein)", "Dana Sebze Güveç Bowl — dana, patlıcan, kabak, biber, domates ve bulgur (500 kcal, 43 g protein)", "Etli Karabuğday Power Bowl — dana, karabuğday, brokoli, mantar ve yoğurt (500 kcal, 46 g protein)"], "🐟 Balık Ağırlıklı": ["Somon Kinoa Protein Bowl — somon, kinoa, brokoli, salatalık ve limonlu yoğurt (500 kcal, 40 g protein)", "Teriyaki Somon Bowl — somon, esmer pirinç, brokoli, havuç ve hafif teriyaki (510 kcal, 39 g protein)", "Somon Edamame Bowl — somon, kinoa, edamame, salatalık ve yoğurt sosu (500 kcal, 43 g protein)", "Akdeniz Somon Bowl — somon, bulgur, roka, domates, salatalık ve yoğurt (510 kcal, 39 g protein)", "Somon Sweet Potato Bowl — somon, tatlı patates, brokoli ve yoğurt (520 kcal, 38 g protein)", "Somon Pesto Bowl — somon, kinoa, brokoli, domates ve az pesto (520 kcal, 40 g protein)", "Levrek Akdeniz Bowl — levrek, kinoa, köz sebze ve tzatziki (470 kcal, 40 g protein)", "Levrek Fajita Bowl — levrek, esmer pirinç, biber, mısır ve salsa (480 kcal, 39 g protein)", "Levrek Green Bowl — levrek, brokoli, kuşkonmaz, roka ve yoğurt (430 kcal, 40 g protein)", "Çipura Kinoa Bowl — çipura, kinoa, kabak, domates ve cacık (470 kcal, 40 g protein)", "Çipura Mediterranean Bowl — çipura, bulgur, roka, salatalık ve yoğurt (480 kcal, 39 g protein)", "Uskumru Bulgur Bowl — uskumru, bulgur, roka, domates ve yoğurt (490 kcal, 38 g protein)", "Uskumru Mediterranean Salad Bowl — uskumru, nohut, yeşillik, domates ve yoğurt (480 kcal, 39 g protein)", "Alabalık Karabuğday Bowl — alabalık, karabuğday, brokoli ve yoğurt (470 kcal, 40 g protein)", "Alabalık Sweet Potato Bowl — alabalık, tatlı patates, brokoli ve cacık (480 kcal, 39 g protein)", "Sardalya Bulgur Bowl — sardalya, bulgur, roka, domates ve yoğurt (470 kcal, 36 g protein)", "Sardalya Akdeniz Bowl — sardalya, nohut, yeşillik, domates ve limonlu yoğurt (460 kcal, 37 g protein)", "Palamut Bulgur Bowl — palamut, bulgur, roka, soğan salatası ve yoğurt (500 kcal, 40 g protein)", "Palamut Fırın Sebze Bowl — palamut, patates, kabak, biber ve yoğurt (510 kcal, 39 g protein)", "Mezgit Kinoa Bowl — mezgit, kinoa, brokoli, salatalık ve yoğurt (450 kcal, 41 g protein)", "Mezgit Mediterranean Bowl — mezgit, bulgur, roka, domates ve cacık (460 kcal, 40 g protein)", "Ton Balığı Protein Bowl — ton balığı, kinoa, nohut, yumurta ve roka (450 kcal, 45 g protein)", "Ton Balığı Sushi Bowl — ton balığı, basmati, edamame, salatalık, havuç ve hafif susam sosu (480 kcal, 44 g protein)", "Ton Balığı Nohut Bowl — ton balığı, nohut, bulgur, domates ve yeşillik (450 kcal, 43 g protein)", "Ton Balığı Avokado Bowl — ton balığı, esmer pirinç, avokado, salatalık ve yumurta (490 kcal, 43 g protein)", "Somon Poke Style Bowl — somon, esmer pirinç, edamame, salatalık ve hafif sos (520 kcal, 40 g protein)", "Levrek Köz Sebze Tabağı — levrek, patlıcan, kabak, biber ve yoğurt (440 kcal, 41 g protein)", "Çipura Tatlı Patates Bowl — çipura, tatlı patates, brokoli ve yoğurt (480 kcal, 40 g protein)", "Alabalık Green Bowl — alabalık, roka, brokoli, salatalık ve yoğurt (420 kcal, 39 g protein)", "Uskumru Sweet Potato Bowl — uskumru, tatlı patates, brokoli ve cacık (500 kcal, 38 g protein)"], "🍗 Tavuk Ağırlıklı": ["Akdeniz Tavuk Protein Bowl — tavuk, kinoa, nohut, domates, salatalık, roka ve tzatziki (470 kcal, 48 g protein)", "Greek Chicken Bowl — tavuk, esmer pirinç, domates, salatalık, zeytin ve tzatziki (490 kcal, 45 g protein)", "Tavuk Shawarma Bowl — tavuk, basmati, köz biber, nohut, salata ve yoğurt (480 kcal, 47 g protein)", "Chicken Fajita Bowl — tavuk, esmer pirinç, siyah fasulye, biber, salsa ve yoğurt (500 kcal, 46 g protein)", "Tavuk Teriyaki Bowl — tavuk, esmer pirinç, brokoli, havuç ve hafif teriyaki (490 kcal, 45 g protein)", "Peri Peri Tavuk Bowl — acılı tavuk, tatlı patates, brokoli ve yoğurt (460 kcal, 47 g protein)", "Tavuk Caesar Protein Bowl — tavuk, marul, parmesan, kruton ve yoğurtlu sos (460 kcal, 50 g protein)", "Tavuk Pesto Kinoa Bowl — tavuk, kinoa, brokoli, domates ve az pesto (480 kcal, 47 g protein)", "Tavuklu Mercimek Bowl — tavuk, mercimek, bulgur, roka ve yoğurt (450 kcal, 49 g protein)", "Tavuklu Nohut Bowl — tavuk, nohut, bulgur, roka, domates ve cacık (470 kcal, 47 g protein)", "Tavuklu Siyah Fasulye Bowl — tavuk, siyah fasulye, esmer pirinç, mısır ve salsa (490 kcal, 46 g protein)", "Tavuk Burrito Bowl — tavuk, basmati, fasulye, mısır, salsa ve yoğurt (500 kcal, 46 g protein)", "Tavuk Tikka Bowl — baharatlı tavuk, basmati, salatalık, domates ve yoğurtlu sos (500 kcal, 45 g protein)", "Tavuk Tandoori Bowl — tavuk, bulgur, köz sebze ve cacık (470 kcal, 47 g protein)", "Tavuk Souvlaki Bowl — tavuk şiş, kinoa, salata, nohut ve tzatziki (480 kcal, 48 g protein)", "Tavuk Gyro Bowl — tavuk, basmati, salatalık, domates ve sarımsaklı yoğurt (490 kcal, 46 g protein)", "Tavuk Fajita Salad Bowl — tavuk, biber, soğan, marul, avokado ve salsa (430 kcal, 45 g protein)", "Tavuklu Orzo Bowl — tavuk, tam buğday orzo, domates, roka ve feta (490 kcal, 46 g protein)", "Tavuk Sweet Potato Bowl — tavuk, tatlı patates, brokoli ve yoğurt (450 kcal, 48 g protein)", "Tavuk Mushroom Bowl — tavuk, esmer pirinç, mantar, brokoli ve yoğurt (470 kcal, 47 g protein)", "Tavuk Teriyaki Noodle Bowl — tavuk, tam tahıllı noodle, brokoli ve havuç (500 kcal, 45 g protein)", "Tavuklu Edamame Bowl — tavuk, kinoa, edamame, salatalık ve yoğurt (470 kcal, 50 g protein)", "Tavuklu Akdeniz Pita Bowl — tavuk, tam tahıllı pita, nohut, salata ve tzatziki (490 kcal, 48 g protein)", "Tavuklu Protein Omlet Bowl — tavuk, yumurta, lor, avokado ve yeşillik (450 kcal, 52 g protein)", "Tavuklu Kinoa Caesar Bowl — tavuk, kinoa, marul, parmesan ve hafif Caesar sos (480 kcal, 49 g protein)", "Tavuklu Bulgur Power Bowl — tavuk, bulgur, nohut, köz biber ve yoğurt (460 kcal, 48 g protein)", "Tavuklu Karabuğday Bowl — tavuk, karabuğday, brokoli, mantar ve cacık (450 kcal, 48 g protein)", "Tavuklu Mercimek Curry Bowl — tavuk, mercimek, basmati, ıspanak ve yoğurt (500 kcal, 48 g protein)", "Tavuklu Akdeniz Couscous Bowl — tavuk, tam tahıllı kuskus, nohut, sebze ve yoğurt (490 kcal, 46 g protein)", "Tavuk Protein Poke Bowl — tavuk, esmer pirinç, edamame, salatalık, havuç ve hafif sos (490 kcal, 47 g protein)"], "🫀 Protein + Ciğer": ["Izgara Dana Ciğer Protein Bowl — ciğer, bulgur, roka, soğan salatası ve cacık (470 kcal, 43 g protein)", "Dana Ciğer Shawarma Bowl — baharatlı ciğer, basmati, nohut, salata ve sarımsaklı yoğurt (490 kcal, 45 g protein)", "Dana Ciğer Karabuğday Bowl — ciğer, karabuğday, brokoli, mantar ve yoğurt (460 kcal, 44 g protein)", "Dana Ciğer Sweet Potato Bowl — ciğer, tatlı patates, brokoli ve cacık (470 kcal, 43 g protein)", "Dana Ciğer Mediterranean Bowl — ciğer, kinoa, domates, salatalık, roka ve yoğurt (480 kcal, 44 g protein)", "Dana Ciğer Fajita Bowl — ciğer, esmer pirinç, biber, soğan ve salsa (490 kcal, 45 g protein)", "Dana Ciğer & Mercimek Bowl — ciğer, mercimek, bulgur, roka ve yoğurt (470 kcal, 48 g protein)", "Dana Ciğer Mushroom Bowl — ciğer, esmer pirinç, mantar, brokoli ve yoğurt (480 kcal, 44 g protein)", "Dana Ciğer Kinoa Power Bowl — ciğer, kinoa, nohut, yeşillik ve cacık (480 kcal, 47 g protein)", "Dana Ciğer Pita Bowl — ciğer, tam tahıllı pita, nohut, salata ve yoğurt (490 kcal, 45 g protein)", "Tavuk Ciğer Protein Bowl — tavuk ciğer, bulgur, roka ve cacık (450 kcal, 42 g protein)", "Tavuk Ciğer Shawarma Bowl — tavuk ciğer, basmati, salata, nohut ve yoğurt (470 kcal, 43 g protein)", "Tavuk Ciğer Karabuğday Bowl — tavuk ciğer, karabuğday, brokoli ve yoğurt (450 kcal, 43 g protein)", "Tavuk Ciğer Sweet Potato Bowl — tavuk ciğer, tatlı patates, brokoli ve cacık (460 kcal, 42 g protein)", "Tavuk Ciğer Fajita Bowl — tavuk ciğer, esmer pirinç, biber, soğan ve salsa (470 kcal, 43 g protein)", "Tavuk Ciğer & Mercimek Bowl — tavuk ciğer, mercimek, roka, domates ve yoğurt (450 kcal, 46 g protein)", "Ciğer & Köfte Protein Bowl — dana ciğer, mini köfte, bulgur, roka ve cacık (500 kcal, 47 g protein)", "Ciğer & Tavuk Mix Bowl — dana ciğer, tavuk göğsü, kinoa, brokoli ve yoğurt (500 kcal, 55 g protein)", "Ciğer & Yumurta Power Bowl — ciğer, haşlanmış yumurta, bulgur, roka ve yoğurt (480 kcal, 46 g protein)", "Ciğer & Nohut Bowl — dana ciğer, nohut, bulgur, domates ve yoğurt (490 kcal, 45 g protein)", "Ciğer & Mercimek Bowl — dana ciğer, yeşil mercimek, roka ve cacık (470 kcal, 48 g protein)", "Ciğer & Sebze Wok Bowl — dana ciğer, brokoli, biber, mantar ve karabuğday (460 kcal, 43 g protein)", "Ciğer & Kinoa Mediterranean Bowl — ciğer, kinoa, nohut, domates ve yoğurt (480 kcal, 45 g protein)", "Ciğer Köfte Fajita Bowl — ciğer, köfte, biber, esmer pirinç ve salsa (510 kcal, 47 g protein)", "Tavuk Ciğer Orzo Bowl — tavuk ciğer, tam buğday orzo, domates ve yoğurt (480 kcal, 43 g protein)", "Dana Ciğer Bulgur Poke Style Bowl — ciğer, bulgur, edamame, salatalık ve yoğurt (480 kcal, 45 g protein)", "Ciğerli Akdeniz Salata Bowl — ciğer, nohut, roka, domates, salatalık ve yoğurt (450 kcal, 43 g protein)", "Ciğerli Köz Sebze Bowl — ciğer, patlıcan, kabak, biber ve cacık (430 kcal, 42 g protein)", "Ciğer & Tatlı Patates Protein Bowl — ciğer, tatlı patates, brokoli ve yoğurt (460 kcal, 43 g protein)", "Ciğer & Karabuğday Power Bowl — dana ciğer, karabuğday, mantar, brokoli ve cacık (470 kcal, 44 g protein)"], "🎲 Karışık / Sürpriz": ["Chicken Fajita Bowl — tavuk, esmer pirinç, siyah fasulye, biber ve salsa (500 kcal, 46 g protein)", "Somon Kinoa Bowl — somon, kinoa, brokoli ve limonlu yoğurt (500 kcal, 40 g protein)", "Dana Steak Bowl — bonfile, kinoa, brokoli, köz biber ve yoğurt (500 kcal, 46 g protein)", "Ton Balığı Sushi Bowl — ton balığı, basmati, edamame, salatalık ve havuç (480 kcal, 44 g protein)", "Tavuk Shawarma Bowl — tavuk, basmati, nohut, salata ve yoğurt (480 kcal, 47 g protein)", "Dana Fajita Bowl — dana, esmer pirinç, biber, salsa ve avokado (510 kcal, 44 g protein)", "Levrek Mediterranean Bowl — levrek, kinoa, köz sebze ve tzatziki (470 kcal, 40 g protein)", "Ciğer Protein Bowl — dana ciğer, bulgur, roka ve cacık (470 kcal, 43 g protein)", "Tavuk Caesar Bowl — tavuk, marul, parmesan, kruton ve hafif sos (460 kcal, 50 g protein)", "Somon Edamame Bowl — somon, kinoa, edamame ve salatalık (500 kcal, 43 g protein)", "Dana Köfte Sweet Potato Bowl — köfte, tatlı patates, roka ve yoğurt (500 kcal, 42 g protein)", "Tavuk Tikka Bowl — baharatlı tavuk, basmati, salata ve yoğurt (500 kcal, 45 g protein)", "Ton Balığı Nohut Bowl — ton balığı, nohut, kinoa, yumurta ve yeşillik (450 kcal, 45 g protein)", "Uskumru Bulgur Bowl — uskumru, bulgur, roka ve yoğurt (490 kcal, 38 g protein)", "Dana Chili Bowl — yağsız dana, kırmızı fasulye, domates ve esmer pirinç (520 kcal, 44 g protein)", "Tavuk Pesto Bowl — tavuk, kinoa, brokoli, domates ve az pesto (480 kcal, 47 g protein)", "Alabalık Karabuğday Bowl — alabalık, karabuğday, brokoli ve yoğurt (470 kcal, 40 g protein)", "Etli Nohut Bowl — dana, nohut, bulgur, roka ve yoğurt (520 kcal, 44 g protein)", "Tavuklu Mercimek Bowl — tavuk, mercimek, bulgur ve cacık (450 kcal, 49 g protein)", "Çipura Tatlı Patates Bowl — çipura, tatlı patates, brokoli ve yoğurt (480 kcal, 40 g protein)", "Steak Mushroom Bowl — bonfile, mantar, esmer pirinç ve brokoli (510 kcal, 47 g protein)", "Tavuklu Siyah Fasulye Bowl — tavuk, fasulye, esmer pirinç, mısır ve salsa (490 kcal, 46 g protein)", "Somon Akdeniz Salata Bowl — somon, roka, domates, salatalık ve yoğurt (440 kcal, 36 g protein)", "Dana Köfte Mediterranean Bowl — köfte, kinoa, domates, salatalık ve cacık (500 kcal, 43 g protein)", "Tavuk Souvlaki Bowl — tavuk şiş, kinoa, nohut ve tzatziki (480 kcal, 48 g protein)", "Ton Balığı Avokado Bowl — ton balığı, esmer pirinç, avokado ve yumurta (490 kcal, 43 g protein)", "Dana Shawarma Bowl — dana, bulgur, nohut, salata ve yoğurt (510 kcal, 45 g protein)", "Tavuk Sweet Potato Bowl — tavuk, tatlı patates, brokoli ve yoğurt (450 kcal, 48 g protein)", "Ciğer & Mercimek Bowl — ciğer, mercimek, bulgur ve cacık (470 kcal, 48 g protein)", "Protein Sürpriz Bowl — tavuk, ton balığı, yumurta, kinoa, yeşillik ve yoğurt (500 kcal, 55 g protein)"]};
 const colors = ["#6d28d9","#0891b2","#db2777","#16a34a","#ea580c","#2563eb","#ca8a04","#9333ea","#0f766e","#be123c"];
 
@@ -477,14 +483,6 @@ let audioCtx = null;
 let tickTimer = null;
 
 const $ = id => document.getElementById(id);
-function loadSelectedCategory(categoryName){
-  const list=CATEGORY_MENUS[categoryName]||[];
-  foods=list.slice();
-  schedule=Array(7).fill(null);
-  history=[];
-  save(); render();
-}
-
 const wheel = $("wheel"), ctx = wheel.getContext("2d");
 
 function save(){
@@ -514,8 +512,6 @@ function addFoods(list){
   save(); render();
   if(added) toast(added+" yemek eklendi");
 }
-const MENU_CATEGORIES={"protein": ["Izgara tavuk göğsü basmati pirinç pilavı yoğurt (450 kcal)", "Izgara tavuk şiş kinoa pilavı cacık (430 kcal)", "Fırında tavuk göğsü tatlı patates brokoli (440 kcal)", "Tavuklu sebze sote karabuğday pilavı (420 kcal)", "Izgara tavuk bonfile bulgur pilavı ayran (450 kcal)", "Fırında tavuk pirzola esmer pirinç pilavı (470 kcal)", "Izgara tavuk köfte kinoa pilavı (440 kcal)", "Tavuk göğsü mantar sote bulgur pilavı (430 kcal)", "Izgara tavuk göğsü mercimek salatası yoğurt (430 kcal)", "Fırında tavuk göğsü kabak ve havuç sote (400 kcal)", "Izgara dana bonfile basmati pirinç pilavı (490 kcal)", "Yağsız dana biftek karabuğday pilavı (460 kcal)", "Dana kuşbaşı mantar sote bulgur pilavı (450 kcal)", "Izgara dana köfte kinoa pilavı yoğurt (460 kcal)", "Dana rosto esmer pirinç pilavı salata (480 kcal)", "Yağsız dana kuşbaşı sebze güveç bulgur pilavı (450 kcal)", "Izgara dana bonfile brokoli ve tatlı patates (470 kcal)", "Dana kıymalı kabak yemeği yoğurt (390 kcal)", "Fırında dana biftek patates püresi salata (480 kcal)", "Yağsız dana köfte bulgur pilavı cacık (450 kcal)", "Fırında somon brokoli kinoa pilavı (470 kcal)", "Izgara levrek bulgur pilavı roka salatası (410 kcal)", "Fırında çipura haşlanmış patates yeşil salata (390 kcal)", "Izgara uskumru esmer pirinç pilavı (460 kcal)", "Ton balıklı kinoa salatası haşlanmış yumurta (400 kcal)", "Izgara dana ciğer bulgur pilavı soğan salatası (450 kcal)", "Dana ciğer sote karabuğday pilavı yoğurt (440 kcal)", "Izgara tavuk ciğer şiş bulgur pilavı (430 kcal)", "Protein omlet tavuk göğsü avokado salatası (410 kcal)", "Ton balıklı mercimek salatası yoğurt (400 kcal)"], "dengeli": ["Izgara tavuk göğsü bulgur pilavı cacık mevsim salata (450 kcal)", "Fırında somon patates brokoli yoğurt (480 kcal)", "Dana kuşbaşı sebze türlü bulgur pilavı (440 kcal)", "Izgara köfte basmati pirinç pilavı cacık (470 kcal)", "Fırında levrek fırın patates yeşil salata (410 kcal)", "Tavuklu sebze sote esmer pirinç pilavı (430 kcal)", "Kıymalı kabak yemeği bulgur pilavı yoğurt (420 kcal)", "Izgara çipura haşlanmış patates salata (400 kcal)", "Dana bonfile karabuğday pilavı brokoli (480 kcal)", "Tavuk şiş bulgur pilavı közlenmiş sebze (450 kcal)", "Ton balıklı kinoa salatası yumurta (410 kcal)", "Kıymalı ıspanak yemeği yoğurt bulgur pilavı (400 kcal)", "Izgara dana köfte kinoa pilavı salata (460 kcal)", "Fırında tavuk pirzola patates ve salata (470 kcal)", "Fırında alabalık bulgur pilavı roka salatası (440 kcal)", "Yağsız dana rosto esmer pirinç pilavı (480 kcal)", "Tavuk göğsü mantar sote kinoa pilavı (430 kcal)", "Izgara uskumru patates salatası yoğurt (450 kcal)", "Kıymalı karnabahar yemeği bulgur pilavı (390 kcal)", "Dana kuşbaşı patlıcan yemeği yoğurt (430 kcal)", "Izgara tavuk köfte karabuğday pilavı (450 kcal)", "Fırında somon tatlı patates roka salatası (480 kcal)", "Izgara dana ciğer bulgur pilavı cacık (450 kcal)", "Tavuklu mercimek salatası yoğurt (420 kcal)", "Fırında levrek esmer pirinç pilavı sebze (420 kcal)", "Izgara köfte tatlı patates püresi salata (470 kcal)", "Dana etli sebze güveç bulgur pilavı (460 kcal)", "Fırında tavuk göğsü kinoa pilavı yoğurt (440 kcal)", "Ton balıklı nohutlu yeşil salata yumurta (420 kcal)", "Izgara dana bonfile bulgur pilavı salata (480 kcal)"], "yesillik": ["Izgara tavuk göğsü büyük yeşil salata yoğurt (380 kcal)", "Ton balıklı roka salatası haşlanmış yumurta (370 kcal)", "Izgara levrek bol yeşillik limonlu salata (360 kcal)", "Izgara dana bonfile közlenmiş sebzeler (430 kcal)", "Tavuklu brokoli mantar ve kabak sote (390 kcal)", "Kıymalı ıspanak yemeği yoğurtlu salata (370 kcal)", "Somonlu roka salatası avokado (450 kcal)", "Izgara köfte közlenmiş patlıcan biber salatası (430 kcal)", "Tavuk göğsü Akdeniz salatası yoğurt (400 kcal)", "Ton balıklı semizotu salatası yumurta (380 kcal)", "Fırında levrek brokoli karnabahar salatası (390 kcal)", "Dana kuşbaşı sebze sote yoğurt (420 kcal)", "Izgara çipura roka domates salatası (370 kcal)", "Tavuklu karnabahar brokoli güveç (400 kcal)", "Kıymalı kabak yemeği cacık salata (380 kcal)", "Izgara uskumru mevsim yeşillikleri (420 kcal)", "Izgara tavuk şiş közlenmiş sebze (400 kcal)", "Dana köfte çoban salata yoğurt (430 kcal)", "Fırında somon kuşkonmaz brokoli (450 kcal)", "Ton balıklı Akdeniz salatası nohut (410 kcal)", "Tavuk göğsü mantar ıspanak sote (390 kcal)", "Izgara dana ciğer soğan maydanoz salatası (410 kcal)", "Fırında alabalık yeşil salata yoğurt (390 kcal)", "Kıymalı karnabahar brokoli yemeği (380 kcal)", "Izgara köfte semizotu yoğurt salatası (420 kcal)", "Fırında tavuk göğsü kabak patlıcan biber (400 kcal)", "Dana biftek roka mantar közlenmiş biber (430 kcal)", "Ton balıklı mercimek yeşillik salatası (400 kcal)", "Fırında çipura brokoli kabak salatası (380 kcal)", "Izgara tavuk göğsü avokadolu yeşil salata (410 kcal)"], "yagkaybi": ["Izgara tavuk göğsü brokoli yoğurt (360 kcal)", "Izgara tavuk şiş büyük yeşil salata (370 kcal)", "Fırında levrek brokoli kabak (360 kcal)", "Ton balıklı yeşil salata yumurta (370 kcal)", "Yağsız dana bonfile közlenmiş sebze (420 kcal)", "Izgara köfte çoban salata yoğurt (410 kcal)", "Fırında somon brokoli kuşkonmaz (440 kcal)", "Tavuk göğsü mantar kabak sote (370 kcal)", "Dana kuşbaşı sebze sote yoğurt (400 kcal)", "Fırında çipura yeşil salata (350 kcal)", "Tavuklu mercimek salatası yoğurt (400 kcal)", "Izgara dana ciğer soğan salatası (390 kcal)", "Fırında tavuk göğsü karnabahar brokoli (370 kcal)", "Ton balıklı semizotu salatası (350 kcal)", "Izgara uskumru roka salatası (410 kcal)", "Dana köfte közlenmiş patlıcan (400 kcal)", "Tavuk göğsü ıspanak mantar sote (360 kcal)", "Fırında alabalık kabak brokoli (380 kcal)", "Kıymalı kabak yemeği yoğurt (380 kcal)", "Izgara levrek kuşkonmaz salatası (360 kcal)", "Fırında somon yeşil salata (430 kcal)", "Izgara tavuk göğsü semizotu yoğurt (370 kcal)", "Dana biftek mantar ve yeşil salata (410 kcal)", "Ton balıklı brokoli yumurta salatası (370 kcal)", "Izgara köfte kabak patlıcan közleme (410 kcal)", "Fırında tavuk göğsü sebze güveç (390 kcal)", "Kıymalı ıspanak yoğurt (360 kcal)", "Izgara çipura roka salatası (360 kcal)", "Dana ciğer közlenmiş sebze (400 kcal)", "Tavuk göğsü karnabahar yoğurt (350 kcal)"], "et": ["Izgara dana bonfile bulgur pilavı salata (480 kcal)", "Yağsız dana kuşbaşı sebze türlü (450 kcal)", "Izgara dana köfte kinoa pilavı (460 kcal)", "Dana rosto esmer pirinç pilavı (480 kcal)", "Yağsız dana biftek karabuğday pilavı (470 kcal)", "Izgara dana ciğer bulgur pilavı (450 kcal)", "Dana ciğer sote esmer pirinç pilavı (450 kcal)", "Dana kuşbaşı mantar sote bulgur pilavı (460 kcal)", "Izgara dana köfte basmati pilavı (470 kcal)", "Dana bonfile tatlı patates brokoli (480 kcal)", "Kıymalı karnabahar yemeği bulgur pilavı (420 kcal)", "Kıymalı kabak yemeği esmer pirinç pilavı (430 kcal)", "Dana etli sebze güveç bulgur pilavı (460 kcal)", "Izgara köfte karabuğday pilavı cacık (460 kcal)", "Dana biftek patates püresi salata (490 kcal)", "Izgara dana bonfile kinoa pilavı (480 kcal)", "Yağsız dana rosto bulgur pilavı (480 kcal)", "Dana kıymalı ıspanak yemeği yoğurt (410 kcal)", "Izgara dana ciğer karabuğday pilavı (450 kcal)", "Dana kuşbaşı patlıcan yemeği bulgur pilavı (440 kcal)", "Izgara dana köfte tatlı patates (470 kcal)", "Dana bonfile mantar sote esmer pirinç (480 kcal)", "Kıymalı taze fasulye bulgur pilavı (430 kcal)", "Izgara ciğer şiş bulgur pilavı (450 kcal)", "Dana biftek közlenmiş sebze yoğurt (440 kcal)", "Dana rosto karabuğday pilavı brokoli (480 kcal)", "Izgara köfte basmati pilavı yoğurt (470 kcal)", "Dana kuşbaşı kabak mantar sote (420 kcal)", "Dana bonfile fırın patates salata (480 kcal)", "Yağsız dana köfte kinoa pilavı (460 kcal)"], "balik": ["Fırında somon patates roka salatası (490 kcal)", "Izgara levrek bulgur pilavı salata (420 kcal)", "Fırında çipura haşlanmış patates (400 kcal)", "Izgara uskumru esmer pirinç pilavı (460 kcal)", "Fırında alabalık karabuğday pilavı (440 kcal)", "Izgara sardalya bulgur pilavı (440 kcal)", "Fırında palamut patates salatası (460 kcal)", "Ton balıklı kinoa salatası yumurta (410 kcal)", "Fırında mezgit fileto patates (400 kcal)", "Izgara somon kinoa salatası (470 kcal)", "Fırında levrek tatlı patates brokoli (420 kcal)", "Izgara çipura bulgur pilavı (430 kcal)", "Fırında uskumru sebzeli patates (450 kcal)", "Izgara alabalık basmati pilavı (450 kcal)", "Fırında sardalya sebze ve yoğurt (420 kcal)", "Ton balıklı mercimek salatası yumurta (400 kcal)", "Fırında somon esmer pirinç kuşkonmaz (480 kcal)", "Izgara palamut bulgur pilavı (460 kcal)", "Fırında çipura brokoli kabak (390 kcal)", "Izgara levrek kinoa pilavı (430 kcal)", "Fırında alabalık tatlı patates (440 kcal)", "Ton balıklı nohutlu yeşil salata (410 kcal)", "Izgara uskumru bulgur pilavı roka (460 kcal)", "Fırında mezgit esmer pirinç pilavı (420 kcal)", "Izgara sardalya patates salatası (430 kcal)", "Fırında palamut bulgur pilavı (460 kcal)", "Somonlu kinoa salatası avokado (480 kcal)", "Ton balıklı esmer pirinç salatası yumurta (420 kcal)", "Izgara çipura karabuğday pilavı (430 kcal)", "Fırında levrek kök sebzeler (410 kcal)"], "tavuk": ["Izgara tavuk göğsü basmati pilavı yoğurt (450 kcal)", "Izgara tavuk şiş kinoa pilavı cacık (430 kcal)", "Fırında tavuk pirzola bulgur pilavı (460 kcal)", "Tavuklu sebze sote esmer pirinç (430 kcal)", "Izgara tavuk bonfile karabuğday pilavı (440 kcal)", "Fırında tavuk göğsü tatlı patates brokoli (440 kcal)", "Tavuk göğsü mantar sote bulgur pilavı (430 kcal)", "Izgara tavuk köfte kinoa pilavı (440 kcal)", "Tavuklu mercimek salatası yoğurt (420 kcal)", "Fırında tavuk göğsü kabak patlıcan (400 kcal)", "Izgara tavuk göğsü bulgur pilavı cacık (440 kcal)", "Tavuk şiş esmer pirinç pilavı (450 kcal)", "Fırında tavuk baget sebzeli bulgur (470 kcal)", "Tavuk göğsü nohutlu salata (430 kcal)", "Izgara tavuk göğsü tatlı patates (430 kcal)", "Tavuklu kinoa sebze salatası yoğurt (410 kcal)", "Fırında tavuk göğsü mantarlı sebze (410 kcal)", "Izgara tavuk bonfile basmati pilavı (450 kcal)", "Tavuk göğsü ıspanak mantar sote (390 kcal)", "Fırında tavuk pirzola patates salata (470 kcal)", "Izgara tavuk şiş bulgur pilavı (440 kcal)", "Tavuklu brokoli kinoa pilavı (430 kcal)", "Fırında tavuk göğsü mercimek salatası (420 kcal)", "Izgara tavuk göğsü arpa şehriye pilavı (450 kcal)", "Tavuk köfte bulgur pilavı ayran (450 kcal)", "Fırında tavuk göğsü sebze güveç (400 kcal)", "Izgara tavuk göğsü avokadolu salata (410 kcal)", "Tavuklu karabuğday sebze sote (420 kcal)", "Fırında tavuk göğsü esmer pirinç brokoli (440 kcal)", "Izgara tavuk şiş tatlı patates salatası (430 kcal)"], "ciger": ["Izgara dana ciğer bulgur pilavı soğan salatası (450 kcal)", "Dana ciğer sote esmer pirinç yoğurt (440 kcal)", "Izgara tavuk ciğer şiş bulgur pilavı (430 kcal)", "Dana ciğer karabuğday pilavı cacık (450 kcal)", "Izgara ciğer şiş basmati pilavı salata (450 kcal)", "Dana ciğer sebze sote bulgur pilavı (440 kcal)", "Tavuk ciğer sote kinoa pilavı yoğurt (430 kcal)", "Izgara dana ciğer tatlı patates brokoli (450 kcal)", "Ciğer şiş bulgur pilavı cacık (440 kcal)", "Dana ciğer mantar sote karabuğday pilavı (450 kcal)", "Tavuk ciğer sebze güveç bulgur pilavı (420 kcal)", "Izgara dana ciğer kinoa pilavı salata (460 kcal)", "Dana ciğer fırın patates yoğurt (450 kcal)", "Tavuk ciğer sote esmer pirinç pilavı (430 kcal)", "Izgara ciğer şiş kinoa pilavı (450 kcal)", "Dana ciğer kabak mantar sote (410 kcal)", "Dana ciğer bulgur pilavı yoğurtlu salata (450 kcal)", "Tavuk ciğer karabuğday pilavı cacık (430 kcal)", "Izgara dana ciğer basmati pilavı (460 kcal)", "Ciğerli sebze sote bulgur pilavı (430 kcal)", "Dana ciğer brokoli tatlı patates (440 kcal)", "Tavuk ciğer nohutlu salata yoğurt (420 kcal)", "Izgara ciğer şiş esmer pirinç pilavı (450 kcal)", "Dana ciğer kinoa salatası yoğurt (430 kcal)", "Ciğer köfte karışık ızgara bulgur pilavı (470 kcal)", "Dana ciğer patlıcan közleme yoğurt (420 kcal)", "Tavuk ciğer mantar sote bulgur pilavı (430 kcal)", "Izgara dana ciğer karabuğday pilavı (450 kcal)", "Ciğerli ıspanak yemeği yoğurt (400 kcal)", "Dana ciğer fırında sebze güveç (430 kcal)"], "karisik": ["Izgara tavuk göğsü basmati pilavı yoğurt (450 kcal)", "Fırında somon tatlı patates brokoli (470 kcal)", "Izgara dana köfte kinoa pilavı cacık (460 kcal)", "Fırında levrek bulgur pilavı salata (410 kcal)", "Dana bonfile karabuğday pilavı (480 kcal)", "Tavuklu sebze sote kinoa (420 kcal)", "Izgara dana ciğer bulgur pilavı (450 kcal)", "Ton balıklı kinoa salatası yumurta (410 kcal)", "Fırında çipura patates salata (400 kcal)", "Tavuk göğsü mantar sote esmer pirinç (420 kcal)", "Dana kuşbaşı sebze güveç bulgur (450 kcal)", "Izgara uskumru bulgur pilavı (460 kcal)", "Fırında tavuk pirzola tatlı patates (470 kcal)", "Kıymalı karnabahar yoğurt (350 kcal)", "Izgara köfte tatlı patates salata (460 kcal)", "Fırında alabalık karabuğday pilavı (440 kcal)", "Tavuk göğsü mercimek salatası (430 kcal)", "Dana rosto esmer pirinç pilavı (480 kcal)", "Izgara levrek kinoa pilavı (430 kcal)", "Tavuk şiş bulgur pilavı cacık (440 kcal)", "Kıymalı kabak yemeği yoğurt (390 kcal)", "Fırında somon esmer pirinç kuşkonmaz (480 kcal)", "Izgara dana bonfile brokoli (450 kcal)", "Ton balıklı mercimek salatası yumurta (400 kcal)", "Fırında tavuk göğsü sebze güveç (400 kcal)", "Izgara sardalya bulgur pilavı (440 kcal)", "Dana köfte basmati pilavı yoğurt (470 kcal)", "Fırında çipura kinoa pilavı (420 kcal)", "Izgara tavuk bonfile karabuğday pilavı (440 kcal)", "Dana ciğer sote esmer pirinç yoğurt (440 kcal)"]};
-
 const CATEGORY_LABELS={
   protein:"💪 Protein Ağırlıklı", dengeli:"⚖️ Dengeli", yesillik:"🥗 Yeşillik / Sebze Ağırlıklı",
   yagkaybi:"🔥 Yağ Kaybı Odaklı", et:"🥩 Et Ağırlıklı", balik:"🐟 Balık Ağırlıklı",
@@ -574,13 +570,52 @@ document.addEventListener("click",e=>{
     if(spinMode==="day") toast(days[idx]+" seçildi — şimdi çarkı çevirebilirsin.");
   }
 });
-$("repeatSpinBtn").onclick=()=>spin();
+$("repeatSpinBtn").onclick=()=>{
+  if(spinning)return;
+  autoWeek=false;
+  $("spinBtn").textContent="ÇEVİR!";
+
+  if(spinMode==="day"){
+    spinDay();
+    return;
+  }
+
+  // Haftalık modda "Tekrar Çevir", bir sonraki güne geçmek yerine
+  // son seçilen günü geri koyup aynı gün için yeni bir seçim yapar.
+  const last=history[history.length-1];
+  if(!last){toast("Tekrar çevirmek için önce bir yemek seç");return}
+  if(spinning)return;
+
+  schedule[last.day]=null;
+  history.pop();
+  if(!foods.includes(last.food)) foods.push(last.food);
+  save();
+  render();
+  spinWeek();
+};
 $("copyResultBtn").onclick=async()=>{
   const food=$("lastFood").textContent;
   if(!food || food==="—" || food==="Çark dönüyor…"){toast("Önce bir yemek seç");return}
   try{await navigator.clipboard.writeText(food);toast("Yemek kopyalandı")}catch(e){toast("Kopyalama kullanılamıyor")}
 };
-$("shareResultBtn").onclick=()=>$("shareBtn").click();
+$("shareResultBtn").onclick=async()=>{
+  const food=$("lastFood").textContent;
+  if(!food || food==="—" || food==="Çark dönüyor…"){toast("Önce bir yemek seç");return}
+  const nutrition=parseNutrition(food);
+  const text=`🍽️ ${food} • ${nutrition.kcal} • ${nutrition.protein}`;
+  try{
+    if(navigator.share){
+      await navigator.share({title:"Yemek Önerisi",text});
+    }else if(navigator.clipboard){
+      await navigator.clipboard.writeText(text);
+      toast("Öneri kopyalandı");
+    }else{
+      toast("Paylaşım bu tarayıcıda desteklenmiyor");
+    }
+  }catch(e){
+    if(e && e.name!=="AbortError") toast("Paylaşım başlatılamadı");
+  }
+};
 
 
 $("repeatWeeks").value=String(repeatWeeks);
@@ -589,6 +624,22 @@ $("repeatWeeks").onchange=()=>{
   toast("Tekrar engelleme: "+repeatWeeks+" hafta");
 };
 
+$("recipeVideoBtn").onclick=()=>{
+  const food=$("lastFood").textContent.trim();
+  if(!food || food==="—" || food==="Çark dönüyor…"){
+    toast("Önce çarktan bir yemek seç");
+    return;
+  }
+  const url=openRecipeVideo(food);
+  const a=document.createElement("a");
+  a.href=url;
+  a.target="_blank";
+  a.rel="noopener noreferrer";
+  a.style.display="none";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>a.remove(),1000);
+};
 $("addBtn").onclick=()=>{ const v=$("foodInput").value.trim(); if(v){addFoods([v]);$("foodInput").value="";} };
 $("foodInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("addBtn").click()});
 $("bulkBtn").onclick=()=>{addFoods($("bulkInput").value.split(/\n|,/));$("bulkInput").value=""};
@@ -637,11 +688,71 @@ $("waitingFoodsTabBtn").onclick=()=>{
   $("waitingFoodsArrow").textContent=p.classList.contains("open")?"−":"＋";
 };
 
-document.querySelectorAll("[data-category]").forEach(el=>el.addEventListener("click",()=>{
-  document.querySelectorAll("[data-category]").forEach(x=>x.classList.remove("active"));
-  el.classList.add("active");
-  loadSelectedCategory(el.dataset.category);
-}));
+function cleanRecipeSearchName(food){
+  let name=String(food||"")
+    .replace(/\s*\(\s*\d+(?:[.,]\d+)?\s*kcal[\s\S]*?\)\s*$/i,"")
+    .replace(/\s*\(\s*\d+(?:[.,]\d+)?\s*kcal[\s\S]*$/i,"")
+    .replace(/\s*[—–-]\s*.*/,"")
+    .trim();
+
+  // Bowl / protein / mix gibi uygulama isimlerini aramadan çıkar.
+  // Ama pişirme yöntemi ve ana proteini koru.
+  name=name
+    .replace(/\bprotein\b/gi,"")
+    .replace(/\bpower\s*bowl\b/gi,"")
+    .replace(/\bprotein\s*bowl\b/gi,"")
+    .replace(/\bbowl\b/gi,"")
+    .replace(/\bmix\b/gi,"")
+    .replace(/\bmenü\b/gi,"")
+    .replace(/\s+/g," ")
+    .trim();
+
+  const words=name.split(/\s+/).filter(Boolean);
+  const method=/\b(ızgara|fırında|haşlanmış|sote|rosto|şiş|tava|kavurma)\b/i;
+  const proteins=/\b(dana|ciğer|tavuk|somon|levrek|çipura|köfte|bonfile|hindi|ton balığı|alabalık|palamut|uskumru|mezgit|sardalya)\b/i;
+
+  const methodWord=words.find(w=>method.test(w)) || "";
+  const proteinWords=[];
+  for(const w of words){
+    if(proteins.test(w) && !proteinWords.includes(w)) proteinWords.push(w);
+  }
+
+  // En azından ana pişirme yöntemi + ana proteini kullan.
+  if(methodWord && proteinWords.length){
+    return [methodWord,...proteinWords].join(" ");
+  }
+  if(proteinWords.length){
+    return proteinWords.slice(0,2).join(" ");
+  }
+  return name;
+}
+function recipeVideoUrl(food){
+  const raw=String(food||"").trim();
+  if(RECIPE_VIDEOS[raw]) return RECIPE_VIDEOS[raw];
+  const clean=cleanRecipeSearchName(raw);
+  if(RECIPE_VIDEOS[clean]) return RECIPE_VIDEOS[clean];
+  return "";
+}
+function youtubeRecipeSearchUrl(food){
+  const clean=cleanRecipeSearchName(food);
+  return "https://www.youtube.com/results?search_query="+encodeURIComponent(clean+" tarifi yapılışı");
+}
+function openRecipeVideo(food){
+  const exact=recipeVideoUrl(food);
+  const url=exact || youtubeRecipeSearchUrl(food);
+  return url;
+}
+function updateRecipeVideoButton(){
+  const btn=$("recipeVideoBtn");
+  if(!btn)return;
+  const food=$("lastFood") ? $("lastFood").textContent.trim() : "";
+  const hasFood=!!food && food!=="—" && food!=="Çark dönüyor…";
+  btn.hidden=!hasFood;
+  btn.style.display=hasFood ? "block" : "none";
+  btn.textContent=hasFood
+    ? (recipeVideoUrl(food) ? "▶️ Yapılış Videosunu İzle" : "🔎 YouTube'da Yapılışını Ara")
+    : "";
+}
 function render(){
   $("foodCount").textContent=foods.length;
   if($("waitingFoodsCount")) $("waitingFoodsCount").textContent=foods.length; if($("repeatWeeks")) $("repeatWeeks").value=String(repeatWeeks);
@@ -677,8 +788,10 @@ function render(){
   renderHistory();
 
   const next=schedule.findIndex(x=>!x);
+  const hasFood=!!shownFood && shownFood!=="—" && shownFood!=="Çark dönüyor…";
+  updateRecipeVideoButton();
   if(spinMode==="day"){
-    $("status").textContent=`${days[activeDay]} için çark hazır.`;
+  $("status").textContent=`${days[activeDay]} için çark hazır.`;
     $("spinBtn").disabled=foods.length===0 || spinning || autoWeek;
   }else{
     $("status").textContent = next===-1 ? "🎉 Haftanın 7 günü tamamlandı!" :
@@ -763,7 +876,8 @@ function escapeHtml(s){
 }
 
 function drawWheel(){
-  const wheelFoods=getAvailableFoods();
+  // Canvas'ta gösterilen liste ile kura listesi her zaman birebir aynı olmalı.
+  const wheelFoods=getSpinFoods();
   const n=wheelFoods.length;
   ctx.clearRect(0,0,700,700);
   const cx=350,cy=350,r=330;
@@ -860,7 +974,7 @@ function nutritionNumbers(food){
   const n=parseNutrition(food);
   const kcal=parseFloat(String(n.kcal).replace(/[^\d.]/g,"")) || 0;
   const protein=parseFloat(String(n.protein).replace(/[^\d.]/g,"")) || 0;
-  return {kcal,protein};
+  return {kcal:Number.isFinite(kcal)?kcal:0,protein:Number.isFinite(protein)?protein:0};
 }
 function mealTarget(){
   if(!calorieProfile) return null;
@@ -902,23 +1016,68 @@ function categoryFitScore(food){
 function getTargetedFoods(){
   if(!foods.length) return [];
   const t=mealTarget();
-  const pool=foods.filter(f=>!schedule.some((x,i)=>i!==activeDay && x===f));
-  const source=pool.length?pool:foods.slice();
+  const recentPool=getAvailableFoods();
+  const pool=recentPool.filter(f=>!schedule.some((x,i)=>i!==activeDay && x===f));
+  const source=pool.length ? pool : (recentPool.length ? recentPool : foods.slice());
   if(!t) return source.slice();
+
+  const kcalWeight=calorieProfile.goal==="gain" ? 0.50 : 0.55;
+  const proteinWeight=(calorieProfile.goal==="gain" || calorieProfile.goal==="recomp") ? 0.30 : 0.25;
+  const categoryWeight=1-kcalWeight-proteinWeight;
+  const fitValues=source.map(categoryFitScore);
+  const maxFit=Math.max(1,...fitValues);
+
   return source.slice().sort((a,b)=>{
     const A=nutritionNumbers(a), B=nutritionNumbers(b);
-    const kcalWeight=(calorieProfile.goal==="gain")?0.45:0.60;
-    const proteinWeight=(calorieProfile.goal==="gain" || calorieProfile.goal==="recomp")?0.40:0.25;
-    const categoryWeight=1-kcalWeight-proteinWeight;
-    const da=Math.abs(A.kcal-t.kcal)/Math.max(t.kcal,1)*kcalWeight
-           +Math.abs(A.protein-t.protein)/Math.max(t.protein,1)*proteinWeight
-           -categoryFitScore(a)*categoryWeight;
-    const db=Math.abs(B.kcal-t.kcal)/Math.max(t.kcal,1)*kcalWeight
-           +Math.abs(B.protein-t.protein)/Math.max(t.protein,1)*proteinWeight
-           -categoryFitScore(b)*categoryWeight;
+    const aKcalErr=Math.abs(A.kcal-t.kcal)/Math.max(t.kcal,1);
+    const bKcalErr=Math.abs(B.kcal-t.kcal)/Math.max(t.kcal,1);
+    const aProteinErr=Math.abs(A.protein-t.protein)/Math.max(t.protein,1);
+    const bProteinErr=Math.abs(B.protein-t.protein)/Math.max(t.protein,1);
+    const aFit=categoryFitScore(a)/maxFit, bFit=categoryFitScore(b)/maxFit;
+    const da=aKcalErr*kcalWeight + aProteinErr*proteinWeight + (1-aFit)*categoryWeight;
+    const db=bKcalErr*kcalWeight + bProteinErr*proteinWeight + (1-bFit)*categoryWeight;
     return da-db;
   });
 }
+
+function getSpinFoods(){
+  // Tek kaynak liste: hem çark hem kura bunu kullanır.
+  return getTargetedFoods();
+}
+
+function pickWinnerIndex(list){
+  if(!list.length) return -1;
+  if(!calorieProfile) return Math.floor(Math.random()*list.length);
+
+  const t=mealTarget();
+  if(!t) return Math.floor(Math.random()*list.length);
+
+  const kcalWeight=calorieProfile.goal==="gain" ? 0.50 : 0.55;
+  const proteinWeight=(calorieProfile.goal==="gain" || calorieProfile.goal==="recomp") ? 0.30 : 0.25;
+  const categoryWeight=1-kcalWeight-proteinWeight;
+  const fits=list.map(categoryFitScore);
+  const maxFit=Math.max(1,...fits);
+
+  const weights=list.map((food,i)=>{
+    const n=nutritionNumbers(food);
+    const kcalErr=Math.abs(n.kcal-t.kcal)/Math.max(t.kcal,1);
+    const proteinErr=Math.abs(n.protein-t.protein)/Math.max(t.protein,1);
+    const fit=fits[i]/maxFit;
+    const score=kcalErr*kcalWeight + proteinErr*proteinWeight + (1-fit)*categoryWeight;
+    // Hedefe yakın yemekler daha olasıdır; seçim yine de rastgeledir.
+    return Math.exp(-score*4);
+  });
+
+  const total=weights.reduce((a,b)=>a+b,0);
+  if(!Number.isFinite(total) || total<=0) return Math.floor(Math.random()*list.length);
+  let r=Math.random()*total;
+  for(let i=0;i<weights.length;i++){
+    r-=weights[i];
+    if(r<=0) return i;
+  }
+  return weights.length-1;
+}
+
 function calculateTargets(){
   const sex=$("pSex").value;
   const age=Number($("pAge").value), weight=Number($("pWeight").value), height=Number($("pHeight").value);
@@ -965,8 +1124,7 @@ function spinWeek(){
   const day=schedule.findIndex(x=>!x);
   if(day<0){autoWeek=false;toast("Hafta tamamlandı");return}
 
-  const ranked=getTargetedFoods();
-  const available=ranked.length?ranked:getAvailableFoods();
+  const available=getSpinFoods();
   if(available.length===0){autoWeek=false;toast("Çarkta uygun yemek kalmadı");return}
   if(day===0 && available.length<7){
     autoWeek=false;toast("İlk dönüş için en az 7 uygun yemek gerekli");return;
@@ -977,19 +1135,20 @@ function spinWeek(){
   $("undoBtn").disabled=true;
   $("status").textContent=days[day]+" seçiliyor… 🎡";
   $("lastFood").textContent="Çark dönüyor…";
+   updateRecipeVideoButton();
    if($("lastCalories")) $("lastCalories").textContent="--- kcal";
    if($("lastProtein")) $("lastProtein").textContent="--- g";
 
   const n=available.length, slice=2*Math.PI/n;
-  const winner=Math.floor(Math.random()*n);
+  const winner=pickWinnerIndex(available);
   // Seçilen yemeği indeks değil, dönüş başında sabitlenen değer olarak taşı.
   // Böylece liste sonradan değişse bile okta görünen yemek ile sonuç aynı kalır.
   const winnerFood=available[winner];
 
   // Ok, çarkın üstündeki sabit göstergenin (pointer) baktığı noktayı
-  // sektörün tam merkezine kilitliyoruz. Canvas dönüşü nedeniyle merkez
-  // açısı +PI/2 değil -PI/2 referansında hesaplanır.
-  const targetBase = Math.PI/2 - (winner+0.5)*slice;
+  // sektörün tam merkezine kilitliyoruz. Çizimde ilk sektör -PI/2
+  // açısından başladığı için hedef merkez doğrudan -(winner+0.5)*slice olur.
+  const targetBase = -(winner+0.5)*slice;
   let delta = targetBase - rotation;
   delta = ((delta%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
   delta += (6 + Math.floor(Math.random()*3))*2*Math.PI;
@@ -1022,8 +1181,7 @@ function spinDay(){
   if(spinning)return;
   if(!selectedCategory){toast("Önce beslenme tarzını seç!");return;}
 
-  const ranked=getTargetedFoods();
-  const available=ranked.length?ranked:getAvailableFoods();
+  const available=getSpinFoods();
   if(available.length===0){toast("Çarkta uygun yemek kalmadı");return;}
 
   const day=activeDay;
@@ -1033,13 +1191,14 @@ function spinDay(){
   $("undoBtn").disabled=true;
   $("status").textContent=days[day]+" için öneri seçiliyor… 🎡";
   $("lastFood").textContent="Çark dönüyor…";
+  updateRecipeVideoButton();
   if($("lastCalories")) $("lastCalories").textContent="--- kcal";
   if($("lastProtein")) $("lastProtein").textContent="--- g";
 
   const n=available.length, slice=2*Math.PI/n;
-  const winner=Math.floor(Math.random()*n);
+  const winner=pickWinnerIndex(available);
   const winnerFood=available[winner];
-  const targetBase=Math.PI/2-(winner+0.5)*slice;
+  const targetBase=-(winner+0.5)*slice;
   let delta=targetBase-rotation;
   delta=((delta%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
   delta+=(6+Math.floor(Math.random()*3))*2*Math.PI;
@@ -1072,6 +1231,7 @@ function finishSpin(day,food){
   if($("lastCalories")) $("lastCalories").textContent=nutrition.kcal;
   if($("lastProtein")) $("lastProtein").textContent=nutrition.protein;
   if($("lastCategory")) $("lastCategory").textContent=categoryLabel(selectedCategory);
+  updateRecipeVideoButton();
   $("status").textContent=`🎉 ${days[day]}: ${food}`;
   spinning=false;
   $("undoBtn").disabled=false;
@@ -1139,7 +1299,7 @@ function createMenuImage(){
   x.fillText("🍽️ HAFTALIK YEMEK MENÜSÜ",w/2,78);
   x.fillStyle="#c4b5fd";
   x.font="700 22px system-ui";
-  x.fillText("🎡 Haftalık Yemek Çarkı"+(selectedCategory?" • "+$("categorySelect").selectedOptions[0].textContent:""),w/2,116);
+  x.fillText("🎡 Haftalık Yemek Çarkı"+(selectedCategory?" • "+categoryLabel(selectedCategory):""),w/2,116);
 
   // Menü kartları
   const left=55, top=155, rowH=111, cardW=w-110;
