@@ -433,7 +433,7 @@
       <button class="mrow" onclick="openVersions()"><i>ℹ️</i><span>Sürüm notları</span><em class="appVer"></em></button>
       <button class="mrow" onclick="logout()"><i>⏻</i><span style="color:var(--red)">Çıkış yap</span><em></em></button>
     </div>
-    <p class="note" id="note">Manifesto Bank <span class="appVer"></span> · hayali bir kurumdur</p>
+    <p class="note" id="note">Manifesto Bank <span class="appVer"></span> · hayali bir kurumdur · Veriler bu cihazın tarayıcısına otomatik kaydedilir.</p>
   </div>
 </section>
 
@@ -551,6 +551,10 @@ function apply(d){
   S.tx.forEach(x=>{if(!x.id)x.id=uid()});
 }
 function save(){if(!canSave)return;try{localStorage.setItem(KEY,JSON.stringify(payload()))}catch(e){}}
+// Telefon veya bilgisayarda sayfa arka plana alındığında/kapatıldığında son durumu da kaydet.
+window.addEventListener('pagehide',save);
+window.addEventListener('beforeunload',save);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')save()});
 S.cards=[defCard()];
 let hadData=false;
 function load(){if(!canSave)return;try{const r=localStorage.getItem(KEY);if(r){hadData=true;apply(JSON.parse(r))}}catch(e){}}
