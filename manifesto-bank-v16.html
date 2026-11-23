@@ -274,7 +274,7 @@
     <label class="f">Hitap</label><select class="in" id="rHitap"><option>Bey</option><option>Hanım</option><option value="">Hitapsız (ad soyad)</option></select>
     <label class="f">Giriş şifresi (4 rakam)</label><input class="in" id="rP1" type="password" inputmode="numeric" maxlength="4" autocomplete="new-password">
     <label class="f">Şifre tekrar</label><input class="in" id="rP2" type="password" inputmode="numeric" maxlength="4" autocomplete="new-password">
-    <label class="f">Başlangıç bakiyesi (TL)</label><input class="in" id="rBal" inputmode="decimal" value="100.000.000">
+    <label class="f">Başlangıç bakiyesi (TL)</label><input class="in" id="rBal" inputmode="decimal" value="0">
     <div class="ferr" id="rErr"></div>
     <button class="btn" onclick="register()">Hesabı Oluştur</button>
   </div>
@@ -487,16 +487,11 @@ const plTxt=(pl,pc)=>(pl>=0?'+':'−')+fmt(Math.abs(pl))+' TL (%'+Math.abs(pc).t
 
 /* ---------- DURUM ---------- */
 const S={
-  bal:100000000, vadeli:0, usd:0, hold:{}, pin:'2960', hidden:false, user:null,
+  // Her cihaz/tarayıcı profili kendi hesabını yerel olarak oluşturur.
+  bal:0, vadeli:0, usd:0, hold:{}, pin:'', hidden:false, user:null,
   notif:[], goals:[], loans:[], loanDone:0, cards:null, flex:{limit:1000000}, subs:[], mute:false, payees:[], income:[], badges:{},
   theme:'night', noFs:false, deps:[], mktOrder:[], mktHidden:[], fz:1, orders:[], alarms:[], lockMin:3, lastAcc:Date.now(), accPend:0,
-  tx:[
-    {ic:'⬇',t:'Gelen Havale',d:'22 Kasım 2026 14:12',ts:+new Date(2026,10,22,14,12),a:100000000},
-    {ic:'☕',t:'Kafe Manifesto',d:'21 Kasım 2026 09:40',ts:+new Date(2026,10,21,9,40),a:-145},
-    {ic:'⛽',t:'Akaryakıt',d:'20 Kasım 2026 18:05',ts:+new Date(2026,10,20,18,5),a:-2350},
-    {ic:'💡',t:'Elektrik Faturası',d:'18 Kasım 2026 10:22',ts:+new Date(2026,10,18,10,22),a:-1180.40},
-    {ic:'⬆',t:'Giden FAST',d:'15 Kasım 2026 16:48',ts:+new Date(2026,10,15,16,48),a:-5000}
-  ]
+  tx:[]
 };
 const ASSETS=[
   {id:'altin',ad:'Gram Altın',br:'gr',f:5757,real:1},
@@ -527,7 +522,7 @@ function addTx(ic,t,a,s,ex){S.tx.unshift(Object.assign({id:uid(),ic,t,d:now(),ts
 /* ---------- KAYIT ----------
    Aynı anahtar her sürümde kullanılır: yeni HTML açılınca eski veriler okunur.
    Ayrıca Menü > Yedekle ile veriler dosyaya/koda alınıp başka sürüme aktarılabilir. */
-const KEY='manifestoBank_v1';
+const KEY='manifestoBank_device_v2';
 let canSave=false;
 try{localStorage.setItem('_t','1');canSave=localStorage.getItem('_t')==='1';localStorage.removeItem('_t')}catch(e){}
 function payload(){return{v:4,appVer:APP_VER,user:S.user,notif:S.notif,goals:S.goals,loans:S.loans,loanDone:S.loanDone,cards:S.cards,flex:S.flex,subs:S.subs,mute:S.mute,orders:S.orders,alarms:S.alarms,lockMin:S.lockMin,iosHint:S.iosHint,deps:S.deps,mktOrder:S.mktOrder,mktHidden:S.mktHidden,fz:S.fz,ph:ASSETS.map(a=>[a.id,a.days,!!a.daysReal]),payees:S.payees,
@@ -551,13 +546,15 @@ function apply(d){
   S.tx.forEach(x=>{if(!x.id)x.id=uid()});
 }
 function save(){if(!canSave)return;try{localStorage.setItem(KEY,JSON.stringify(payload()))}catch(e){}}
+// Sekme kapanırken/arka plana geçerken son durumu da güvenceye al.
+window.addEventListener('pagehide',save);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')save()});
 // Telefon veya bilgisayarda sayfa arka plana alındığında/kapatıldığında son durumu da kaydet.
 window.addEventListener('pagehide',save);
 window.addEventListener('beforeunload',save);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')save()});
 S.cards=[defCard()];
-let hadData=false;
-function load(){if(!canSave)return;try{const r=localStorage.getItem(KEY);if(r){hadData=true;apply(JSON.parse(r))}}catch(e){}}
+function load(){if(!canSave)return;try{const r=localStorage.getItem(KEY);if(r)apply(JSON.parse(r))}catch(e){}}
 load();
 // eski kayıtlarda kullanıcı yoksa veriler kaybolmasın: Hikmet Bey olarak devam
 if(!S.cards||!S.cards.length)S.cards=[defCard()];
