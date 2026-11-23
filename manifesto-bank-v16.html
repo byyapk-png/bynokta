@@ -559,7 +559,7 @@ if(!S.cards||!S.cards.length)S.cards=[defCard()];
   S.alarms=S.alarms.filter(x=>x.id!==id)});
 S.alarms=S.alarms.filter(x=>ASSETS.some(a=>a.id===x.id));
 function fullName(){const u=S.user||{ad:'Müşteri',soyad:'',hitap:''};return (u.ad+' '+(u.soyad||'')).trim()}
-function shortName(){const u=S.user||{ad:'Hikmet',soyad:'',hitap:'Bey'};return u.hitap?u.ad+' '+u.hitap:fullName()}
+function shortName(){const u=S.user||{ad:'Müşteri',soyad:'',hitap:''};return u.hitap?u.ad+' '+u.hitap:fullName()}
 function applyUser(){
   const u=S.user||{ad:'Müşteri',soyad:''};
   const ini=((u.ad[0]||'')+((u.soyad||'')[0]||(u.hitap||'')[0]||(u.ad[1]||''))).toLocaleUpperCase('tr');
@@ -1198,7 +1198,7 @@ function cardHTML(c,i,big){
     <div class="bot"><span>${esc(cardName())}</span><span>${c.skt}</span></div>
     <span class="tag">${c.donuk?'DONDURULDU':c.tip==='Sanal'?'SANAL':'FİZİKSEL'}</span></div>`;
 }
-function cardName(){const u=S.user||{ad:'Hikmet',soyad:'',hitap:'Bey'};return ((u.soyad?fullName():shortName())).toLocaleUpperCase('tr')}
+function cardName(){const u=S.user||{ad:'Müşteri',soyad:'',hitap:''};return ((u.soyad?fullName():shortName())).toLocaleUpperCase('tr')}
 let cardShow=false;
 function renderCards(){
   $('ccs').innerHTML=S.cards.map((c,i)=>cardHTML(c,i)).join('')+`<div class="cc add" onclick="openNewCard()"><div style="font-size:30px">＋</div>Yeni Kart Oluştur</div>`;
