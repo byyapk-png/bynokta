@@ -269,7 +269,7 @@
     <div class="logo"><div class="mark">M</div><div class="brand">Manifesto Bank<small>DİJİTAL ŞUBE</small></div></div>
     <h1 style="text-align:center">Hesap Oluştur</h1>
     <p class="sub" style="text-align:center;margin-bottom:8px">İlk kullanım için bilgilerinizi girin</p>
-    <label class="f">Adınız</label><input class="in" id="rAd" placeholder="Örn. Hikmet" maxlength="30" autocomplete="given-name">
+    <label class="f">Adınız</label><input class="in" id="rAd" placeholder="Örn. Ahmet" maxlength="30" autocomplete="given-name">
     <label class="f">Soyadınız</label><input class="in" id="rSoyad" placeholder="Örn. Yılmaz" maxlength="30" autocomplete="family-name">
     <label class="f">Hitap</label><select class="in" id="rHitap"><option>Bey</option><option>Hanım</option><option value="">Hitapsız (ad soyad)</option></select>
     <label class="f">Giriş şifresi (4 rakam)</label><input class="in" id="rP1" type="password" inputmode="numeric" maxlength="4" autocomplete="new-password">
@@ -285,7 +285,7 @@
   <div class="card" id="card">
     <div class="logo"><div class="mark">M</div><div class="brand">Manifesto Bank<small>DİJİTAL ŞUBE</small></div></div>
     <div class="avatar">HB</div>
-    <h1>Hoş geldiniz <span class="uName">Hikmet Bey</span></h1>
+    <h1>Hoş geldiniz <span class="uName">Müşterimiz</span></h1>
     <p class="sub">Devam etmek için 4 haneli şifrenizi girin</p>
     <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
     <div class="err" id="err"></div>
@@ -301,7 +301,7 @@
   <!-- ANA SAYFA -->
   <div class="page on" id="pg-home">
     <header>
-      <div class="who"><div class="avatar">HB</div><div><b class="uName">Hikmet Bey</b><span id="greet">İyi akşamlar</span></div></div>
+      <div class="who"><div class="avatar">HB</div><div><b class="uName">Müşterimiz</b><span id="greet">İyi akşamlar</span></div></div>
       <button class="iconbtn" onclick="openNotif()" aria-label="Bildirimler" style="position:relative"><svg class="i" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="nbadge" id="nbadge"></span></button>
     </header>
     <div class="hero">
@@ -392,7 +392,7 @@
     <header><div class="ptitle">Menü</div></header>
     <div class="box" style="display:flex;align-items:center;gap:14px">
       <div class="avatar" style="width:56px;height:56px;font-size:22px;margin:0">HB</div>
-      <div><b style="font-size:17px" class="uFull">Hikmet Bey</b><div style="font-size:12px;color:var(--mut)">Manifesto Private · Müşteri No 4471209</div></div>
+      <div><b style="font-size:17px" class="uFull">Müşterimiz</b><div style="font-size:12px;color:var(--mut)">Manifesto Private · Müşteri No 4471209</div></div>
     </div>
     <div class="box">
       <h3>Kartlarım <a onclick="openNewCard()">+ Yeni kart</a></h3>
@@ -546,9 +546,6 @@ function apply(d){
   S.tx.forEach(x=>{if(!x.id)x.id=uid()});
 }
 function save(){if(!canSave)return;try{localStorage.setItem(KEY,JSON.stringify(payload()))}catch(e){}}
-// Sekme kapanırken/arka plana geçerken son durumu da güvenceye al.
-window.addEventListener('pagehide',save);
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')save()});
 // Telefon veya bilgisayarda sayfa arka plana alındığında/kapatıldığında son durumu da kaydet.
 window.addEventListener('pagehide',save);
 window.addEventListener('beforeunload',save);
@@ -556,17 +553,15 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 S.cards=[defCard()];
 function load(){if(!canSave)return;try{const r=localStorage.getItem(KEY);if(r)apply(JSON.parse(r))}catch(e){}}
 load();
-// eski kayıtlarda kullanıcı yoksa veriler kaybolmasın: Hikmet Bey olarak devam
 if(!S.cards||!S.cards.length)S.cards=[defCard()];
 [['mhf','Manifesto Hisse Fonu'],['mpf','Manifesto Para Piyasası Fonu'],['mtf','Manifesto Teknoloji Fonu']].forEach(([id,ad])=>{const h=S.hold[id];if(!h)return;
   S.bal+=h.cost;addTx('📉',ad+' kapatıldı',h.cost,'Fon kaldırıldı, yatırılan tutar iade edildi',{c:'Yatırım'});delete S.hold[id];
   S.alarms=S.alarms.filter(x=>x.id!==id)});
 S.alarms=S.alarms.filter(x=>ASSETS.some(a=>a.id===x.id));
-if(!S.user&&hadData)S.user={ad:'Hikmet',soyad:'',hitap:'Bey'};
-function fullName(){const u=S.user||{ad:'Hikmet',soyad:'',hitap:'Bey'};return (u.ad+' '+(u.soyad||'')).trim()}
+function fullName(){const u=S.user||{ad:'Müşteri',soyad:'',hitap:''};return (u.ad+' '+(u.soyad||'')).trim()}
 function shortName(){const u=S.user||{ad:'Hikmet',soyad:'',hitap:'Bey'};return u.hitap?u.ad+' '+u.hitap:fullName()}
 function applyUser(){
-  const u=S.user||{ad:'Hikmet',soyad:''};
+  const u=S.user||{ad:'Müşteri',soyad:''};
   const ini=((u.ad[0]||'')+((u.soyad||'')[0]||(u.hitap||'')[0]||(u.ad[1]||''))).toLocaleUpperCase('tr');
   document.querySelectorAll('.avatar').forEach(e=>e.textContent=ini);
   document.querySelectorAll('.uName').forEach(e=>e.textContent=shortName());
